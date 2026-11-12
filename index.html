@@ -89,6 +89,14 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
 .dream{margin:0 0 calc(var(--s)*2px);font-size:calc(var(--s)*6.5px)}
 .ptitle.sub{margin-top:calc(var(--s)*3px);font-size:calc(var(--s)*6.5px)}
 .tasks.log li{color:#5a5040}
+.hin .ptitle{font-size:calc(var(--s)*8px);border-bottom:calc(var(--s)*1px) solid #3f6b4a;padding-bottom:calc(var(--s)*1px);margin-bottom:calc(var(--s)*2.5px)}
+.hin .ptitle.sub{font-size:calc(var(--s)*7px);color:#3f6b4a;border-bottom:calc(var(--s)*.5px) solid #3f6b4a;text-decoration:none;margin-top:calc(var(--s)*3px);margin-bottom:calc(var(--s)*1px);padding-bottom:calc(var(--s)*.5px)}
+.hin .tasks li{padding:calc(var(--s)*.5px) calc(var(--s)*2px);border-radius:calc(var(--s)*1px)}
+.hin .tasks li:nth-child(odd){background:#efe4c6}
+.hin .pr{color:#2f5a3a}
+.hin .tab2{display:flex;gap:calc(var(--s)*2px);margin-bottom:calc(var(--s)*2px)}
+.hin .tab2 span{padding:0 calc(var(--s)*3px);border-radius:calc(var(--s)*1px);color:#6a5f4c;border:calc(var(--s)*.5px) solid #c9b98f}
+.hin .tab2 span.on{background:#3f6b4a;color:#f6efdc;border-color:#3f6b4a}
 /* title */
 #title{position:absolute;inset:0;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:linear-gradient(180deg,rgba(20,30,24,.15),rgba(20,30,24,.75) 70%)}
@@ -289,7 +297,7 @@ function buildVillage(){const W=20,H=12,G=[],O=[];
   for(let y=0;y<=8;y++)G[y][10]='p';for(let x=8;x<=17;x++)G[8][x]='p';for(let x=3;x<=9;x++)G[6][x]='p';
   O.push({k:'shop',x:15,y:5,w:4,h:3},{k:'house2',x:1,y:1,w:5,h:4},{k:'mailbox',x:6,y:4,w:1,h:1},{k:'bench',x:12,y:9,w:2,h:1},
     {k:'vsign',x:11,y:1,w:1,h:1},{k:'bush',x:7,y:7,w:1,h:1},{k:'rock',x:4,y:7,w:1,h:1},{k:'raimo',x:5,y:5,w:1,h:1},
-    {k:'lamp',x:9,y:7,w:1,h:1},{k:'pyora',x:14,y:7,w:1,h:1},{k:'maito',x:8,y:4,w:1,h:1});
+    {k:'lamp',x:9,y:7,w:1,h:1},{k:'pyora',x:12,y:7,w:1,h:1},{k:'maito',x:14,y:7,w:1,h:1});
   const tree=(x,y)=>{if(G[y][x]==='p')return;if(O.some(o=>x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h))return;
     O.push({k:'tree',x,y,w:1,h:1,v:hash(x,y,19)<.5?'koivu':'kuusi'});G[y][x]='g';};
   for(let x=0;x<W;x++)if(x!==10)tree(x,0);
@@ -1123,14 +1131,15 @@ $('#panel').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='pan
 let hinPage=0;
 function openHinnasto(pg){hinPage=pg||0;renderHinnasto();}
 function renderHinnasto(){let h;
-  if(hinPage===0){h='<div class="ptitle">Hinnasto · Kyläkaupan hinnat</div><div class="ptitle sub">Kaupassa myytävänä</div><ul class="tasks">'+
+  const tabs='<div class="tab2"><span class="'+(hinPage===0?'on':'')+'">Kaupan hinnat</span><span class="'+(hinPage===1?'on':'')+'">Haaveostokset</span></div>';
+  if(hinPage===0){h='<div class="ptitle">Hinnasto</div>'+tabs+'<div class="ptitle sub">Kaupassa myytävänä</div><ul class="tasks">'+
       SHOP_BUY.map(it=>'<li><span style="flex:1">'+it.n+'</span><span class="pr">'+it.p+' mk</span></li>').join('')+'</ul>'+
       '<div class="ptitle sub">Kauppias maksaa sadosta</div><ul class="tasks">'+SHOP_SELL.map(it=>'<li><span style="flex:1">'+it.n+'</span><span class="pr">'+it.p+' mk</span></li>').join('')+'</ul>'+
       '<div class="foot">Sinulla '+S.money+' mk · ▶ haaveostokset · B sulje</div>';}
-  else{h='<div class="ptitle">Hinnasto · Haaveostokset</div><ul class="tasks">'+DREAMS.map(d=>'<li style="display:block"><div style="display:flex"><span style="flex:1"><b>'+d.n+'</b></span><span class="pr">'+d.p.toLocaleString('fi-FI')+' mk</span></div>'+
+  else{h='<div class="ptitle">Hinnasto</div>'+tabs+'<div class="ptitle sub">Haaveostokset</div><ul class="tasks">'+DREAMS.map(d=>'<li style="display:block"><div style="display:flex"><span style="flex:1"><b>'+d.n+'</b></span><span class="pr">'+d.p.toLocaleString('fi-FI')+' mk</span></div>'+
       '<small style="display:block;color:#7a6f5a">'+d.d+' Avautuu myöhemmin.'+(d.vihko?' A = mökkivihko: Haave omasta rannasta':'')+'</small><div class="bar"><i style="width:'+Math.min(100,S.money/d.p*100)+'%"></i></div></li>').join('')+'</ul>'+
       '<div class="foot">Sinulla '+S.money+' mk · ◀ kaupan hinnat · B sulje</div>';}
-  showPanel(h,'hinnasto');}
+  showPanel('<div class="hin">'+h+'</div>','hinnasto');}
 function showTasks(p){vihkoPage=p||0;renderVihko();}
 function vihkoPages(){return raimoState().st>0?3:2;}
 function renderVihko(){const done=TASKS.filter(t=>S.tasks[t[0]]).length;let h;
