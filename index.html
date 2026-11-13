@@ -182,7 +182,7 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.15</div>
+        <div class="sub">mummon mökki · versio 0.16</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -343,9 +343,11 @@ function buildRaimo(){const W=14,H=11,G=[],O=[];
   for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push(hash(x,y,57)<0.12?'f':'g');}
   const PATH=[[6,5],[7,6],[8,6],[9,6],[10,6],[11,6],[12,6],[13,6],[6,6],[5,6],[4,6],[3,6],[2,6],[2,5],[2,4],[2,3],[2,2],[2,1],[2,0]];
   for(const [x,y] of PATH)G[y][x]='p';G[6][13]='x';
-  O.push({k:'house2',x:4,y:1,w:5,h:4},{k:'raimo',x:11,y:5,w:1,h:1},{k:'aita',x:10,y:5,w:1,h:1},
+  O.push({k:'house2',x:4,y:1,w:5,h:4},{k:'raimo',x:7,y:5,w:1,h:1},
     {k:'palju',x:9,y:4,w:2,h:1},{k:'mopo',x:3,y:4,w:1,h:1},{k:'tsauna',x:10,y:2,w:2,h:1},
-    {k:'rhalot',x:12,y:3,w:1,h:1},{k:'stump',x:4,y:8,w:1,h:1},{k:'rock',x:9,y:8,w:1,h:1});
+    {k:'rhalot',x:12,y:3,w:1,h:1},{k:'stump',x:3,y:5,w:1,h:1});
+  for(let x=2;x<=12;x++)O.push({k:'aita',x,y:7,w:1,h:1});
+  for(const y of [4,5])O.push({k:'aitaV',x:12,y,w:1,h:1});
   const tree=(x,y,v)=>{if(G[y][x]==='p'||G[y][x]==='x')return;if(O.some(o=>x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h))return;
     O.push({k:'tree',x,y,w:1,h:1,v:v||(hash(x,y,59)<.5?'koivu':'kuusi')});G[y][x]='g';};
   for(let x=0;x<W;x++){tree(x,0,x<5?'kuusi':null);tree(x,H-1);}
@@ -535,6 +537,9 @@ function makeBush(berries){return outlined(52,44,g=>{const CL=[[26,24,16,13],[13
 function makeAita(){return outlined(38,30,g=>{const C=['#8a9a94','#b8c4bc','#dfe6de','#f2f4ee'];
   R(g,0,12,38,3,C[1]);R(g,0,12,38,1,C[3]);R(g,0,21,38,3,C[1]);R(g,0,21,38,1,C[2]);
   for(let x=2;x<38;x+=9){R(g,x,4,5,24,C[2]);R(g,x,4,1,24,C[3]);R(g,x+4,4,1,24,C[0]);P(g,x+2,3,C[2]);R(g,x+1,3,3,1,C[2]);R(g,x+2,2,1,1,C[3]);R(g,x,26,5,2,'#6a5a48');}});}
+function makeAitaV(){return outlined(14,52,g=>{const C=['#8a9a94','#b8c4bc','#dfe6de','#f2f4ee'];
+  for(let y=0;y<44;y+=6){R(g,4,y+2,6,16,C[2]);R(g,4,y+2,1,16,C[3]);R(g,9,y+2,1,16,C[0]);R(g,5,y+1,4,1,C[2]);P(g,6,y,C[3]);P(g,7,y,C[2]);R(g,4,y+17,6,1,C[0]);}
+  R(g,2,14,10,2,C[1]);R(g,2,14,10,1,C[3]);R(g,2,36,10,2,C[1]);R(g,2,36,10,1,C[3]);R(g,4,49,6,3,'#6a5a48');});}
 function makeMossRock(){const c=makeRock(),g=c.getContext('2d');const M=['#3a6a34','#4e8a3e','#6aa84c','#8cc460'];
   for(let i=0;i<220;i++){const x=Math.floor(hash(i,3,93)*c.width),y=Math.floor(hash(i,4,93)*c.height);if(y>c.height*.62)continue;
     const d=g.getImageData(x,y,1,1).data;if(d[3]<200||(d[0]<40&&d[1]<40))continue;P(g,x,y,M[Math.floor(hash(i,5,93)*4)]);}
@@ -582,16 +587,23 @@ function makePalju(){return outlined(66,52,g=>{const cx=36;
   for(let y=9;y<=24;y++){const q=1-((y-16)*(y-16))/(9.5*9.5);if(q<0)continue;const w=Math.round(26*Math.sqrt(q));R(g,cx+2,y,Math.max(0,w-2),1,(y%3===0)?WOOD[3]:WOOD[4]);}
   R(g,cx+1,8,2,17,WOOD[1]);R(g,cx+12,13,6,2,WOOD[1]);
   R(g,0,36,14,12,WOOD[3]);R(g,0,36,14,2,WOOD[5]);R(g,0,41,14,1,WOOD[1]);R(g,0,47,14,1,WOOD[0]);R(g,1,38,1,9,WOOD[2]);R(g,12,38,1,9,WOOD[1]);});}
-function makeMopo(){return outlined(48,42,g=>{const O=['#9a5a32','#bf7444','#d58c58','#e6a876'];
-  for(const wx of [10,37]){ell(g,wx,33,7,7,'#1c1c20');ell(g,wx,33,4,4,'#3a3a40');ell(g,wx,33,2,2,'#9a9ea6');P(g,wx-1,32,'#d0d4da');}
-  ell(g,10,25,7,2,O[1]);R(g,4,25,13,1,O[0]);
-  line(g,12,30,9,10,'#3a3a40');line(g,13,30,10,10,'#55555c');
-  R(g,4,7,10,2,'#2a2a2e');R(g,3,6,3,3,'#1c1c20');ell(g,8,12,3,3,'#e8e2c8');P(g,7,11,'#ffffff');R(g,10,11,4,4,O[1]);
-  poly(g,[[12,24],[18,30],[30,30],[30,26],[16,24]],O[1]);R(g,16,28,14,2,O[0]);
-  ell(g,34,23,10,7,O[2]);ell(g,33,21,7,4,O[3]);R(g,26,27,16,3,O[1]);P(g,30,19,'#f4c49a');
-  R(g,26,14,15,5,'#1a1a1e');R(g,27,14,12,1,'#46464e');
-  R(g,39,13,8,2,'#7a7e86');R(g,39,13,8,1,'#a6aab2');R(g,44,15,1,6,'#5a5e66');
-  R(g,40,26,6,3,'#2a2a2e');P(g,46,27,'#c83a2a');});}
+function makeMopo(){return outlined(58,46,g=>{const O=['#a83814','#cc4a1c','#e65e28','#f68a52'],L=['#8e8e8a','#b4b4b0','#d8d8d2','#f0f0ea'],C=['#6a6e74','#9a9ea6','#c8ccd2','#eef0f4'];
+  const wheel=(cx,cy)=>{ell(g,cx,cy,9,9,'#18181c');ell(g,cx,cy,7,7,'#2a2a30');ell(g,cx,cy,6,6,C[1]);ell(g,cx,cy,5,5,'#3a3e44');
+    for(let a=0;a<12;a++){const t=a*Math.PI/6;line(g,cx,cy,cx+Math.round(Math.cos(t)*5),cy+Math.round(Math.sin(t)*5),C[1]);}ell(g,cx,cy,2,2,C[2]);P(g,cx-1,cy-1,C[3]);};
+  wheel(11,35);wheel(46,35);
+  for(let x=4;x<20;x++){const y=Math.round(26+Math.pow((x-11)/8,2)*3);R(g,x,y,1,3,L[2]);P(g,x,y,L[3]);}R(g,15,26,5,10,L[1]);R(g,15,26,1,10,L[3]);
+  line(g,11,35,18,12,C[1]);line(g,12,35,19,12,C[2]);line(g,13,35,20,12,C[0]);
+  line(g,18,12,14,3,C[2]);line(g,19,12,15,3,C[1]);line(g,14,3,22,2,C[2]);line(g,15,4,23,3,C[0]);R(g,21,1,6,3,'#1c1c20');R(g,9,4,5,3,'#1c1c20');line(g,14,4,10,5,C[2]);
+  ell(g,16,13,3,3,C[2]);P(g,15,12,C[3]);
+  poly(g,[[17,10],[25,10],[32,16],[33,22],[30,30],[24,30],[17,18]],O[2]);poly(g,[[24,12],[31,16],[32,21],[27,21]],O[3]);poly(g,[[17,18],[24,30],[30,30],[30,32],[22,32],[16,22]],O[1]);
+  R(g,23,17,8,3,'#f0f0ea');R(g,24,18,6,1,'#1c1c20');
+  poly(g,[[28,28],[34,24],[38,24],[38,30],[30,32]],O[1]);
+  poly(g,[[36,16],[52,16],[57,22],[56,28],[50,30],[38,30],[36,22]],O[2]);poly(g,[[38,17],[51,17],[54,21],[40,21]],O[3]);R(g,38,27,18,3,O[0]);R(g,54,20,3,4,'#d82a1a');P(g,55,20,'#ff7060');
+  R(g,36,11,15,5,'#1a1a1e');R(g,37,10,13,2,'#2e2e34');R(g,38,10,8,1,'#55555c');
+  R(g,48,12,10,2,C[2]);R(g,48,12,10,1,C[3]);line(g,50,14,46,28,C[1]);line(g,51,14,47,28,C[2]);
+  poly(g,[[22,32],[38,30],[52,32],[52,36],[38,38],[24,38],[20,35]],L[2]);R(g,24,36,28,1,L[0]);R(g,22,32,30,1,L[3]);
+  ell(g,30,37,5,4,C[1]);ell(g,30,37,3,2,C[2]);P(g,29,36,C[3]);line(g,24,39,34,38,C[1]);
+  line(g,36,38,34,45,C[0]);line(g,37,38,35,45,C[1]);});}
 function makeTynnyriSauna(){return outlined(76,82,g=>{const cx=38;
   for(let x=8;x<68;x++){const k=x-8,c=Math.floor(k/6)%2?WOOD[2]:WOOD[3];R(g,x,14,1,32,c);if(k%6===0)R(g,x,14,1,32,WOOD[1]);}
   ell(g,cx,14,30,5,WOOD[4]);for(let x=10;x<66;x+=6)R(g,x,12,1,4,WOOD[2]);
@@ -850,7 +862,7 @@ function bottomRow(c){const d=c.getContext('2d').getImageData(0,0,c.width,c.heig
 function A(c){c.bot=bottomRow(c);return c;}
 function makeSprites(){
   SPR.kuusi=[makeSpruce(1),makeSpruce(2)].map(A);SPR.koivu=[makeBirch(1),makeBirch(2)].map(A);
-  SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());SPR.aita=A(makeAita());SPR.sammalkivi=A(makeMossRock());SPR.skanto=A(makeMossStump());
+  SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());SPR.aita=A(makeAita());SPR.aitaV=A(makeAitaV());SPR.sammalkivi=A(makeMossRock());SPR.skanto=A(makeMossStump());
   SPR.rock=A(makeRock());SPR.bush=A(makeBush(true));SPR.bushTyhja=A(makeBush(false));SPR.stump=A(makeStump());SPR.lippu=[0,1,2].map(makeLippu).map(A);SPR.pyykki=[0,1].map(makePyykki).map(A);
   SPR.halot=A(makeHalot());SPR.karry=A(makeKarry());SPR.tynnyri=A(makeTynnyri());SPR.mailbox=A(makeMailbox());SPR.mpyora=A(makeBike('#2f5a46','kukat'));
   SPR.shop=A(makeShop());SPR.bench=A(makeBench());SPR.lamp=A(makeLamp());SPR.maito=A(makeMaito());SPR.puhelin=A(makePuhelin());SPR.pyora=A(makeBike('#b8443a','pulla'));
@@ -1005,7 +1017,7 @@ function rebuildGround(){groundDirty=false;if(S.scene==='tupa')return buildTupa(
           if(hash(tx,ty,163)<.5){ell(g,cx-2,cy-2,2,1,'#f6f0f4');P(g,cx-2,cy-3,'#f0b8d0');P(g,cx-2,cy-2,'#f4d35e');}}}
       else if(!(pih&&inHouse(tx,ty))){const n=5+Math.floor(hash(tx,ty,13)*6);for(let i=0;i<n;i++)tuft(g,ox+3+Math.floor(hash(tx,ty,20+i)*26),oy+5+Math.floor(hash(tx,ty,30+i)*26),i+tx);
         if(ch==='f')for(let i=0;i<4;i++)flower(g,ox+5+Math.floor(hash(tx,ty,40+i)*22),oy+6+Math.floor(hash(tx,ty,50+i)*20),Math.floor(hash(tx,ty,60+i)*4));}}
-    const LUP=pih?[[2,6,3],[16,6,2],[6,15,3],[13,15,2],[2,3,2]]:S.scene==='kyla'?[[5,8,3],[13,8,2],[17,6,2],[1,6,2],[4,5,3],[6,4,2]]:S.scene==='raimo'?[[3,9,3],[8,9,2],[12,7,2]]:[];
+    const LUP=pih?[[2,6,3],[16,6,2],[6,15,3],[13,15,2],[2,3,2]]:S.scene==='kyla'?[[5,8,3],[13,8,2],[17,6,2],[1,6,2],[4,5,3],[6,4,2]]:S.scene==='raimo'?[[3,8,3],[8,8,2],[10,8,2]]:[];
     for(const [tx,ty,n] of LUP)for(let i=0;i<n;i++)lupin(g,tx*32+6+i*8,ty*32+24,['#8a5ac8','#d070b0','#b07ad8','#f0eef4'][Math.floor(hash(tx,ty,i+200)*4)]);
     for(const o of YOBJ){if(o.k!=='tree'||o.v!=='koivu')continue;for(let i=0;i<6;i++){const x=o.x*32+Math.floor(hash(o.x,o.y,220+i)*44)-6,y=(o.y+1)*32+Math.floor(hash(o.y,o.x,230+i)*14)-10;R(g,x,y,3,2,i%2?'#e8c050':'#d0a040');P(g,x,y,'#f8e090');}}
     if(pih){for(const [mx,my] of [[2,12],[17,9],[4,3],[15,14]])for(const [a,b] of [[8,18],[16,22],[22,16]]){const x=mx*32+a,y=my*32+b;ell(g,x,y,3,1,'#e8a93a');P(g,x-1,y-1,'#f6d27a');R(g,x,y+1,1,2,'#f4d8a0');}
@@ -1447,7 +1459,7 @@ function raimoTalk(){const R=raimoState();
       R.st===2?['Raimo: "Piirakka odottaa vielä mustikoita. Metsäpolun varrella niitä kasvaa."']:['Raimo: "Vaarin saunassa oli Vattulan parhaat löylyt. Siitä puhutaan vieläkin."'];say(L[S.day%L.length]);});
   opts.push('Kysy reittiä');acts.push(()=>say('Raimo: "Sienimetsään pääset tuosta pihan laidalta. Polku jatkuu kuusten väliin."'));
   opts.push('Hei hei');acts.push(()=>{});
-  ask('Raimo nojaa aitaan.'+(has?' Vasara on sinulla lainassa.':''),opts,i=>acts[i]());}
+  ask('Raimo seisoo ovensa vieressä.'+(has?' Vasara on sinulla lainassa.':''),opts,i=>acts[i]());}
 function giveBerries(){const R=raimoState();S.inv.mustikka--;R.st=3;S.recipes=S.recipes||{};S.recipes.mustikkapiirakka=true;
   if(!R.laudat){R.laudat=true;S.inv.lautoja=(S.inv.lautoja||0)+2;}addLog('Annoin Raimolle litran mustikoita. Sain kaksi lautaa ja mustikkapiirakan reseptin.');save();
   say(['Raimo: "Kiitos! Ota nuo kaksi lautaa. Minulla ne ovat vain tiellä."','Raimo: "Ja tässä mummoni mustikkapiirakan resepti. Siinä on salainen ainesosa: kardemumma."'],()=>{toast('Sait 2 lautaa ja reseptin: Mustikkapiirakka');jingle();});}
@@ -1529,9 +1541,9 @@ function interactYard(fx,fy){
     case 'shop':if(fx===16&&fy===7)return openShop();if(fx===15&&fy===7)return openHinnasto(0);return say('Vattulan kyläkauppa. Ovi on kyltin alla.');
     case 'house2':if(isNight()){const pg=['Raimo taitaa jo nukkua.'];if((S.inv.vasara||0)>0)pg.push('Vasaran voi palauttaa aamulla. Raimo on pihalla taas seitsemästä alkaen.');return say(pg);}return say('Raimon siniharmaa lautamökki. Kuistilla on raidallinen markiisi, ja ikkunalaudalla nukkuu oranssi kissa.');
     case 'palju':return say(['Palju','Pyöreä puupalju tummin metallivantein. Kansi on puoliksi auki, ja edessä on pieni askelma.','Tällaisen voisi joskus hankkia omallekin pihalle.']);
-    case 'mopo':return say(['Mökkimopo','Haalistuneen oranssi runko, musta satula ja pieni tarakka. Mopo nojaa Raimon kuistin kaiteeseen.','Tarakalle mahtuisi maitotonkka tai kaksi kassillista kaupasta.']);
+    case 'mopo':return say(['Mökkimopo','Kirkkaan oranssi runko ja tankki, valkoiset lokasuojat, musta satula ja kromattu tarakka. Mopo seisoo Raimon kuistin vieressä.','Tarakalle mahtuisi maitotonkka tai kaksi kassillista kaupasta.']);
     case 'tsauna':return say(['Tynnyrisauna','Pyöreä puinen pääty, pieni ikkuna ja lyhyt savupiippu. Pinta tuoksuu tervalta.','Tynnyrisaunan voisi joskus pystyttää omallekin rannalle.']);
-    case 'aita':return say('Matala säleaita. Raimo on maalannut sen, mutta vain kadun puolelta.');
+    case 'aitaV':case 'aita':return say('Matala valkoinen säleaita kiertää Raimon pihaa. Raimo on maalannut sen, mutta vain polun puolelta.');
     case 'rhalot':return say('Raimon halkopino. Jokainen halko on samassa kulmassa, kuin viivoittimella.');
     case 'skanto':return say('Sammaloitunut kanto. Sen kolossa asuu joku, joka ei halua tulla häirityksi.');
     case 'sammalkivi':return say(['Sammaleinen kivi. Sammal on paksua kuin villasukka.','Kiven juurella on varjoista ja kosteaa. Hyvää sienimaata.','Kivi on lämmin auringon puolelta ja viileä varjon puolelta.','Kiven kyljessä kasvaa jäkälää, harmaata ja pehmeää.'][(o.x+o.y)%4]);
@@ -1560,7 +1572,7 @@ function interactYard(fx,fy){
   if(ch==='w')return say('Vattulanjärvi kimmeltää. Jossain tuolla on ranta, joka voi tulla myyntiin.');}
 function gameNow(){return S.day*1440+S.time;}
 function isNight(){return S.time<420||S.time>=1320;}
-function raimoOut(){return !isNight()&&!(S.scene==='raimo'&&PL.x===11&&PL.y===5);}
+function raimoOut(){return !isNight()&&!(S.scene==='raimo'&&PL.x===7&&PL.y===5);}
 function stageOf(pl){if(pl.p==null)return pl.st||0;return Math.max(0,Math.min(3,Math.floor((gameNow()-pl.p)/(GROW[pl.t]||900)*3)));}
 function growPlants(){let ch=false;for(const k in S.plants){const pl=S.plants[k],st=stageOf(pl);if(st!==pl.st){pl.st=st;ch=true;}}return ch;}
 function readyText(pl){const N={porkkana:'Porkkana',kehakukka:'Kehäkukka'}[pl.t];if(stageOf(pl)>=3)return N+(pl.t==='porkkana'?' on valmis nostettavaksi!':' kukkii!');
