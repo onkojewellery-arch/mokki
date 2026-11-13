@@ -245,7 +245,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.33</div>
+        <div class="sub">mummon mökki · versio 0.34</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -588,7 +588,7 @@ function drawCandles(){const t=YOBJ.find(o=>o.k==='tiski2');if(!t)return;const [
 function tarotLuenta(){TFX.on=true;const same=S.tarot&&S.tarot.day===S.day;if(!same){S.tarot={day:S.day,i:Math.floor(Math.random()*TAROT.length)};addLog('Mandi luki minulle tarotkortin: '+TAROT[S.tarot.i].n+'.');save();}
   const c=TAROT[S.tarot.i],show=()=>{showPanel('<div class="tarot"><div class="tflip"><img src="'+tarotImg(S.tarot.i)+'" alt=""></div><div><b>'+c.n+'</b><p>Mandi: "'+c.t+'"</p></div></div><div class="foot">'+(same?'Sama kortti kuin aiemmin tänään · B sulkee':'A tai B sulkee')+'</div>','tarot');$('#panel').classList.add('tarotbox');};
   say(same?['Mandi: "Kortit eivät vaihda mieltään saman päivän aikana. Sama kortti kuin äsken."']:['Mandi sekoittaa pakkaa tottuneesti ja nostaa yhden kortin tiskille.'],show);}
-const KARA_LOOK={style:2,hair:'#c8823a',skin:'#f6d3b3',eye:'#4a6fa5',top:{c:'#7a5aa0'},pants:'#3a4f7a'};
+const KARA_LOOK={style:1,hair:'#e3c46e',skin:'#f6d3b3',eye:'#4a6fa5',top:{c:'#34343c'},pants:'#26262c'};
 const KIRPPIS=[{id:'saappaat',n:'Punaiset kumisaappaat',p:6,kind:'vaate'},{id:'isomatto',n:'Iso räsymatto',p:9,kind:'kaluste'},{id:'maljakko',n:'Maljakko ja auringonkukat',p:7,kind:'koriste'}]; /* testihinnat */
 let ksel=0;
 function karaTalk(){ask('Kara: "Kaupungissa oli kaappi kaapeille. Nyt on peräkontti. Tervetuloa penkomaan!"',['Katso tavaroita','Jutellaan','Hei hei'],i=>{
@@ -1362,7 +1362,7 @@ function txt(g,s,x,y,c,j){let X=x;for(const ch0 of s){const um=ch0==='Ä'||ch0==
 // ---------- hahmot ----------
 const LOOK={
   mandi:{skin:'#f0c4a0',hair:'#6a3a20',style:'long',shirt:'#b83a30',pants:'#3a3a52',shoes:'#2a1a14',glasses:1,apron:1},
-  kara:{skin:'#f4cfae',hair:'#c8642a',style:'bun',shirt:'#6a4a8a',inner:'#e4d4e8',pants:'#3e5a86',shoes:'#5a3020'},
+  kara:{skin:'#f4cfae',hair:'#e3c46e',style:'long',shirt:'#34343c',inner:'#46464e',pants:'#26262c',shoes:'#18181c'},
   pelaaja:{skin:'#efc3a0',hair:'#5a3420',style:'short',shirt:'#c0392b',plaid:1,pants:'#34507a',shoes:'#2a1a14'}};
 function drawChar(g,L,dir,fr,blink){
   const cx=24,side=dir==='right',sw=fr===1?1:fr===3?-1:0;
@@ -2934,7 +2934,7 @@ function tryStep(d){const [dx,dy]=DIRS[d];const nx=PL.x+dx,ny=PL.y+dy;
   PL.tx=nx;PL.ty=ny;PL.moving=true;PL.parity^=1;}
 function updatePlayer(){
   if(PL.bumpCool>0)PL.bumpCool--;
-  if(PL.moving){const sp=heldB?8:4,tx=PL.tx*TS,ty=PL.ty*TS;
+  if(PL.moving){const sp=(HDV&&TALLV?2:3)*(heldB?2:1),tx=PL.tx*TS,ty=PL.ty*TS;
     PL.px+=clamp(tx-PL.px,-sp,sp);PL.py+=clamp(ty-PL.py,-sp,sp);
     if(PL.px===tx&&PL.py===ty){PL.moving=false;PL.x=PL.tx;PL.y=PL.ty;PL.justArrived=true;}}
   if(!PL.moving&&mode==='world'&&AUTO){if(heldDirection())AUTO=null;else if(autoStep()){PL.justArrived=false;return;}}
