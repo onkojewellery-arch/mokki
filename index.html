@@ -237,7 +237,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.28</div>
+        <div class="sub">mummon mökki · versio 0.29</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -649,7 +649,7 @@ function qbPress(q){AUTO=null;if(mode!=='world')return;blip(700,.04);
 /* ---------- kosketuskokeilu (v0.27): korkea näkymä ja napautusohjaus pihalla ja tuvassa ---------- */
 let TALLV=false,QPAD=0,AUTO=null,PADUSER=false;
 let TOUCHX=(()=>{try{const v=localStorage.getItem('mokki-touchx');if(v!=null)return v==='1';}catch(_){}return matchMedia('(pointer:coarse)').matches;})();
-function tallWanted(){return TOUCHX&&S&&S.started&&mode!=='title'&&(S.scene==='piha'||S.scene==='tupa')&&innerHeight>innerWidth*1.2;}
+function tallWanted(){return TOUCHX&&S&&S.started&&mode!=='title'&&innerHeight>innerWidth*1.2;}
 function toggleTouchX(){TOUCHX=!TOUCHX;try{localStorage.setItem('mokki-touchx',TOUCHX?'1':'0');}catch(_){}toast('Kosketuskokeilu '+(TOUCHX?'päällä':'pois'));}
 function bfsPath(goal){const key=(x,y)=>x+','+y,prev={},q=[[PL.x,PL.y]];prev[key(PL.x,PL.y)]=null;let found=null;
   while(q.length){const [x,y]=q.shift();if(goal(x,y)){found=[x,y];break;}for(const [d,[dx,dy]] of Object.entries(DIRS)){const nx=x+dx,ny=y+dy,k=key(nx,ny);if(k in prev)continue;if(solid(nx,ny))continue;prev[k]=[x,y,d];q.push([nx,ny]);}}
@@ -668,14 +668,23 @@ function tapTarget(gx,gy){const tx=Math.floor(gx/TS),ty=Math.floor(gy/TS);
     if(!hit&&sp&&o.k!=='tree'&&o.k!=='house'){const [x0,y0]=sprPos(sp,o);hit=gx>=x0&&gx<x0+sp.width&&gy>=y0&&gy<y0+sp.bot;}
     if(hit&&(!best||o.y+o.h>best.y+best.h))best=o;}
   if(best&&best.k==='house'){const dx=gx-10.5*TS;if(Math.abs(dx)<TS*1.2&&gy>4.5*TS)return {tiles:[[10,6]],act:()=>tryStep('up')};}
+  if(best&&best.k==='grilli')return {tiles:[[best.x+1,best.y+2]],act:()=>tryStep(PL.dir)};
+  if(best&&best.k==='shop')return {tiles:[[best.x+1,best.y+2]],act:interact};
+  if(best&&best.k==='house3')return {tiles:[[best.x+2,best.y+3]],act:interact};
+  if(best&&(best.k==='jaska'||best.k==='tiski2')){const t=YOBJ.find(q=>q.k==='tiski2');const T=[];for(let x=t.x;x<t.x+t.w;x++)T.push([x,t.y]);return {tiles:T,act:interact};}
   if(best){const T=[];for(let y=best.y;y<best.y+best.h;y++)for(let x=best.x;x<best.x+best.w;x++)T.push([x,y]);return {tiles:T,act:interact};}
-  const ch=(YARD[ty]||[])[tx];if(ch==='D'||ch==='B')return {tiles:[[tx,ty]],act:interact,soil:true};if(ch==='x')return {tiles:[[tx,ty]],act:()=>tryStep(PL.dir)};return null;}
+  const ch=(YARD[ty]||[])[tx];if(ch==='D'||ch==='B')return {tiles:[[tx,ty]],act:interact,soil:true};if(ch==='x'||ch==='o')return {tiles:[[tx,ty]],act:()=>tryStep(PL.dir)};return null;}
 function onTap(gx,gy){
   if(mode==='decor')return decorTap(gx,gy);
   if(mode==='dialog'){if(!(dlg&&dlg.choice))press('a');return;}
   if(mode!=='world')return;
   const t=tapTarget(gx,gy);if(t){walkToAdjacent(t.tiles,t.act);return;}
-  const tx=Math.floor(gx/TS),ty=Math.floor(gy/TS);if(tx===PL.x&&ty===PL.y){AUTO=null;return;}
+  const tx=Math.floor(gx/TS),ty=Math.floor(gy/TS);
+  if(S.scene!=='tupa'){const out=ty<0?'up':ty>=YH?'down':tx<0?'left':tx>=YW?'right':null;
+    const ex=clamp(tx,0,YW-1),ey=clamp(ty,0,YH-1),edge=out||(isPath(ex,ey)&&(ey===0?'up':ey===YH-1?'down':ex===0?'left':ex===YW-1?'right':null));
+    if(edge&&!solid(ex,ey)&&ex===PL.x&&ey===PL.y){AUTO=null;PL.dir=edge;tryStep(edge);return;}
+    if(edge&&!solid(ex,ey)){const q=bfsPath((x,y)=>x===ex&&y===ey);if(q){AUTO={steps:q.steps,face:edge,act:()=>tryStep(edge),scene:S.scene,mark:[ex,ey]};return;}}}
+  if(tx===PL.x&&ty===PL.y){AUTO=null;return;}
   const p=bfsPath((x,y)=>x===tx&&y===ty);if(!p){toastNow('Tuonne ei pääse tästä.');blip(180,.1);AUTO=null;return;}AUTO={steps:p.steps,face:null,act:null,scene:S.scene,mark:[tx,ty]};}
 function autoStep(){if(!AUTO)return false;if(AUTO.scene!==S.scene||mode!=='world'){AUTO=null;return false;}
   if(AUTO.steps.length){const d=AUTO.steps.shift(),bx=PL.x,by=PL.y,sc=S.scene;PL.dir=d;tryStep(d);if(!PL.moving&&S.scene===sc&&PL.x===bx&&PL.y===by&&mode==='world'){AUTO=null;}return true;}
@@ -2379,7 +2388,7 @@ function openShop(){const pages=['Päivää! Ostan porkkanoita ja mustikoita. My
 function renderShop(){const list=shop.tab===0?SHOP_BUY:sellList();shop.sel=clamp(shop.sel,0,list.length-1);
   let h='<div class="ptitle">Vattulan kyläkauppa</div><div class="shoptop"><span>Rahaa: <b>'+S.money+' mk</b></span><span class="tabs"><span class="tab'+(shop.tab===0?' on':'')+'" data-tab="0">Osta</span><span class="tab'+(shop.tab===1?' on':'')+'" data-tab="1">Myy</span></span></div><ul class="shoplist">';
   list.forEach((it,i)=>{h+='<li data-i="'+i+'" class="'+(i===shop.sel?'sel':'')+'"><span>'+it.n+'<small>Sinulla: '+(shop.tab===1?qty(it.id):(S.inv[it.id]||0))+(it.d?' · '+it.d:'')+'</small></span><span class="pr">'+(shop.tab===1?'+':'')+it.p+' mk</span></li>';});
-  h+='</ul><div class="foot">◀ ▶ osta tai myy · A '+(shop.tab===0?'osta':'myy')+' · B poistu</div>';
+  h+='</ul><div class="foot">◀ ▶ osta tai myy · A '+(shop.tab===0?'osta':'myy')+' · B poistu</div><button class="pclose" aria-label="Sulje">✕</button>';
   const el=$('#panel');el.innerHTML=h;el.classList.remove('hide');
   el.querySelectorAll('.tab').forEach(t=>t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();shop.tab=+t.dataset.tab;shop.sel=0;blip(660,.03);renderShop();}));
   el.querySelectorAll('.shoplist li').forEach(li=>li.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();shop.sel=+li.dataset.i;shopPress('a');}));}
@@ -2556,7 +2565,7 @@ function drawPlayer(){if(!CH)return;const prog=Math.abs(PL.px-PL.x*TS)+Math.abs(
   const fi=PL.moving&&prog<16?(PL.parity?1:2):0;const x=Math.round(PL.px),y=Math.round(PL.py);
   ell(ctx,x+17,y+29,10,2,'rgba(14,52,70,.35)');const blink=!PL.moving&&PL.dir!=='up'&&(frame%250)<7;ctx.drawImage(CH[PL.dir][blink?3:fi],x-3,y-24);}
 function draw(){
-  ctx.fillStyle=S&&S.scene==='tupa'?'#211812':'#10160f';ctx.fillRect(0,0,VW,VH);
+  ctx.fillStyle=S&&INDOOR[S.scene]?'#211812':S&&FOREST_SC[S.scene]?'#12201a':'#162418';ctx.fillRect(0,0,VW,VH);
   const sc=S.scene,mapW=sc!=='tupa'?YW*TS:320,mapH=sc!=='tupa'?YH*TS:288;
   let fx=PL.px+16,fy=PL.py+16;
   if(mode==='build'&&build){const c=build.cands[build.i];fx=(c.x+c.w/2)*TS;fy=(c.y+c.h/2)*TS;}
