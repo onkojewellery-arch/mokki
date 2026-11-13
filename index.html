@@ -166,7 +166,7 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.12</div>
+        <div class="sub">mummon mökki · versio 0.13</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -297,27 +297,56 @@ YOBJ.push({k:'sauna',x:3,y:13,w:3,h:2},{k:'lippu',x:7,y:4,w:1,h:1},{k:'pyykki',x
 function buildVillage(){const W=20,H=12,G=[],O=[];
   for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push(hash(x,y,17)<0.09?'f':'g');}
   for(let x=0;x<W;x++){G[9][x]='s';G[10][x]='w';G[11][x]='w';}
-  for(let y=0;y<=8;y++)G[y][10]='p';for(let x=8;x<=17;x++)G[8][x]='p';for(let x=3;x<=9;x++)G[6][x]='p';
-  O.push({k:'shop',x:15,y:5,w:4,h:3},{k:'house2',x:1,y:1,w:5,h:4},{k:'mailbox',x:6,y:4,w:1,h:1},{k:'bench',x:12,y:9,w:2,h:1},
-    {k:'vsign',x:11,y:1,w:1,h:1},{k:'bush',x:7,y:7,w:1,h:1},{k:'rock',x:4,y:7,w:1,h:1},{k:'raimo',x:5,y:5,w:1,h:1},
+  for(let y=0;y<=8;y++)G[y][10]='p';for(let x=8;x<=17;x++)G[8][x]='p';
+  for(const [x,y] of [[2,3],[3,3],[4,4],[5,5],[6,3],[3,6],[7,5],[8,4]])G[y][x]='f';
+  O.push({k:'shop',x:15,y:5,w:4,h:3},{k:'mailbox',x:11,y:4,w:1,h:1},{k:'bench',x:12,y:9,w:2,h:1},
+    {k:'vsign',x:11,y:1,w:1,h:1},{k:'bush',x:7,y:7,w:1,h:1},{k:'rock',x:4,y:7,w:1,h:1},{k:'stump',x:5,y:3,w:1,h:1},
     {k:'lamp',x:9,y:7,w:1,h:1},{k:'pyora',x:12,y:7,w:1,h:1},{k:'maito',x:14,y:7,w:1,h:1},{k:'puhelin',x:13,y:6,w:1,h:1});
   const tree=(x,y)=>{if(G[y][x]==='p')return;if(O.some(o=>x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h))return;
     O.push({k:'tree',x,y,w:1,h:1,v:hash(x,y,19)<.5?'koivu':'kuusi'});G[y][x]='g';};
   for(let x=0;x<W;x++)if(x!==10)tree(x,0);
   for(let y=1;y<=8;y++){tree(0,y);tree(19,y);}
-  [[1,1],[7,1],[8,1],[13,1],[15,1],[17,1],[18,2],[16,3],[17,5],[18,7],[1,8],[3,8],[6,8]].forEach(([x,y])=>tree(x,y));
+  [[1,1],[7,1],[8,1],[13,1],[15,1],[17,1],[18,2],[16,3],[17,5],[18,7],[1,8],[3,8],[6,8],[2,1],[4,1],[3,2],[1,4],[2,6],[7,3]].forEach(([x,y])=>tree(x,y));
   return {W,H,grid:G,objs:O};}
 function buildPolku(){const W=14,H=14,G=[],O=[];
   for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push('m');}
-  const PATH=[[7,0],[7,1],[7,2],[7,3],[6,3],[5,3],[5,4],[5,5],[5,6],[6,6],[7,6],[8,6],[8,7],[8,8],[8,9],[7,9],[6,9],[6,10],[6,11],[6,12],[6,13]];
-  for(const [x,y] of PATH)G[y][x]='p';G[13][6]='x';
-  O.push({k:'kelo',x:9,y:4,w:2,h:1},{k:'rock',x:3,y:8,w:1,h:1},{k:'rock',x:10,y:11,w:1,h:1},{k:'mustikka',x:4,y:5,w:1,h:1},
+  const PATH=[[7,0],[7,1],[7,2],[7,3],[6,3],[5,3],[5,4],[5,5],[5,6],[6,6],[7,6],[8,6],[8,7],[8,8],[8,9],[7,9],[6,9],[6,10],[6,11],[6,12],[6,13],[4,4],[3,4],[2,4],[1,4],[0,4]];
+  for(const [x,y] of PATH)G[y][x]='p';G[13][6]='x';G[4][0]='x';
+  O.push({k:'kelo',x:2,y:3,w:2,h:1},{k:'rviitta',x:4,y:3,w:1,h:1},{k:'rock',x:3,y:8,w:1,h:1},{k:'rock',x:10,y:11,w:1,h:1},{k:'mustikka',x:4,y:5,w:1,h:1},
     {k:'mustikka',x:9,y:8,w:1,h:1},{k:'mustikka',x:8,y:2,w:1,h:1},{k:'stump',x:7,y:11,w:1,h:1});
   const near=(x,y)=>{let d=9;for(const [px,py] of PATH)d=Math.min(d,Math.max(Math.abs(px-x),Math.abs(py-y)));return d;};
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(G[y][x]!=='m')continue;if(O.some(o=>x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h))continue;
     const d=near(x,y),edge=x===0||x===W-1;if(PATH.some(([px,py])=>Math.abs(px-x)<=1&&y-py>=1&&y-py<=2))continue;if(O.some(q=>q.k==='mustikka'&&Math.abs(q.x-x)<=1&&y-q.y>=1&&y-q.y<=2))continue;if(edge||d>=2||(d===1&&hash(x,y,41)<.22))O.push({k:'tree',x,y,w:1,h:1,v:hash(x,y,42)<.72?'kuusi':'koivu'});}
   return {W,H,grid:G,objs:O};}
-const MAPS={piha:{W:YW,H:YH,grid:YARD,objs:YOBJ},kyla:buildVillage(),polku:buildPolku()};
+function forestTrees(G,O,W,H,PATH,seed,spr){const near=(x,y)=>{let d=9;for(const [px,py] of PATH)d=Math.min(d,Math.max(Math.abs(px-x),Math.abs(py-y)));return d;};
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(G[y][x]!=='m')continue;if(O.some(o=>x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h))continue;
+    const d=near(x,y),edge=x===0||x===W-1||y===0;if(PATH.some(([px,py])=>Math.abs(px-x)<=1&&y-py>=1&&y-py<=2))continue;if(O.some(q=>q.k!=='tree'&&Math.abs(q.x-x)<=1&&y-q.y>=1&&y-q.y<=2))continue;
+    if(edge||d>=2||(d===1&&hash(x,y,seed)<.22))O.push({k:'tree',x,y,w:1,h:1,v:hash(x,y,seed+1)<spr?'kuusi':'koivu'});}}
+/* ---------- Raimon piha (v0.13) ---------- */
+function buildRaimo(){const W=14,H=11,G=[],O=[];
+  for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push(hash(x,y,57)<0.12?'f':'g');}
+  const PATH=[[7,5],[7,6],[8,6],[9,6],[10,6],[11,6],[12,6],[13,6],[6,6],[5,6],[4,6],[3,6],[2,6],[2,5],[2,4],[2,3],[2,2],[2,1],[2,0]];
+  for(const [x,y] of PATH)G[y][x]='p';G[6][13]='x';
+  O.push({k:'house2',x:5,y:1,w:5,h:4},{k:'raimo',x:10,y:5,w:1,h:1},{k:'aita',x:11,y:5,w:1,h:1},{k:'aita',x:12,y:5,w:1,h:1},
+    {k:'rhalot',x:11,y:2,w:1,h:1},{k:'stump',x:4,y:8,w:1,h:1},{k:'rock',x:9,y:8,w:1,h:1},{k:'rviitta2',x:3,y:2,w:1,h:1});
+  const tree=(x,y,v)=>{if(G[y][x]==='p'||G[y][x]==='x')return;if(O.some(o=>x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h))return;
+    O.push({k:'tree',x,y,w:1,h:1,v:v||(hash(x,y,59)<.5?'koivu':'kuusi')});G[y][x]='g';};
+  for(let x=0;x<W;x++){tree(x,0,x<5?'kuusi':null);tree(x,H-1);}
+  for(let y=1;y<H-1;y++){tree(0,y,'kuusi');tree(W-1,y);}
+  [[1,1],[3,1],[1,2],[1,3],[3,0],[12,1],[12,2],[1,9],[12,9],[6,9],[11,9]].forEach(([x,y])=>tree(x,y,x<4?'kuusi':null));
+  return {W,H,grid:G,objs:O};}
+/* ---------- Sienimetsä (v0.13) ---------- */
+function buildSieni(){const W=16,H=16,G=[],O=[];
+  for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push('m');}
+  const PATH=[[8,15],[8,14],[8,13],[8,12],[7,12],[6,12],[6,11],[6,10],[6,9],[7,9],[8,9],[9,9],[9,8],[9,7],[9,6],[8,6],[7,6],[7,5],[7,4],[7,3],[6,3],[8,3],
+    [10,9],[11,9],[12,9],[12,10],[6,6],[5,6],[4,6]];
+  for(const [x,y] of PATH)G[y][x]='p';
+  O.push({k:'sammalkivi',x:9,y:2,w:1,h:1},{k:'sammalkivi',x:13,y:10,w:1,h:1},{k:'sammalkivi',x:4,y:11,w:1,h:1},{k:'sammalkivi',x:10,y:13,w:1,h:1},
+    {k:'kelo',x:2,y:6,w:2,h:1},{k:'skanto',x:5,y:3,w:1,h:1},{k:'stump',x:11,y:6,w:1,h:1});
+  forestTrees(G,O,W,H,PATH,61,.86);
+  return {W,H,grid:G,objs:O};}
+const FOREST_SC={polku:1,sieni:1};
+const MAPS={piha:{W:YW,H:YH,grid:YARD,objs:YOBJ},kyla:buildVillage(),polku:buildPolku(),raimo:buildRaimo(),sieni:buildSieni()};
 function useMap(sc){const m=MAPS[sc]||MAPS.piha;YARD=m.grid;YOBJ=m.objs;YW=m.W;YH=m.H;}
 
 function objAt(x,y){
@@ -486,6 +515,15 @@ function makeBush(berries){return outlined(52,44,g=>{const CL=[[26,24,16,13],[13
   for(const [x,y,rx,ry] of CL)ell(g,x-2,y-2,rx-4,ry-3,LEAF[2]);for(const [x,y,rx,ry] of CL)if(rx>8)ell(g,x-4,y-4,3,2,LEAF[3]);
   for(let i=0;i<40;i++){const px=4+Math.floor(hash(i,1,81)*44),py=4+Math.floor(hash(i,2,81)*34);if(opaque(g,px,py))P(g,px,py,i%3?LEAF[4]:LEAF[0]);}
   if(berries)for(const [bx,by] of [[12,22],[22,28],[32,19],[18,13],[37,30],[28,9],[42,24],[8,30]]){R(g,bx,by,3,3,'#c4304a');P(g,bx,by,'#ff9ab0');P(g,bx+2,by+2,'#7a1428');}});}
+function makeAita(){return outlined(38,30,g=>{const C=['#8a9a94','#b8c4bc','#dfe6de','#f2f4ee'];
+  R(g,0,12,38,3,C[1]);R(g,0,12,38,1,C[3]);R(g,0,21,38,3,C[1]);R(g,0,21,38,1,C[2]);
+  for(let x=2;x<38;x+=9){R(g,x,4,5,24,C[2]);R(g,x,4,1,24,C[3]);R(g,x+4,4,1,24,C[0]);P(g,x+2,3,C[2]);R(g,x+1,3,3,1,C[2]);R(g,x+2,2,1,1,C[3]);R(g,x,26,5,2,'#6a5a48');}});}
+function makeMossRock(){const c=makeRock(),g=c.getContext('2d');const M=['#3a6a34','#4e8a3e','#6aa84c','#8cc460'];
+  for(let i=0;i<220;i++){const x=Math.floor(hash(i,3,93)*c.width),y=Math.floor(hash(i,4,93)*c.height);if(y>c.height*.62)continue;
+    const d=g.getImageData(x,y,1,1).data;if(d[3]<200||(d[0]<40&&d[1]<40))continue;P(g,x,y,M[Math.floor(hash(i,5,93)*4)]);}
+  for(const [x,y,w] of [[12,9,8],[20,6,9],[9,14,5]]){R(g,x,y,w,2,M[1]);R(g,x+1,y,w-2,1,M[3]);}return c;}
+function makeMossStump(){const c=makeStump(),g=c.getContext('2d');const M=['#3a6a34','#4e8a3e','#6aa84c','#8cc460'];
+  ell(g,20,10,13,4,M[1]);ell(g,18,9,8,2,M[2]);P(g,14,8,M[3]);P(g,24,9,M[3]);R(g,8,14,3,8,M[0]);R(g,29,15,3,6,M[1]);R(g,18,17,5,4,'#2a2018');R(g,19,18,3,2,'#14100c');return c;}
 function makeStump(){return outlined(40,32,g=>{R(g,6,10,28,16,WOOD[2]);R(g,6,10,4,16,WOOD[3]);R(g,28,10,6,16,WOOD[1]);for(let x=12;x<28;x+=5)R(g,x,13,1,13,WOOD[1]);
   ell(g,20,10,14,5,'#d8b47a');ell(g,20,10,10,3,'#c49a60');ell(g,20,10,6,2,'#d8b47a');ell(g,20,10,2,1,'#a07a48');R(g,2,24,8,4,WOOD[2]);R(g,30,24,8,4,WOOD[1]);ell(g,16,8,3,1,'#ecd0a0');});}
 function makeLippu(ph){return outlined(60,112,g=>{const o=3;R(g,o+27,o+6,3,100,'#efece4');R(g,o+29,o+6,1,100,'#bcb8ac');ell(g,o+28,o+4,2,2,'#e8b84a');P(g,o+27,o+3,'#fff0a0');
@@ -732,7 +770,7 @@ function bottomRow(c){const d=c.getContext('2d').getImageData(0,0,c.width,c.heig
 function A(c){c.bot=bottomRow(c);return c;}
 function makeSprites(){
   SPR.kuusi=[makeSpruce(1),makeSpruce(2)].map(A);SPR.koivu=[makeBirch(1),makeBirch(2)].map(A);
-  SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());
+  SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());SPR.aita=A(makeAita());SPR.sammalkivi=A(makeMossRock());SPR.skanto=A(makeMossStump());
   SPR.rock=A(makeRock());SPR.bush=A(makeBush(true));SPR.bushTyhja=A(makeBush(false));SPR.stump=A(makeStump());SPR.lippu=[0,1,2].map(makeLippu).map(A);SPR.pyykki=[0,1].map(makePyykki).map(A);
   SPR.halot=A(makeHalot());SPR.karry=A(makeKarry());SPR.tynnyri=A(makeTynnyri());SPR.mailbox=A(makeMailbox());SPR.mpyora=A(makeBike('#2f5a46','kukat'));
   SPR.shop=A(makeShop());SPR.bench=A(makeBench());SPR.lamp=A(makeLamp());SPR.maito=A(makeMaito());SPR.puhelin=A(makePuhelin());SPR.pyora=A(makeBike('#b8443a','pulla'));
@@ -743,7 +781,7 @@ const HOUSE_COLORS={haalistunut:['#b06a56',true],punainen:['#b04b37',false],kelt
 const HCACHE={};function houseSprite(k){const hc=HOUSE_COLORS[k]||HOUSE_COLORS.haalistunut;return HCACHE[k]||(HCACHE[k]=A(makeHouse(hc[0],hc[1])));}
 function sprFor(o){switch(o.k){
   case 'house':return houseSprite(mode==='paint'&&paint?PAINT_OPTS[paint.i].key:S.facade.color);
-  case 'puhelin':return SPR.puhelin;case 'vsign':return SPR.sign;case 'pmailbox':return SPR.mailbox;
+  case 'puhelin':return SPR.puhelin;case 'rhalot':return SPR.halot;case 'rviitta':case 'rviitta2':return SPR.signL||(SPR.signL=A(mk(SPR.sign.width,SPR.sign.height,g=>{g.translate(SPR.sign.width,0);g.scale(-1,1);g.drawImage(SPR.sign,0,0);})));case 'vsign':return SPR.sign;case 'pmailbox':return SPR.mailbox;
   case 'lippu':return SPR.lippu[(frame>>4)%3];case 'pyykki':return SPR.pyykki[(frame>>5)%2];
   case 'tree':return SPR[o.v][hash(o.x,o.y,11)<.5?0:1];
   case 'bush':return raspFull(o)?SPR.bush:SPR.bushTyhja;
@@ -849,7 +887,7 @@ function rebuildGround(){groundDirty=false;if(S.scene==='tupa')return buildTupa(
   const FW=[];for(let x=0;x<YW;x++){let f=YH;for(let y=0;y<YH;y++)if(YARD[y][x]==='w'){f=y;break;}FW.push(f);}
   ground=mk(W,H,g=>{const img=g.createImageData(W,H),Ad=img.data;
     for(let y=0;y<H;y++)for(let x=0;x<W;x++){const tx=x>>5,ty=y>>5,ch=YARD[ty][tx];
-      const forest=S.scene==='polku';
+      const forest=!!FOREST_SC[S.scene];
       let col=forest?dpick(FOREST,fbm(x/50,y/50,21)*.85+hash(x,y,22)*.18,x,y):dpick(GR,fbm(x/70,y/70,1)*.92+hash(x,y,5)*.12-.04,x,y);
       if(ch==='p'||ch==='x'){const lx=x&31,ly=y&31;let d=99;const L=!isPath(tx-1,ty),Rr=!isPath(tx+1,ty),U=!isPath(tx,ty-1),Dn=!isPath(tx,ty+1);
         if(L)d=Math.min(d,lx);if(Rr)d=Math.min(d,31-lx);if(U)d=Math.min(d,ly);if(Dn)d=Math.min(d,31-ly);
@@ -869,14 +907,16 @@ function rebuildGround(){groundDirty=false;if(S.scene==='tupa')return buildTupa(
     g.putImageData(img,0,0);
     for(let ty=0;ty<YH;ty++)for(let tx=0;tx<YW;tx++){const ch=YARD[ty][tx],ox=tx*TS,oy=ty*TS;
       if(ch==='p'||ch==='x'){for(let i=0;i<5;i++){const px=ox+6+Math.floor(hash(tx,ty,70+i)*20),py=oy+6+Math.floor(hash(tx,ty,80+i)*20);R(g,px,py,3,2,'#ecc69a');R(g,px,py+2,3,1,'#7e4a30');}
-        if(S.scene!=='polku'&&!isPath(tx-1,ty))for(let i=0;i<2;i++)tuft(g,ox+2,oy+8+Math.floor(hash(tx,ty,91+i)*20),tx+i);
-        if(S.scene!=='polku'&&!isPath(tx+1,ty))for(let i=0;i<2;i++)tuft(g,ox+26,oy+8+Math.floor(hash(tx,ty,93+i)*20),tx+i+1);}
+        if(!FOREST_SC[S.scene]&&!isPath(tx-1,ty))for(let i=0;i<2;i++)tuft(g,ox+2,oy+8+Math.floor(hash(tx,ty,91+i)*20),tx+i);
+        if(!FOREST_SC[S.scene]&&!isPath(tx+1,ty))for(let i=0;i<2;i++)tuft(g,ox+26,oy+8+Math.floor(hash(tx,ty,93+i)*20),tx+i+1);}
       else if(ch==='D'||ch==='B')drawSoil(g,ox,oy,tx,ty,ch);
       else if(ch==='m'){for(let i=0;i<18;i++){const px=ox+Math.floor(hash(tx,ty,300+i)*31),py=oy+Math.floor(hash(tx,ty,320+i)*31);if(i%3===0)R(g,px,py,2,1,'#7a6440');else P(g,px,py,i%2?'#8a7448':'#24402e');}
         if(hash(tx,ty,340)<.5)ell(g,ox+8+Math.floor(hash(tx,ty,341)*16),oy+10+Math.floor(hash(tx,ty,342)*14),4,2,'#5e9450');
         if(hash(tx,ty,343)<.45)drawFern(g,ox+10+Math.floor(hash(tx,ty,344)*12),oy+22+Math.floor(hash(tx,ty,345)*6),tx*31+ty);
         if(hash(tx,ty,346)<.12){const mx=ox+6+Math.floor(hash(tx,ty,347)*20),my=oy+14+Math.floor(hash(tx,ty,348)*12);R(g,mx,my,2,4,'#f0ead8');ell(g,mx+1,my-1,3,2,'#d8302a');P(g,mx,my-2,'#ffffff');P(g,mx+2,my-1,'#ffffff');P(g,mx+3,my-2,'#ffffff');}
         if(hash(tx,ty,349)<.15){const bx=ox+6+Math.floor(hash(tx,ty,350)*20),by=oy+8+Math.floor(hash(tx,ty,351)*18);ell(g,bx,by,3,2,'#2f6e42');for(const [a,b] of [[-1,-1],[1,0],[0,1]])R(g,bx+a,by+b,2,2,'#c8283a');}
+        if(S.scene==='sieni'&&hash(tx,ty,355)<.16){const cx=ox+5+Math.floor(hash(tx,ty,356)*20),cy=oy+12+Math.floor(hash(tx,ty,357)*14);for(const [a,b] of [[0,0],[4,2]]){R(g,cx+a,cy+b,2,3,'#e8c070');ell(g,cx+a+1,cy+b-1,3,1,'#f0b030');P(g,cx+a,cy+b-2,'#ffd870');}}
+        if(S.scene==='sieni'&&hash(tx,ty,358)<.22){const sx=ox+4+Math.floor(hash(tx,ty,359)*22),sy=oy+6+Math.floor(hash(tx,ty,360)*20);ell(g,sx,sy,5,3,'#4e8a3e');ell(g,sx-1,sy-1,3,2,'#6aa84c');}
         if(hash(tx,ty,352)<.12){const cx=ox+4+Math.floor(hash(tx,ty,353)*24),cy=oy+6+Math.floor(hash(tx,ty,354)*22);ell(g,cx,cy,1,2,'#6e4a2c');P(g,cx,cy-1,'#9a6a40');}}
       else if(ch==='s'){for(let i=0;i<4;i++){const px=ox+3+Math.floor(hash(tx,ty,170+i)*26),py=oy+10+Math.floor(hash(tx,ty,180+i)*18);R(g,px,py,2,1,i%2?'#a08458':'#f8ecd0');}
         if(hash(tx,ty,185)<.3){const px=ox+8+Math.floor(hash(tx,ty,186)*16),py=oy+14+Math.floor(hash(tx,ty,187)*10);ell(g,px,py,3,2,STONE[2]);ell(g,px-1,py-1,1,1,STONE[4]);}}
@@ -885,7 +925,7 @@ function rebuildGround(){groundDirty=false;if(S.scene==='tupa')return buildTupa(
           if(hash(tx,ty,163)<.5){ell(g,cx-2,cy-2,2,1,'#f6f0f4');P(g,cx-2,cy-3,'#f0b8d0');P(g,cx-2,cy-2,'#f4d35e');}}}
       else if(!(pih&&inHouse(tx,ty))){const n=5+Math.floor(hash(tx,ty,13)*6);for(let i=0;i<n;i++)tuft(g,ox+3+Math.floor(hash(tx,ty,20+i)*26),oy+5+Math.floor(hash(tx,ty,30+i)*26),i+tx);
         if(ch==='f')for(let i=0;i<4;i++)flower(g,ox+5+Math.floor(hash(tx,ty,40+i)*22),oy+6+Math.floor(hash(tx,ty,50+i)*20),Math.floor(hash(tx,ty,60+i)*4));}}
-    const LUP=pih?[[2,6,3],[16,6,2],[6,15,3],[13,15,2],[2,3,2]]:S.scene==='kyla'?[[5,8,3],[13,8,2],[17,6,2],[1,6,2]]:[];
+    const LUP=pih?[[2,6,3],[16,6,2],[6,15,3],[13,15,2],[2,3,2]]:S.scene==='kyla'?[[5,8,3],[13,8,2],[17,6,2],[1,6,2],[4,5,3],[6,4,2]]:S.scene==='raimo'?[[3,9,3],[8,9,2],[12,7,2]]:[];
     for(const [tx,ty,n] of LUP)for(let i=0;i<n;i++)lupin(g,tx*32+6+i*8,ty*32+24,['#8a5ac8','#d070b0','#b07ad8','#f0eef4'][Math.floor(hash(tx,ty,i+200)*4)]);
     for(const o of YOBJ){if(o.k!=='tree'||o.v!=='koivu')continue;for(let i=0;i<6;i++){const x=o.x*32+Math.floor(hash(o.x,o.y,220+i)*44)-6,y=(o.y+1)*32+Math.floor(hash(o.y,o.x,230+i)*14)-10;R(g,x,y,3,2,i%2?'#e8c050':'#d0a040');P(g,x,y,'#f8e090');}}
     if(pih){for(const [mx,my] of [[2,12],[17,9],[4,3],[15,14]])for(const [a,b] of [[8,18],[16,22],[22,16]]){const x=mx*32+a,y=my*32+b;ell(g,x,y,3,1,'#e8a93a');P(g,x-1,y-1,'#f6d27a');R(g,x,y+1,1,2,'#f4d8a0');}
@@ -1130,7 +1170,7 @@ function updateToast(){const el=$('#toast');if(toastT>0){toastT--;if(toastT===0)
   if(toastQ.length){el.textContent=toastQ.shift();el.classList.remove('hide');el.classList.toggle('low',mode==='shop'||mode==='panel');toastT=150;}}
 function hud(){const el=$('#hud');if(mode==='title'||mode==='custom'){el.classList.add('hide');return;}
   const [L,f]=levelProgress();el.classList.remove('hide');
-  el.innerHTML='<div>Päivä '+S.day+' · klo '+clockStr()+' · '+({piha:'Piha',tupa:'Tupa',kyla:'Vattula',polku:'Metsäpolku'})[S.scene]+' · '+S.money+' mk</div><div class="lv">Mökkitaso '+L+'<span class="xb"><i style="width:'+Math.round(f*100)+'%"></i></span></div>';}
+  el.innerHTML='<div>Päivä '+S.day+' · klo '+clockStr()+' · '+({piha:'Piha',tupa:'Tupa',kyla:'Vattula',polku:'Metsäpolku',raimo:'Raimon piha',sieni:'Sienimetsä'})[S.scene]+' · '+S.money+' mk</div><div class="lv">Mökkitaso '+L+'<span class="xb"><i style="width:'+Math.round(f*100)+'%"></i></span></div>';}
 function hint(t){const el=$('#hint');if(!t){el.classList.add('hide');return;}el.textContent=t;el.classList.remove('hide');}
 
 function say(pages,done){if(typeof pages==='string')pages=[pages];dlg={pages,i:0,shown:0,done,ret:mode==='dialog'?'world':mode};mode='dialog';renderDialog(true);}
@@ -1198,7 +1238,7 @@ function renderVihko(){const done=TASKS.filter(t=>S.tasks[t[0]]).length;let h;
     h='<div class="ptitle">Mökkivihko · Taidot ja naapurit</div><div class="ptitle sub">Taidot</div><ul class="tasks">'+
       '<li style="display:block"><div style="display:flex"><span style="flex:1">Rakennustaito</span><span class="pr">Taso '+bs+'</span></div><small style="display:block;color:#7a6f5a">'+(bs<2?'Ensimmäinen valmis rakennusprojekti, kuisti tai pihasauna, nostaa tason 2.':(S.porch&&S.porch.terrace?'Terassi on rakennettu.':'Riittää terassiin: Rakenna-valikko → Laajenna terassiksi.'))+'</small></li>'+
       '<li><span style="flex:1">Grillaustaito</span><span class="pr">Taso '+(S.grill>=3?2:1)+'</span></li></ul>'+
-      '<div class="ptitle sub">Naapurit</div><ul class="tasks">'+(R.st>0?'<li style="display:block"><div style="display:flex"><span style="flex:1"><b>Raimo</b>, sininen talo · pihalla klo 7–22</span><span class="pr">'+RAIMO_ST[R.st]+'</span></div><small style="display:block;color:#7a6f5a">'+next+'</small></li>':'<li><span>Et ole vielä tavannut naapureita. Vattulassa asuu ainakin yksi.</span></li>')+'</ul>'+
+      '<div class="ptitle sub">Naapurit</div><ul class="tasks">'+(R.st>0?'<li style="display:block"><div style="display:flex"><span style="flex:1"><b>Raimo</b>, oma piha metsäpolun varrella · pihalla klo 7–22</span><span class="pr">'+RAIMO_ST[R.st]+'</span></div><small style="display:block;color:#7a6f5a">'+next+'</small></li>':'<li><span>Et ole vielä tavannut naapureita. Vattulassa asuu ainakin yksi.</span></li>')+'</ul>'+
       '<div class="foot">◀ ▶ sivut · B sulje</div>';showPanel(h,'vihko');return;}
   if(vihkoPage===0){h='<div class="ptitle">Mökkivihko · '+((S.cabins&&S.cabins.mummo&&S.cabins.mummo.name)||'Mummon mökki')+'</div><ul class="tasks">'+TASKS.map(t=>'<li class="'+(S.tasks[t[0]]?'done':'')+'"><span class="ck">'+(S.tasks[t[0]]?'✓':'·')+'</span><span>'+t[1]+'</span></li>').join('')+
     '</ul><div class="bar"><i style="width:'+(done/TASKS.length*100)+'%"></i></div><div class="foot">Mökkitaso '+curLevel()+' · '+(S.xp||0)+(levelProgress()[2]?' / '+levelProgress()[2]:'')+' XP · '+done+'/'+TASKS.length+' tehty · ▶ Haave omasta rannasta</div>';}
@@ -1282,6 +1322,7 @@ function raimoTalk(){const R=raimoState();
   else{opts.push('Lainaa vasara');acts.push(lend);}
   opts.push('Jutellaan');acts.push(()=>{const L=R.st>=3?['Raimo: "Piirakka onnistui. Tule joskus kahville."','Raimo: "Järvellä on tyyntä. Huomenna kalastetaan."','Raimo: "Hyvä naapuri on kullanarvoinen. Sinä olet sellainen."']:
       R.st===2?['Raimo: "Piirakka odottaa vielä mustikoita. Metsäpolun varrella niitä kasvaa."']:['Raimo: "Vaarin saunassa oli Vattulan parhaat löylyt. Siitä puhutaan vieläkin."'];say(L[S.day%L.length]);});
+  opts.push('Kysy reittiä');acts.push(()=>say('Raimo: "Sienimetsään pääset tuosta pihan laidalta. Polku jatkuu kuusten väliin."'));
   opts.push('Hei hei');acts.push(()=>{});
   ask('Raimo nojaa aitaan.'+(has?' Vasara on sinulla lainassa.':''),opts,i=>acts[i]());}
 function giveBerries(){const R=raimoState();S.inv.mustikka--;R.st=3;S.recipes=S.recipes||{};S.recipes.mustikkapiirakka=true;
@@ -1364,9 +1405,15 @@ function interactYard(fx,fy){
     case 'stump':return say('Vanha koivun kanto. Tällä on hyvä istua ja kuunnella pihaa.');
     case 'sauna':return saunaInteract();
     case 'shop':if(fx===16&&fy===7)return openShop();if(fx===15&&fy===7)return openHinnasto(0);return say('Vattulan kyläkauppa. Ovi on kyltin alla.');
-    case 'house2':if(isNight()){const pg=['Raimo taitaa jo nukkua.'];if((S.inv.vasara||0)>0)pg.push('Vasaran voi palauttaa aamulla. Raimo on pihalla taas seitsemästä alkaen.');return say(pg);}return say('Naapurin talo. Ikkunalaudalla nukkuu oranssi kissa.');
+    case 'house2':if(isNight()){const pg=['Raimo taitaa jo nukkua.'];if((S.inv.vasara||0)>0)pg.push('Vasaran voi palauttaa aamulla. Raimo on pihalla taas seitsemästä alkaen.');return say(pg);}return say('Raimon sininen talo. Ikkunalaudalla nukkuu oranssi kissa.');
+    case 'aita':return say('Matala säleaita. Raimo on maalannut sen, mutta vain kadun puolelta.');
+    case 'rhalot':return say('Raimon halkopino. Jokainen halko on samassa kulmassa, kuin viivoittimella.');
+    case 'rviitta':return say('Viitta: Raimo länteen. Sienimetsään pääsee Raimon pihan kautta.');
+    case 'rviitta2':return say('Käsin maalattu kyltti: SIENIMETSÄ. Nuoli osoittaa kuusten väliin.');
+    case 'skanto':return say('Sammaloitunut kanto. Sen kolossa asuu joku, joka ei halua tulla häirityksi.');
+    case 'sammalkivi':return say(['Sammaleinen kivi. Sammal on paksua kuin villasukka.','Kiven juurella on varjoista ja kosteaa. Hyvää sienimaata.','Kivi on lämmin auringon puolelta ja viileä varjon puolelta.','Kiven kyljessä kasvaa jäkälää, harmaata ja pehmeää.'][(o.x+o.y)%4]);
     case 'puhelin':return say('Luuri on vielä paikallaan. Ovessa lukee 1 mk / puhelu.');
-    case 'mailbox':return say(['Vattulan Sanomat. Kyläkauppa on auki! Kauppias ostaa porkkanoita.','Rantamökki saattaa tulla myyntiin. Lisää tietoa seuraavassa numerossa.'],()=>{if(!S.flags.lehti){S.flags.lehti=true;addLog('Luin Vattulan Sanomista, että rantamökki voi tulla myyntiin.');save();}});
+    case 'mailbox':return say(['Kylän postilaatikko. Vattulan Sanomat. Kyläkauppa on auki! Kauppias ostaa porkkanoita.','Rantamökki saattaa tulla myyntiin. Lisää tietoa seuraavassa numerossa.'],()=>{if(!S.flags.lehti){S.flags.lehti=true;addLog('Luin Vattulan Sanomista, että rantamökki voi tulla myyntiin.');save();}});
     case 'bench':return say('Penkki järven rannalla. Täältä näkee vastarannan mökit.');
     case 'vsign':return say('Vattula. Kauppa, posti ja järvi.');
     case 'mpyora':return say('Mummon vanha pyörä nojaa vajan seinään. Ketju on ruosteessa, mutta kello soi yhä.');
@@ -1388,11 +1435,11 @@ function interactYard(fx,fy){
     case 'tree':if(o.tikka)return throwDarts();return say(o.v==='koivu'?'Koivu. Tästä saa vihtoja, kunhan pihalla on sauna.':'Kuusi tuoksuu pihkalta. Juurella on muurahaispolku.');}}
   const ch=(YARD[fy]||[])[fx];
   if(ch==='D'||ch==='B')return soilInteract(fx,fy);
-  if(ch==='x')return say(S.scene==='polku'?'Polku jatkuu Vattulan kylään.':'Tie vie metsäpolulle ja sieltä Vattulaan. Kävele etelään.');
+  if(ch==='x')return say(S.scene==='polku'?(fx===0?'Sivupolku vie Raimon pihalle.':'Polku jatkuu Vattulan kylään.'):S.scene==='raimo'?'Polku vie takaisin metsäpolulle.':'Tie vie metsäpolulle ja sieltä Vattulaan. Kävele etelään.');
   if(ch==='w')return say('Vattulanjärvi kimmeltää. Jossain tuolla on ranta, joka voi tulla myyntiin.');}
 function gameNow(){return S.day*1440+S.time;}
 function isNight(){return S.time<420||S.time>=1320;}
-function raimoOut(){return !isNight()&&!(S.scene==='kyla'&&PL.x===5&&PL.y===5);}
+function raimoOut(){return !isNight()&&!(S.scene==='raimo'&&PL.x===10&&PL.y===5);}
 function stageOf(pl){if(pl.p==null)return pl.st||0;return Math.max(0,Math.min(3,Math.floor((gameNow()-pl.p)/(GROW[pl.t]||900)*3)));}
 function growPlants(){let ch=false;for(const k in S.plants){const pl=S.plants[k],st=stageOf(pl);if(st!==pl.st){pl.st=st;ch=true;}}return ch;}
 function readyText(pl){const N={porkkana:'Porkkana',kehakukka:'Kehäkukka'}[pl.t];if(stageOf(pl)>=3)return N+(pl.t==='porkkana'?' on valmis nostettavaksi!':' kukkii!');
@@ -1548,8 +1595,12 @@ function terracePress(b){
 function addLog(t){S.log=S.log||[];S.log.push('Päivä '+S.day+': '+t);if(S.log.length>30)S.log.shift();}
 function goVillage(){fadeTo(()=>{S.scene='kyla';useMap('kyla');placePlayer(10,0,'down');groundDirty=true;hud();save();},
   ()=>{if(!S.flags.kylaKaynti){S.flags.kylaKaynti=true;save();say('Vattula. Hiekkatie, kyläkauppa ja järvi, joka kimmeltää puiden takana.');}});}
-function goPolku(fromYard){fadeTo(()=>{S.scene='polku';useMap('polku');if(fromYard)placePlayer(7,0,'down');else placePlayer(6,12,'up');groundDirty=true;hud();save();},
+function goPolku(from){fadeTo(()=>{S.scene='polku';useMap('polku');if(from==='piha')placePlayer(7,0,'down');else if(from==='raimo')placePlayer(1,4,'right');else placePlayer(6,12,'up');groundDirty=true;hud();save();},
   ()=>{if(!S.flags.polkuKaynti){S.flags.polkuKaynti=true;save();say('Metsäpolku Vattulaan. Kuusikossa tuoksuu pihka ja sammal.');}});}
+function goRaimo(from){fadeTo(()=>{S.scene='raimo';useMap('raimo');if(from==='sieni')placePlayer(2,1,'down');else placePlayer(12,6,'left');groundDirty=true;hud();save();},
+  ()=>{if(!S.flags.raimoKaynti){S.flags.raimoKaynti=true;save();say('Raimon piha. Sininen talo, suora halkopino ja kissa ikkunalaudalla.');}});}
+function goSieni(){fadeTo(()=>{S.scene='sieni';useMap('sieni');placePlayer(8,14,'up');groundDirty=true;hud();save();},
+  ()=>{if(!S.flags.sieniKaynti){S.flags.sieniKaynti=true;addLog('Löysin Raimon pihan takaa sienimetsän.');save();say(['Sienimetsä. Kuusten alla on hämärää, ja sammal joustaa askelten alla.','Polku haarautuu muutamaan kertaan. Kaikki haarat eivät vie minnekään, mutta katsomisen arvoisia ne ovat.']);}});}
 function goYard(){fadeTo(()=>{S.scene='piha';useMap('piha');placePlayer(10,16,'up');groundDirty=true;hud();save();});}
 const SHOP_BUY=[{id:'porkkana_s',n:'Porkkanansiemen',p:2},{id:'maali',n:'Julkisivumaali',p:8,d:'riittää yhteen maalaukseen'},{id:'lautoja',n:'Lauta',p:2,d:'rakentamiseen'},{id:'kiuas',n:'Kiuas',p:12,d:'pihasaunaan'},{id:'naulat',n:'Naula',p:1,d:'terassiin tarvitaan 4'}];
 const SHOP_SELL=[{id:'porkkana',n:'Porkkana',p:5},{id:'mustikka',n:'Mustikka-annos',p:2},{id:'vadelma',n:'Vadelma-annos',p:2}];
@@ -1606,7 +1657,7 @@ function titlePress(b){const o=titleOpts();
   if(b==='up'||b==='down'){titleSel=(titleSel+(b==='up'?-1:1)+o.length)%o.length;blip(660,.03);renderTitle();return;}
   if(b==='b'&&titleConfirm){titleConfirm=false;titleSel=0;renderTitle();return;}
   if(b!=='a'&&b!=='start')return;blip(990,.06);const ch=o[titleSel];
-  if(ch==='Jatka'){mode='world';renderTitle();useMap(S.scene);groundDirty=true;placePlayer(S.px,S.py,S.dir);if(S.scene!=='tupa'&&solid(S.px,S.py)){const sp={piha:[10,9],kyla:[10,8],polku:[7,1]}[S.scene]||[10,9];placePlayer(sp[0],sp[1],'down');}CH=buildChar(S.look);hud();return;}
+  if(ch==='Jatka'){mode='world';renderTitle();useMap(S.scene);groundDirty=true;placePlayer(S.px,S.py,S.dir);if(S.scene!=='tupa'&&solid(S.px,S.py)){const sp={piha:[10,9],kyla:[10,8],polku:[7,1],raimo:[7,6],sieni:[8,14]}[S.scene]||[10,9];placePlayer(sp[0],sp[1],'down');}CH=buildChar(S.look);hud();return;}
   if(ch==='Uusi peli'&&S.started){titleConfirm=true;titleSel=1;renderTitle();return;}
   if(ch==='Peru'){titleConfirm=false;titleSel=0;renderTitle();return;}
   // uusi peli
@@ -1657,10 +1708,14 @@ document.addEventListener('contextmenu',e=>e.preventDefault());
 /* ---------- päivitys ---------- */
 function tryStep(d){const [dx,dy]=DIRS[d];const nx=PL.x+dx,ny=PL.y+dy;
   if(S.scene==='piha'&&nx===10&&ny===6)return enterHouse();
-  if(S.scene==='piha'&&nx===10&&ny===17)return goPolku(true);
+  if(S.scene==='piha'&&nx===10&&ny===17)return goPolku('piha');
   if(S.scene==='polku'&&ny<0)return goYard();
   if(S.scene==='polku'&&nx===6&&ny===13)return goVillage();
-  if(S.scene==='kyla'&&ny<0)return goPolku(false);
+  if(S.scene==='polku'&&nx===0&&ny===4)return goRaimo('polku');
+  if(S.scene==='kyla'&&ny<0)return goPolku('kyla');
+  if(S.scene==='raimo'&&nx===13&&ny===6)return goPolku('raimo');
+  if(S.scene==='raimo'&&ny<0)return goSieni();
+  if(S.scene==='sieni'&&ny>=YH)return goRaimo('sieni');
   if(S.scene==='tupa'&&nx===5&&ny===8)return exitHouse();
   if(solid(nx,ny))return;
   PL.tx=nx;PL.ty=ny;PL.moving=true;PL.parity^=1;}
@@ -1795,7 +1850,7 @@ function lightSources(){const L=[];
 let LM=null;
 function drawLighting(){
   const out=ambientAt(S.time),odk=darkness(out);
-  let amb=S.scene==='tupa'?lerpHex('#fff2e0','#7e7092',clamp(odk*1.15,0,1)):out;if(S.scene==='polku')amb=amb.map((v,i)=>Math.round(v*[.88,.94,.9][i]));const dk=darkness(amb);
+  let amb=S.scene==='tupa'?lerpHex('#fff2e0','#7e7092',clamp(odk*1.15,0,1)):out;if(FOREST_SC[S.scene])amb=amb.map((v,i)=>Math.round(v*[.88,.94,.9][i]));const dk=darkness(amb);
   if(S.scene==='tupa'){const k=1-odk*.5;ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb('+out.map(v=>Math.round(v*k)).join(',')+')';for(const wx of [72,200])ctx.fillRect(wx+4,10,40,36);ctx.globalCompositeOperation='source-over';
     if(odk>.3){ctx.fillStyle='rgba(255,255,230,'+Math.min(1,(odk-.3)*2)+')';for(const [x,y] of [[78,12],[83,16],[112,13],[116,19],[204,12],[218,14],[229,11],[240,17]])ctx.fillRect(x,y,1,1);
       ctx.fillStyle='rgba(240,240,220,'+Math.min(.9,(odk-.3)*1.8)+')';ctx.fillRect(237,12,3,3);ctx.fillRect(236,13,1,1);
