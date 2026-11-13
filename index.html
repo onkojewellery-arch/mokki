@@ -245,7 +245,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.34</div>
+        <div class="sub">mummon mökki · versio 0.35</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -623,16 +623,28 @@ function updateDog(){const o=YOBJ.find(q=>q.k==='maukka');if(!o)return;
 function drawDog(o){const sl=dogSleeps(),sp=sl?SPR.koiraNuk:SPR.koira[(o.px+o.py)>>3&1],fl=!sl&&o.face<0;const X=Math.round(o.px+16-sp.width/2),Y=Math.round(o.py+31-sp.bot);
   if(fl){ctx.save();ctx.translate(X+sp.width,Y);ctx.scale(-1,1);ctx.drawImage(sp,0,0);ctx.restore();}else ctx.drawImage(sp,X,Y);
   if(sl&&(frame>>5)%3!==0){const t=(frame%96)/96;ctx.globalAlpha=1-t;ctx.fillStyle='#e8eef4';ctx.font='bold 8px sans-serif';ctx.fillText('z',X+sp.width-6+t*4,Y-2-t*10);ctx.globalAlpha=1;}}
-function makeKoira(f){return outlined(36,26,g=>{const O=['#a8501a','#d0702a','#e8904a','#f4b070'];
-  for(const [lx,k] of [[9,0],[13,1],[22,0],[26,1]]){const up=(k===f)?2:0;R(g,lx,15-up,3,8+up,O[0]);R(g,lx,22,3,1,'#5a2a10');}
-  ell(g,17,13,10,6,O[1]);ell(g,16,11,8,3,O[2]);line(g,7,10,3,5,O[1]);line(g,8,10,4,4,O[2]);
-  ell(g,28,8,5,5,O[1]);ell(g,30,10,4,3,O[2]);P(g,33,10,'#2a1a10');R(g,29,6,2,1,'#2a1a10');poly(g,[[25,4],[27,0],[29,4]],O[0]);poly(g,[[29,4],[31,1],[32,5]],O[0]);R(g,22,15,6,2,'#f4ece0');});}
-function makeKoiraNuk(){return outlined(44,26,g=>{const O=['#9a4816','#c8682a','#e08a44','#f4b880'],D='#2a1a10';
-  R(g,2,19,12,3,O[1]);R(g,2,19,4,3,O[3]);R(g,12,17,3,3,O[1]);
-  ell(g,18,15,12,6,O[1]);ell(g,17,12,10,3,O[2]);R(g,9,18,17,2,O[3]);ell(g,10,16,5,5,O[0]);ell(g,10,15,3,3,O[1]);
-  R(g,25,19,13,3,O[2]);R(g,25,21,13,1,O[0]);for(const x of [33,36])P(g,x,20,O[0]);
-  ell(g,31,14,7,6,O[1]);ell(g,30,12,5,3,O[2]);R(g,36,15,6,4,O[2]);R(g,36,18,6,1,O[0]);R(g,40,15,2,2,D);
-  R(g,32,13,3,1,D);ell(g,27,13,3,5,O[0]);P(g,27,10,O[0]);R(g,27,9,2,2,O[0]);R(g,26,12,1,6,'#3a6aa8');});}
+function makeKoira(f){return outlined(44,36,g=>{g.translate(0,2);
+  const O=['#8a3e14','#b85a20','#d0782e','#e89a50'],BR='#7a3812',CR='#f0d0a8',LG='#c8803e',SW='#1e1e24',SWl='#2c2c34',CO='#f07a58',COl='#ffa284';
+  line(g,8,14,3,17,O[1]);line(g,8,15,3,18,O[1]);line(g,7,13,4,15,O[2]);R(g,2,17,3,2,O[0]);
+  const leg=(x,y0,len,c,dx)=>{for(let k=0;k<len;k++){const xx=x+Math.round(dx*k/len);R(g,xx,y0+k,2,1,c);}R(g,x+dx,y0+len,3,1,'#f4ece0');P(g,x+dx+2,y0+len,'#c8bca8');};
+  const a=f?1:-1;
+  leg(9,17,13,shade32(LG,-.2),a);leg(12,18,12,LG,-a);leg(27,18,12,shade32(LG,-.2),-a);leg(30,18,12,LG,a);
+  ell(g,11,15,4,4,O[1]);ell(g,10,13,3,2,O[2]);R(g,9,14,1,3,BR);R(g,12,16,1,2,BR);R(g,9,18,4,1,O[0]);
+  ell(g,20,14,9,4,SW);R(g,14,11,13,7,SW);for(let y=12;y<18;y+=2)for(let x=14+(y%4?1:0);x<27;x+=3)P(g,x,y,SWl);
+  R(g,15,10,10,2,'#46464e');for(let x=15;x<25;x+=2){P(g,x,10,'#e8e8ee');P(g,x+1,11,'#c8c8d0');}R(g,20,8,2,2,'#2a2a30');
+  R(g,26,11,3,7,CO);R(g,26,11,1,7,COl);R(g,28,12,1,5,'#c85a40');
+  R(g,28,6,3,7,O[1]);R(g,30,7,2,6,CR);P(g,28,6,O[2]);
+  ell(g,33,7,3,3,O[1]);ell(g,32,6,2,1,O[2]);R(g,35,7,4,2,O[2]);R(g,35,9,3,1,CR);R(g,36,7,3,1,O[3]);R(g,38,7,2,2,'#2a1a10');
+  P(g,34,6,'#2a1a10');P(g,33,5,BR);P(g,32,9,CR);
+  poly(g,[[28,6],[30,-2],[33,5]],O[1]);R(g,30,1,1,4,'#d89070');P(g,30,0,'#6a3010');poly(g,[[33,5],[36,-2],[38,6]],O[0]);R(g,35,1,1,4,'#c07858');P(g,36,0,'#5a2a10');},-.6);}
+function shade32(c,k){return T(c,k);}
+function makeKoiraNuk(){return outlined(46,26,g=>{const O=['#8a3e14','#b85a20','#d0782e','#e89a50'],D='#2a1a10',SW='#1e1e24',SWl='#34343e',CO='#f07a58';
+  R(g,2,19,12,3,O[1]);R(g,2,19,4,3,O[0]);R(g,12,17,3,3,O[1]);
+  ell(g,18,15,12,6,O[1]);ell(g,10,16,5,5,O[0]);ell(g,10,15,3,3,O[1]);
+  ell(g,20,14,9,5,SW);for(let y=11;y<19;y+=2)for(let x=13+(y%4?1:0);x<28;x+=2)P(g,x,y,SWl);R(g,14,10,10,2,'#4a4a54');for(let x=14;x<24;x+=2)P(g,x,10,'#e8e8ee');R(g,26,13,3,6,CO);
+  R(g,25,19,13,3,'#c8803e');R(g,25,21,13,1,'#8a4a1a');R(g,36,19,3,3,'#f4ece0');
+  ell(g,32,15,6,5,O[1]);ell(g,31,13,4,2,O[2]);R(g,36,15,6,3,O[2]);R(g,36,17,6,1,'#f0d0a8');R(g,41,15,2,2,D);
+  R(g,32,14,3,1,D);poly(g,[[27,13],[28,5],[31,12]],O[1]);poly(g,[[28,12],[28,8],[30,12]],'#6a3010');poly(g,[[31,12],[34,6],[35,13]],O[0]);});}
 /* ---------- Karan illat Mandin grillillä ---------- */
 function karaPubTalk(){const L=['Kara: "Tänään myin yhden maton. Siinä oli koko päivän tulosraportti."','Kara: "Kaupungissa illat menivät sähköposteihin. Täällä menee tuoppiin ja tähtiin."','Kara: "Mandi lupasi lukea minulle kortit. Toivottavasti niissä ei ole budjettia."'];
   say(L[(S.day+(S.kirppis?Object.keys(S.kirppis).length:0))%L.length]);}
