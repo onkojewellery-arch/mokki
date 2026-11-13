@@ -178,6 +178,26 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
 .qb{flex:1;min-height:58px;background:var(--btn);border:0;border-radius:12px;box-shadow:0 3px 0 var(--btn-edge);color:var(--ink);font:inherit;font-size:11px;letter-spacing:.04em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 2px;touch-action:none}
 .qb img{width:32px;height:32px;image-rendering:pixelated;image-rendering:crisp-edges}
 .qb.vh{visibility:hidden}.qb.on{transform:translateY(2px);box-shadow:0 1px 0 var(--btn-edge);filter:brightness(1.12)}
+.pclose{display:none;position:absolute;right:calc(var(--s)*3px);top:calc(var(--s)*3px);width:calc(var(--s)*14px);height:calc(var(--s)*14px);border-radius:50%;border:0;background:#3f6b4a;color:#fff;font:inherit;font-size:calc(var(--s)*7px);line-height:1}
+#padtoggle,#dbar{display:none}
+body.tall .pclose{display:block}
+body.tall #app{display:block;padding:0}
+body.tall header{display:none}
+body.tall #screenWrap{position:fixed;left:0;top:0;border-radius:0;box-shadow:none;z-index:1}
+body.tall #dpad,body.tall #mid,body.tall #ab{display:none}
+body.tall.pad #dpad{display:block;position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 104px);z-index:5;opacity:.86}
+body.tall.pad #ab{display:block;position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 104px);z-index:5;opacity:.86}
+body.tall #qbar{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);z-index:6;width:auto;max-width:none}
+body.tall .qb{background:rgba(18,26,20,.66);color:#f4efe2;box-shadow:0 2px 0 rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.16);min-height:64px}
+body.tall #padtoggle{display:block;position:fixed;right:10px;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:6;font:inherit;font-size:11px;color:#f4efe2;background:rgba(18,26,20,.6);border:1px solid rgba(255,255,255,.18);border-radius:99px;padding:6px 10px}
+body.tall.pad #padtoggle{background:#3f6b4a}
+body.tall #dbar{display:flex;position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);z-index:7;gap:8px}
+body.tall #dbar.hide{display:none}
+body.tall #dbar .db{flex:1;font-size:15px;font-weight:600;min-height:56px}
+body.tall #dbar .dinfo{flex:1.4;align-self:center;color:#fff;font-size:12px;text-shadow:0 1px 2px #000}
+body.tall #hud{top:calc(env(safe-area-inset-top,0px) + 6px)}
+body.tall #dialog{bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
 #mid{grid-area:mid;display:flex;flex-direction:column;align-items:center;gap:8px}
 .pill{font:inherit;font-size:12px;letter-spacing:.12em;color:var(--ink);background:var(--btn);border:0;border-radius:99px;padding:8px 14px;box-shadow:0 3px 0 var(--btn-edge);touch-action:none}
 .hint2{font-size:10px;color:var(--muted);text-align:center;max-width:96px;line-height:1.3}
@@ -207,7 +227,7 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.26</div>
+        <div class="sub">mummon mökki · versio 0.27</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -223,6 +243,8 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
       </div>
     </div>
   </div>
+  <button id="padtoggle" aria-label="Ohjaimet">✚ A B</button>
+  <div id="dbar" class="hide"></div>
   <div id="qbar"><button class="qb" data-q="vihko"><img alt=""><span>Vihko</span></button><button class="qb" data-q="reppu"><img alt=""><span>Reppu</span></button><button class="qb" data-q="ctx"><img alt=""><span>Sisusta</span></button><button class="qb" data-q="valikko"><img alt=""><span>Valikko</span></button></div>
   <div id="dpad" aria-label="Suuntaohjain"><span class="u"></span><span class="l"></span><span class="c"></span><span class="r"></span><span class="d"></span></div>
   <div id="mid"><button id="bStart" class="pill">VALIKKO</button><div class="hint2">Näppäimistöllä: nuolet, z = A, x = B, Enter = valikko</div></div>
@@ -235,7 +257,7 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
    MÖKKI – prototyyppi 0.1
    Yksi tiedosto: grafiikka piirretään koodilla pikseleinä.
    ============================================================ */
-const TS=32,VW=320,VH=288;
+const TS=32;let VW=320,VH=288;
 const cv=document.getElementById('cv'); const ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);
 
@@ -605,11 +627,58 @@ function updQbar(){const bar=document.getElementById('qbar');if(!bar||!S)return;
   if(!QICON.vihko)qIcons();bar.classList.toggle('off',!show);const btns=bar.querySelectorAll('.qb');
   btns[0].querySelector('img').src=QICON.vihko;btns[1].querySelector('img').src=QICON.reppu;btns[3].querySelector('img').src=QICON.valikko;
   const cb=btns[2];cb.classList.toggle('vh',!k);if(k){cb.querySelector('img').src=QICON[k];cb.querySelector('span').textContent=k==='sisusta'?'Sisusta':k==='terassi'?'Sisusta/Remontoi':'Remontoi';}}
-function qbPress(q){if(mode!=='world')return;blip(700,.04);
+function qbPress(q){AUTO=null;if(mode!=='world')return;blip(700,.04);
   if(q==='vihko')return showTasks(0);if(q==='reppu')return showInv();if(q==='valikko')return openMenu();
   const k=qbCtxKind();if(k==='sisusta')return S.scene==='rtupa'?openDecorR():openDecor();
   if(k==='terassi')return ask('Terassi',['Sisusta terassi','Remontoi','Peru'],i=>{if(i===0)startPick('terassi');else if(i===1)openBuildMenu();});
   if(k==='remontoi')return S.scene==='ranta'?openBuildMenuR():openBuildMenu();}
+/* ---------- kosketuskokeilu (v0.27): korkea näkymä ja napautusohjaus pihalla ja tuvassa ---------- */
+let TALLV=false,QPAD=0,AUTO=null,PADUSER=false;
+let TOUCHX=(()=>{try{const v=localStorage.getItem('mokki-touchx');if(v!=null)return v==='1';}catch(_){}return matchMedia('(pointer:coarse)').matches;})();
+function tallWanted(){return TOUCHX&&S&&S.started&&mode!=='title'&&(S.scene==='piha'||S.scene==='tupa')&&innerHeight>innerWidth*1.2;}
+function toggleTouchX(){TOUCHX=!TOUCHX;try{localStorage.setItem('mokki-touchx',TOUCHX?'1':'0');}catch(_){}toast('Kosketuskokeilu '+(TOUCHX?'päällä':'pois'));}
+function bfsPath(goal){const key=(x,y)=>x+','+y,prev={},q=[[PL.x,PL.y]];prev[key(PL.x,PL.y)]=null;let found=null;
+  while(q.length){const [x,y]=q.shift();if(goal(x,y)){found=[x,y];break;}for(const [d,[dx,dy]] of Object.entries(DIRS)){const nx=x+dx,ny=y+dy,k=key(nx,ny);if(k in prev)continue;if(solid(nx,ny))continue;prev[k]=[x,y,d];q.push([nx,ny]);}}
+  if(!found)return null;const steps=[];let c=key(found[0],found[1]);while(prev[c]){const [px,py,d]=prev[c];steps.unshift(d);c=key(px,py);}return {steps,end:found};}
+function dirTo(ax,ay,bx,by){return bx>ax?'right':bx<ax?'left':by>ay?'down':'up';}
+function walkToAdjacent(tiles,act,label){const set=new Set(tiles.map(([x,y])=>x+','+y));
+  const p=bfsPath((x,y)=>!set.has(x+','+y)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>set.has((x+dx)+','+(y+dy))));
+  if(!p){toastNow('Tuonne ei pääse tästä.');blip(180,.1);return;}
+  const [ex,ey]=p.end;const adj=tiles.find(([x,y])=>Math.abs(x-ex)+Math.abs(y-ey)===1);AUTO={steps:p.steps,face:dirTo(ex,ey,adj[0],adj[1]),act,scene:S.scene,mark:[adj[0],adj[1]]};}
+function tapTarget(gx,gy){const tx=Math.floor(gx/TS),ty=Math.floor(gy/TS);
+  if(S.scene==='tupa'){if(ty>=7&&tx===5&&gy>=7.5*TS)return {tiles:[[5,8]],act:()=>tryStep('down')};
+    if(ty<=1&&tx>=1&&tx<=8)return {tiles:[[tx,1]],act:interact};
+    const f=furnAt(tx,ty)||furnAt(tx,ty+1);if(f){const [w,h]=dims(f),T=[];for(let y=f.y;y<f.y+h;y++)for(let x=f.x;x<f.x+w;x++)T.push([x,y]);return {tiles:T,act:interact};}
+    return null;}
+  let best=null;for(const o of YOBJ){if(objHidden(o)||o.k==='maukka'&&!dogSleeps())continue;const sp=sprFor(o);let hit=gx>=o.x*TS-4&&gx<(o.x+o.w)*TS+4&&gy>=o.y*TS-4&&gy<(o.y+o.h)*TS+4;
+    if(!hit&&sp&&o.k!=='tree'&&o.k!=='house'){const [x0,y0]=sprPos(sp,o);hit=gx>=x0&&gx<x0+sp.width&&gy>=y0&&gy<y0+sp.bot;}
+    if(hit&&(!best||o.y+o.h>best.y+best.h))best=o;}
+  if(best&&best.k==='house'){const dx=gx-10.5*TS;if(Math.abs(dx)<TS*1.2&&gy>4.5*TS)return {tiles:[[10,6]],act:()=>tryStep('up')};}
+  if(best){const T=[];for(let y=best.y;y<best.y+best.h;y++)for(let x=best.x;x<best.x+best.w;x++)T.push([x,y]);return {tiles:T,act:interact};}
+  const ch=(YARD[ty]||[])[tx];if(ch==='D'||ch==='B')return {tiles:[[tx,ty]],act:interact,soil:true};if(ch==='x')return {tiles:[[tx,ty]],act:()=>tryStep(PL.dir)};return null;}
+function onTap(gx,gy){
+  if(mode==='decor')return decorTap(gx,gy);
+  if(mode==='dialog'){if(!(dlg&&dlg.choice))press('a');return;}
+  if(mode!=='world')return;
+  const t=tapTarget(gx,gy);if(t){walkToAdjacent(t.tiles,t.act);return;}
+  const tx=Math.floor(gx/TS),ty=Math.floor(gy/TS);if(tx===PL.x&&ty===PL.y){AUTO=null;return;}
+  const p=bfsPath((x,y)=>x===tx&&y===ty);if(!p){toastNow('Tuonne ei pääse tästä.');blip(180,.1);AUTO=null;return;}AUTO={steps:p.steps,face:null,act:null,scene:S.scene,mark:[tx,ty]};}
+function autoStep(){if(!AUTO)return false;if(AUTO.scene!==S.scene||mode!=='world'){AUTO=null;return false;}
+  if(AUTO.steps.length){const d=AUTO.steps.shift(),bx=PL.x,by=PL.y,sc=S.scene;PL.dir=d;tryStep(d);if(!PL.moving&&S.scene===sc&&PL.x===bx&&PL.y===by&&mode==='world'){AUTO=null;}return true;}
+  const a=AUTO;AUTO=null;if(a.face)PL.dir=a.face;if(a.act)a.act();return true;}
+function drawAutoMark(){if(!AUTO||!AUTO.mark)return;const [x,y]=AUTO.mark,t=(frame>>3)%2;ctx.strokeStyle=t?'#ffffff':'#f4d35e';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x*TS+16,y*TS+26,10,5,0,0,Math.PI*2);ctx.stroke();}
+function decorTap(gx,gy){const D=decor,B=dcBounds(),tx=Math.floor(gx/TS),ty=Math.floor(gy/TS);
+  if(D.held){D.held.x=clamp(tx,B.x0,B.x1);D.held.y=clamp(ty,B.y0,B.y1);D.cx=D.held.x;D.cy=D.held.y;blip(620,.02);decorHint();return;}
+  if(tx<B.x0||tx>B.x1||ty<B.y0||ty>B.y1){const f=D.ctx==='tupa'?furnAt(tx,ty+1):null;if(!f)return;D.cx=clamp(tx,B.x0,B.x1);D.cy=clamp(ty+1,B.y0,B.y1);}else{D.cx=tx;D.cy=ty;if(D.ctx==='tupa'&&!dcAt(tx,ty)&&furnAt(tx,ty+1))D.cy=ty+1;}
+  press('a');}
+let DB_STATE='';
+function updDbar(){const bar=document.getElementById('dbar');if(!bar)return;let btns=[];
+  if(TALLV){if(mode==='decor'&&decor)btns=decor.held?[['Käännä','start'],['Aseta','a'],['Peru','b']]:[['Napauta kalustetta','',1],['Valmis','b']];
+    else if(mode==='build'||mode==='terrace'||mode==='veranta'||mode==='paint')btns=[['◀','left'],['▶','right'],[mode==='paint'?'Maalaa':'Rakenna','a'],['Peru','b']];}
+  const st=btns.map(b=>b[0]).join('|');if(st===DB_STATE)return;DB_STATE=st;bar.innerHTML='';bar.classList.toggle('hide',!btns.length);
+  for(const [l,k,info] of btns){const el=document.createElement(info?'span':'button');el.className=info?'dinfo':'qb db';el.textContent=l;if(!info)el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();press(k);});bar.appendChild(el);}}
+const PAD_MODES={world:1,dialog:1,menu:1,panel:1,decor:1,build:1,terrace:1,veranta:1,paint:1,custom:1,busy:1,title:1,shop:1};
+function updTall(){const w=!!tallWanted();if(w!==TALLV){TALLV=w;AUTO=null;layout();}if(TALLV)document.body.classList.toggle('pad',PADUSER||!PAD_MODES[mode]);updDbar();}
 const FOREST_SC={polku:1,sieni:1};
 const MAPS={piha:{W:YW,H:YH,grid:YARD,objs:YOBJ},kyla:buildVillage(),polku:buildPolku(),raimo:buildRaimo(),sieni:buildSieni(),laituri:buildLaituri(),ranta:buildRanta(),jaska:buildJaska(),rtupa:buildRtupa(null)};
 function useMap(sc){if(sc==='piha'&&typeof S!=='undefined'&&S)syncTerrace();if(sc==='rtupa'){const R=rantaR();MAPS.rtupa=buildRtupa(R&&R.veranta);syncRanta();}if(sc==='ranta')syncRantaExt();const m=MAPS[sc]||MAPS.piha;YARD=m.grid;YOBJ=m.objs;YW=m.W;YH=m.H;}
@@ -1471,7 +1540,7 @@ function buildJaskaGround(){ground=mk(320,288,g=>{
   R(g,0,280,320,8,'#3a2416');R(g,128,272,32,16,'#6a4a32');R(g,130,274,28,12,'#8a6a3a');for(let x=132;x<156;x+=3)R(g,x,276,1,8,'#7a5a30');
   R(g,128,286,32,2,'#ffe8b0');g.drawImage(SPR.ruokalista,60,4);g.drawImage(SPR.telkkari,220,6);});}
 function buildTupa(){const wc=WALLS[S.wall][1],fl=FLOORS[S.floor];
-  ground=mk(VW,VH,g=>{
+  ground=mk(320,288,g=>{
     for(let y=2;y<=7;y++)for(let x=1;x<=8;x++)drawFloorTile(g,x*TS,y*TS,x,y,fl);
     for(const wx of [72,200])for(let yy=64;yy<176;yy++){const t=(yy-64)/112;g.fillStyle='rgba(255,232,170,'+(0.17*(1-t))+')';const x0=Math.round(wx+4+(yy-64)*.35);g.fillRect(x0,yy,19,1);g.fillRect(x0+21,yy,19,1);}
     for(let i=0;i<10;i++){g.fillStyle='rgba(30,14,4,'+(0.3-i*0.03)+')';g.fillRect(32,64+i,256,1);g.fillRect(32+i,64,1,192);g.fillRect(287-i,64,1,192);}
@@ -1698,7 +1767,7 @@ $('#dialog').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='di
 /* valikko */
 function openMenu(){const items=[['Mökkivihko',()=>showTasks(0)],['Reppu',showInv],['Hahmo',()=>openCustom('menu')]];
   if(S.scene==='tupa')items.push(['Sisusta',openDecor]);else if(S.scene==='piha')items.push(['Rakenna',openBuildMenu]);else if(S.scene==='rtupa')items.push(['Sisusta',openDecorR]);else if(S.scene==='ranta'&&S.flags.rantaOstettu)items.push(['Rakenna',openBuildMenuR]);
-  items.push(['Kellonaika (testi)',pickTime],['Päävalikko',toTitle],['Sulje',null]);menu={items,sel:0};mode='menu';blip(700,.04);renderMenu();}
+  items.push(['Kosketuskokeilu: '+(TOUCHX?'päällä':'pois'),toggleTouchX],['Kellonaika (testi)',pickTime],['Päävalikko',toTitle],['Sulje',null]);menu={items,sel:0};mode='menu';blip(700,.04);renderMenu();}
 function renderMenu(){const el=$('#menu');if(!menu){el.classList.add('hide');return;}el.classList.remove('hide');const ul=el.querySelector('.opts');ul.innerHTML='';
   menu.items.forEach((it,i)=>{const li=document.createElement('li');li.textContent=it[0];if(i===menu.sel)li.className='sel';
     li.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();menu.sel=i;press('a');});ul.appendChild(li);});}
@@ -1710,7 +1779,7 @@ function menuPress(b){if(b==='up'){menu.sel=(menu.sel-1+menu.items.length)%menu.
 
 /* paneelit */
 let panelKind='',vihkoPage=0;
-function showPanel(html,kind){const el=$('#panel');if(kind!=='tarot')el.classList.remove('tarotbox');el.innerHTML=html;el.classList.remove('hide');mode='panel';panelKind=kind||'';}
+function showPanel(html,kind){const el=$('#panel');html+='<button class="pclose" aria-label="Sulje">✕</button>';if(kind!=='tarot')el.classList.remove('tarotbox');el.innerHTML=html;el.classList.remove('hide');mode='panel';panelKind=kind||'';}
 /* ---------- Vattulan Sanomat (v0.14) ---------- */
 const LEHTI=[{main:true,img:'ranta',h:()=>S.flags.rantaOstettu?'Rantamökki sai uuden omistajan':curLevel()>=3?'Rantamökkiä pääsee katsomaan':'Rantamökki myynnissä',
     t:()=>S.flags.rantaOstettu?'Vattulanjärven rantamökki on myyty. Uusi omistaja antoi mökille nimen '+rantaNimi()+'.':curLevel()>=3?'Vattulanjärven rantamökki on myynnissä '+DREAMS[0].p+' markalla. Puomi on nostettu: kulje metsäpolulta itään venelaiturille ja sieltä rantatietä pohjoiseen.':'Rantamökki saattaa tulla myyntiin. Lisää tietoa seuraavassa numerossa.'},
@@ -1788,7 +1857,7 @@ function panelPress(b){
   if(panelKind==='hinnasto'){if(b==='left'||b==='right'){hinPage=hinPage?0:1;blip(660,.03);renderHinnasto();return;}if(b==='a'){if(hinPage===0){hinPage=1;blip(660,.03);renderHinnasto();}else{blip(660,.03);showTasks(1);}return;}}
   if(panelKind==='vihko'){const n=vihkoPages();if(b==='left'||b==='right'||(b==='a'&&vihkoPage<n-1)){vihkoPage=(vihkoPage+(b==='left'?-1:1)+n)%n;blip(660,.03);renderVihko();return;}}
   if(b==='a'||b==='b'||b==='start'){$('#panel').classList.add('hide');mode='world';panelKind='';blip(330,.05);}}
-$('#panel').addEventListener('pointerdown',e=>{if(panelKind==='nimi'||panelKind==='varasto'||panelKind==='kirppis')return;e.preventDefault();if(mode==='panel')press('a');});
+$('#panel').addEventListener('pointerdown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('pclose')){e.preventDefault();e.stopPropagation();press('b');return;}if(panelKind==='nimi'||panelKind==='varasto'||panelKind==='kirppis')return;e.preventDefault();if(mode==='panel')press('a');});
 let hinPage=0;
 function openHinnasto(pg){hinPage=pg||0;renderHinnasto();}
 function renderHinnasto(){let h;
@@ -2033,7 +2102,7 @@ function interactYard(fx,fy){
     case 'mpyora':return say('Mummon vanha pyörä nojaa vajan seinään. Ketju on ruosteessa, mutta kello soi yhä.');
     case 'ulkotuoli':case 'ulkopoyta':return say(fname({t:o.k})+' terassilla. Siirrä: Rakenna → Sisusta terassi.');
     case 'muovituoli':return say('Valkoinen muovituoli. Vähän kellastunut, mutta grillin vieressä paras paikka.');
-    case 'pmailbox':return say('Postilaatikko tien varressa. Kyljessä lukee vielä vaarin nimi. Lehti tulee kylän laatikkoon.');
+    case 'pmailbox':return openMail();
     case 'lippu':return say('Lipputanko. Vaari nosti lipun salkoon aina juhannusaattona.');
     case 'pyykki':return say('Pyykit kuivuvat tuulessa. Lakanat tuoksuvat auringolta.');
     case 'halot':if((S.saunaSt||0)>=2&&(S.inv.klapi||0)<3){S.inv.klapi=(S.inv.klapi||0)+1;save();toast('Klapi reppuun ('+S.inv.klapi+')');return say('Otit halkopinosta koivuklapin. Se tuoksuu kesältä.');}
@@ -2155,8 +2224,8 @@ function placeReason(f){const D=decor,[w,h]=dims(f),B=dcBounds();
   const g=(S.tfurn||[]).find(q=>q!==D.src&&q.x===f.x&&q.y===f.y);if(g)return 'Paikalla on jo '+fname(g).toLowerCase()+'.';
   if(f.x===PL.x&&f.y===PL.y)return 'Seisot itse siinä kohdassa.';return null;}
 function decorHint(){const D=decor;if(!D)return;
-  if(D.held){const rs=placeReason(D.held);hint(fname(D.held)+' '+sizeTxt(D.held)+' · '+(rs?'✖ '+rs:'✔ paikka käy')+' · A vahvista · B peru · VALIKKO käännä');}
-  else hint(D.ctx!=='terassi'?'Valitse kaluste nuolilla · A valitse · B takaisin':'Terassi: valitse kaluste · A valitse · B lopeta');}
+  if(D.held){const rs=placeReason(D.held);hint(fname(D.held)+' '+sizeTxt(D.held)+' · '+(rs?'✖ '+rs:'✔ paikka käy')+(TALLV?' · napauta ruutua siirtääksesi':' · A vahvista · B peru · VALIKKO käännä'));}
+  else hint(TALLV?'Napauta kalustetta, jota haluat siirtää':D.ctx!=='terassi'?'Valitse kaluste nuolilla · A valitse · B takaisin':'Terassi: valitse kaluste · A valitse · B lopeta');}
 function pickColors(){const pick=()=>ask('Seinät ja lattia',['Lattia: '+FLOORS[S.floor].n,'Seinät: '+WALLS[S.wall][0],'Valmis'],i=>{
     if(i===0){S.floor=(S.floor+1)%FLOORS.length;groundDirty=true;save();pick();}
     else if(i===1){S.wall=(S.wall+1)%WALLS.length;groundDirty=true;save();pick();}
@@ -2378,6 +2447,8 @@ function bindBtn(id,b){const el=document.getElementById(id);
   el.addEventListener('pointerdown',e=>{e.preventDefault();el.classList.add('on');if(b==='b')heldB=true;press(b);});
   const up=()=>{el.classList.remove('on');if(b==='b')heldB=false;};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('pointerleave',up);}
 bindBtn('bA','a');bindBtn('bB','b');bindBtn('bStart','start');
+cv.addEventListener('pointerdown',e=>{if(!TALLV)return;e.preventDefault();const r=cv.getBoundingClientRect();onTap((e.clientX-r.left)/r.width*VW+camX,(e.clientY-r.top)/r.height*VH+camY);});
+$('#padtoggle').addEventListener('pointerdown',e=>{e.preventDefault();PADUSER=!PADUSER;blip(600,.03);});
 document.querySelectorAll('#qbar .qb').forEach(el=>{el.addEventListener('pointerdown',e=>{e.preventDefault();el.classList.add('on');qbPress(el.dataset.q);});const up=()=>el.classList.remove('on');el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('pointerleave',up);});
 const KEYMAP={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',
   z:'a',Z:'a',' ':'a',x:'b',X:'b',Enter:'start',Escape:'b'};
@@ -2416,6 +2487,7 @@ function updatePlayer(){
   if(PL.moving){const sp=heldB?8:4,tx=PL.tx*TS,ty=PL.ty*TS;
     PL.px+=clamp(tx-PL.px,-sp,sp);PL.py+=clamp(ty-PL.py,-sp,sp);
     if(PL.px===tx&&PL.py===ty){PL.moving=false;PL.x=PL.tx;PL.y=PL.ty;PL.justArrived=true;}}
+  if(!PL.moving&&mode==='world'&&AUTO){if(heldDirection())AUTO=null;else if(autoStep()){PL.justArrived=false;return;}}
   if(!PL.moving&&mode==='world'){const d=heldDirection();
     if(d){if(d!==PL.dir&&!PL.justArrived){PL.dir=d;PL.turn=5;}else{PL.dir=d;if(PL.turn>0)PL.turn--;else tryStep(d);}}
     else PL.turn=0;PL.justArrived=PL.moving;}}
@@ -2437,7 +2509,7 @@ function drawHare(){const H=HARE;if(!H)return;const ph=H.t%26,hop=ph<16?Math.rou
   ell(ctx,X(5),y-3,3,3,body);P(ctx,X(7),y-3,'#1a1410');P(ctx,X(8),y-2,dark);
   R(ctx,X(3),y-11,1,8,dark);R(ctx,X(5),y-10,1,7,body);P(ctx,X(3),y-11,'#2a2018');P(ctx,X(5),y-10,'#2a2018');
   ell(ctx,X(-6),y-1,2,2,'#f2efe6');ctx.globalAlpha=1;}
-function update(){frame++;updateHare();updQbar();if(S&&S.scene==='raimo')updateDog();
+function update(){frame++;updateHare();updQbar();updTall();if(S&&S.scene==='raimo')updateDog();
   if(saunaSmoke>0){saunaSmoke--;if(S.scene==='piha'&&frame%9===0){const so=YOBJ.find(o=>o.k==='sauna');if(so&&SPR.saunaB){const [x0,y0]=sprPos(SPR.saunaB,so);PARTS.push({x:x0+76+Math.random()*4,y:y0+8,vx:.2+Math.random()*.1,vy:-.45,life:0,max:170,c:'#eeeeea',s:1,smoke:true});}}}
   if(frame%30===0){growPlants();updatePlantHint();}
   if(mode==='world'&&frame%60===0&&S.time<1439){S.time++;hud();}
@@ -2469,15 +2541,15 @@ function drawPlayer(){if(!CH)return;const prog=Math.abs(PL.px-PL.x*TS)+Math.abs(
   const fi=PL.moving&&prog<16?(PL.parity?1:2):0;const x=Math.round(PL.px),y=Math.round(PL.py);
   ell(ctx,x+17,y+29,10,2,'rgba(14,52,70,.35)');const blink=!PL.moving&&PL.dir!=='up'&&(frame%250)<7;ctx.drawImage(CH[PL.dir][blink?3:fi],x-3,y-24);}
 function draw(){
-  ctx.fillStyle='#10160f';ctx.fillRect(0,0,VW,VH);
-  const sc=S.scene,mapW=sc!=='tupa'?YW*TS:VW,mapH=sc!=='tupa'?YH*TS:VH;
+  ctx.fillStyle=S&&S.scene==='tupa'?'#211812':'#10160f';ctx.fillRect(0,0,VW,VH);
+  const sc=S.scene,mapW=sc!=='tupa'?YW*TS:320,mapH=sc!=='tupa'?YH*TS:288;
   let fx=PL.px+16,fy=PL.py+16;
   if(mode==='build'&&build){const c=build.cands[build.i];fx=(c.x+c.w/2)*TS;fy=(c.y+c.h/2)*TS;}
   if(mode==='veranta'&&vrt){const c=vrt.cands[vrt.i];fx=(c.x+c.w/2)*TS;fy=(c.y+c.h/2)*TS;}
   if(mode==='terrace'&&terr){fx=(terr.rect.x+terr.rect.w/2)*TS;fy=(terr.rect.y+terr.rect.h/2)*TS;}
   if(mode==='paint'){fx=10*TS+16;fy=5*TS+16;}
   if(mode==='title'&&sc==='piha'){fx=320+Math.sin(frame/400)*180;fy=280+Math.sin(frame/530)*100;}
-  let cb0=0,cb1=mapW;if(sc==='rtupa'){const R=rantaR(),sd=R&&R.veranta;cb0=(sd==='lansi'?0:3)*TS;cb1=(sd==='ita'?17:14)*TS;}camX=Math.round(clamp(fx-VW/2,cb0,cb1-VW));camY=Math.round(clamp(fy-VH/2,0,mapH-VH));
+  let cb0=0,cb1=mapW;if(sc==='rtupa'){const R=rantaR(),sd=R&&R.veranta;cb0=(sd==='lansi'?0:3)*TS;cb1=(sd==='ita'?17:14)*TS;}const PADT=TALLV?40:0,PADB=TALLV?QPAD:0;camX=cb1-cb0<VW?Math.round(cb0-(VW-(cb1-cb0))/2):Math.round(clamp(fx-VW/2,cb0,cb1-VW));{const lo=-PADT,hi=mapH+PADB-VH;camY=hi<lo?Math.round((lo+hi)/2):Math.round(clamp(fy-VH/2,lo,hi));}
   if(groundDirty)rebuildGround();
   ctx.drawImage(ground,-camX,-camY);
   ctx.save();ctx.translate(-camX,-camY);
@@ -2518,6 +2590,7 @@ function draw(){
     const ax=c.side==='ita'?c.x*TS-3:(c.x+c.w)*TS-3,ay=(c.y+1)*TS+2;ctx.fillStyle=(frame>>3)%2?'#f4d35e':'#ffffff';ctx.fillRect(ax,ay,6,28);ctx.fillStyle='#3a2a1e';ctx.fillRect(ax+2,ay+3,2,22);}
   if(mode==='build'&&build){const c=build.cands[build.i];ctx.globalAlpha=.8;drawPorch(ctx,c);ctx.globalAlpha=1;
     ctx.strokeStyle=(frame>>4)%2?'#ffffff':'#f4d35e';ctx.lineWidth=2;ctx.strokeRect(c.x*TS+1,c.y*TS+1,c.w*TS-2,c.h*TS-2);}
+  drawAutoMark();
   ctx.restore();
   drawLighting();
   if(VIGN)ctx.drawImage(VIGN,0,0);
@@ -2556,10 +2629,10 @@ function drawLighting(){
   const out=ambientAt(S.time),odk=darkness(out);
   if(S.scene==='jaska'){TFX.k+=((TFX.on?1:0)-TFX.k)*.06;if(TFX.k<.01&&!TFX.on)TFX.k=0;}
   let amb=(S.scene==='tupa'||S.scene==='rtupa')?lerpHex('#fff2e0','#7e7092',clamp(odk*1.15,0,1)):S.scene==='jaska'?lerpHex('#fff0dc','#c4a890',clamp(odk,0,1)):out;if(FOREST_SC[S.scene])amb=amb.map((v,i)=>Math.round(v*[.88,.94,.9][i]));if(S.scene==='jaska'&&TFX.k>0){const d=hexRgb('#3a2e40');amb=amb.map((v,i)=>Math.round(v+(d[i]-v)*TFX.k*.9));}const dk=darkness(amb);
-  if(S.scene==='tupa'){const k=1-odk*.5;ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb('+out.map(v=>Math.round(v*k)).join(',')+')';for(const wx of [72,200])ctx.fillRect(wx+4,10,40,36);ctx.globalCompositeOperation='source-over';
-    if(odk>.3){ctx.fillStyle='rgba(255,255,230,'+Math.min(1,(odk-.3)*2)+')';for(const [x,y] of [[78,12],[83,16],[112,13],[116,19],[204,12],[218,14],[229,11],[240,17]])ctx.fillRect(x,y,1,1);
-      ctx.fillStyle='rgba(240,240,220,'+Math.min(.9,(odk-.3)*1.8)+')';ctx.fillRect(237,12,3,3);ctx.fillRect(236,13,1,1);
-      ctx.fillStyle='rgba(190,200,230,'+Math.min(.55,(odk-.3)*1.2)+')';ctx.fillRect(98,16,3,10);ctx.fillRect(98,28,3,18);}}
+  if(S.scene==='tupa'){const k=1-odk*.5;ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb('+out.map(v=>Math.round(v*k)).join(',')+')';for(const wx of [72,200])ctx.fillRect(wx+4-camX,10-camY,40,36);ctx.globalCompositeOperation='source-over';
+    if(odk>.3){ctx.fillStyle='rgba(255,255,230,'+Math.min(1,(odk-.3)*2)+')';for(const [x,y] of [[78,12],[83,16],[112,13],[116,19],[204,12],[218,14],[229,11],[240,17]])ctx.fillRect(x-camX,y-camY,1,1);
+      ctx.fillStyle='rgba(240,240,220,'+Math.min(.9,(odk-.3)*1.8)+')';ctx.fillRect(237-camX,12-camY,3,3);ctx.fillRect(236-camX,13-camY,1,1);
+      ctx.fillStyle='rgba(190,200,230,'+Math.min(.55,(odk-.3)*1.2)+')';ctx.fillRect(98-camX,16-camY,3,10);ctx.fillRect(98-camX,28-camY,3,18);}}
   if(S.scene==='rtupa'){const k=1-odk*.5;ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb('+out.map(v=>Math.round(v*k)).join(',')+')';for(const [x,y,w,h] of RT_WINS)ctx.fillRect(x-camX,y-camY,w,h);ctx.globalCompositeOperation='source-over';
     if(odk>.3){ctx.fillStyle='rgba(255,255,230,'+Math.min(1,(odk-.3)*2)+')';for(const [x,y,w,h] of RT_WINS)for(let k=0;k<3;k++)ctx.fillRect(x-camX+Math.floor(hash(x,k,804)*w),y-camY+Math.floor(hash(y,k,805)*h*.3),1,1);}}
   if(!LM)LM=mk(VW,VH,()=>{});const g=LM.getContext('2d');
@@ -2573,10 +2646,15 @@ function drawLighting(){
     for(const l of L){if(l.win){ctx.fillStyle='rgba(255,180,80,'+(.6*a)+')';ctx.fillRect(l.win[0]-camX,l.win[1]-camY,l.win[2],l.win[3]);}
       const x=l.x-camX,y=l.y-camY,r=l.r*.55,gr=ctx.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,'rgba('+l.c+','+(.25*a)+')');gr.addColorStop(1,'rgba('+l.c+',0)');ctx.fillStyle=gr;ctx.fillRect(x-r,y-r,r*2,r*2);}}
   ctx.globalCompositeOperation='source-over';}
-function makeVignette(){VIGN=mk(VW,VH,g=>{const gr=g.createRadialGradient(VW/2,VH/2,110,VW/2,VH/2,230);gr.addColorStop(0,'rgba(70,40,30,0)');gr.addColorStop(1,'rgba(70,40,30,.14)');g.fillStyle=gr;g.fillRect(0,0,VW,VH);});}
+function makeVignette(){VIGN=mk(VW,VH,g=>{const gr=g.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.38,VW/2,VH/2,Math.max(VW,VH)*.8);gr.addColorStop(0,'rgba(70,40,30,0)');gr.addColorStop(1,'rgba(70,40,30,.14)');g.fillStyle=gr;g.fillRect(0,0,VW,VH);});}
 
 /* ---------- asettelu ---------- */
-function layout(){const wrap=$('#screenWrap');const land=innerWidth>innerHeight&&innerHeight<=560;
+function layout(){const wrap=$('#screenWrap');
+  if(TALLV){document.body.classList.add('tall');const W=innerWidth,H=innerHeight;VW=320;VH=clamp(Math.round(320*H/W),300,760);
+    if(cv.height!==VH){cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;LM=null;makeVignette();}
+    wrap.style.width=W+'px';wrap.style.height=H+'px';const s=W/160;$('#ui').style.setProperty('--s',s);QPAD=Math.round(96*320/W);return;}
+  document.body.classList.remove('tall','pad');if(cv.height!==288){VW=320;VH=288;cv.width=320;cv.height=288;ctx.imageSmoothingEnabled=false;LM=null;makeVignette();}
+  const land=innerWidth>innerHeight&&innerHeight<=560;
   let aw,ah;if(land){aw=innerWidth-2*130-40;ah=innerHeight-24;}else{aw=Math.min(innerWidth,560)-32;ah=innerHeight-60-170-30-76;}
   let s=Math.min(aw/160,ah/144);if(s>=2)s=Math.floor(s);s=clamp(s,1,5);
   wrap.style.width=160*s+'px';wrap.style.height=144*s+'px';$('#ui').style.setProperty('--s',s);}
