@@ -144,12 +144,20 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
 .hin .tab2 span{padding:0 calc(var(--s)*3px);border-radius:calc(var(--s)*1px);color:#6a5f4c;border:calc(var(--s)*.5px) solid #c9b98f}
 .hin .tab2 span.on{background:#3f6b4a;color:#f6efdc;border-color:#3f6b4a}
 /* title */
-#title{position:absolute;inset:0;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:linear-gradient(180deg,rgba(20,30,24,.15),rgba(20,30,24,.75) 70%)}
-#title .logo{font-size:calc(var(--s)*26px);font-weight:600;color:#f6efdc;letter-spacing:.12em;
+#title{position:absolute;inset:0;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:calc(var(--s)*22px) 0 calc(var(--s)*14px);box-sizing:border-box;
+  background:linear-gradient(180deg,rgba(255,240,200,.08),rgba(20,30,24,0) 40%,rgba(20,30,24,.45) 100%)}
+#title .logo{font-size:calc(var(--s)*24px);font-weight:600;color:#f6efdc;letter-spacing:.12em;padding:calc(var(--s)*3px) calc(var(--s)*10px) calc(var(--s)*4px);
+  background:repeating-linear-gradient(180deg,#a8743e 0,#a8743e calc(var(--s)*7px),#8a5a2e calc(var(--s)*7px),#8a5a2e calc(var(--s)*8px));
+  border:calc(var(--s)*1.5px) solid #3a2416;border-radius:calc(var(--s)*3px);box-shadow:inset 0 calc(var(--s)*1px) 0 #d0a068,0 calc(var(--s)*2px) 0 rgba(0,0,0,.4);
   text-shadow:0 calc(var(--s)*1px) 0 #2b2420,calc(var(--s)*1px) 0 0 #2b2420,calc(var(--s)*-1px) 0 0 #2b2420,0 calc(var(--s)*-1px) 0 #2b2420,0 calc(var(--s)*3px) 0 #a63c32}
-#title .sub{color:#f3ecd9;font-size:calc(var(--s)*6.5px);margin:calc(var(--s)*2px) 0 calc(var(--s)*8px);opacity:.9}
-#title .tbox{position:relative}
+#title .sub{color:#f3ecd9;font-size:calc(var(--s)*6.5px);margin:calc(var(--s)*4px) 0 0;background:rgba(20,30,24,.6);padding:calc(var(--s)*1px) calc(var(--s)*5px);border-radius:99px}
+#title .tbox{position:relative;margin-top:auto;background:rgba(20,30,24,.55);border:0;box-shadow:none;padding:calc(var(--s)*3px);min-width:calc(var(--s)*96px)}
+#tmenu li{display:block;text-align:center;padding:calc(var(--s)*3px) calc(var(--s)*10px);margin:calc(var(--s)*2px) 0;border-radius:calc(var(--s)*3px);background:#efe4c6;color:#2b2420;border:calc(var(--s)*.5px) solid #cdbd98;font-size:calc(var(--s)*8px);box-shadow:0 calc(var(--s)*1px) 0 rgba(0,0,0,.3)}
+#tmenu li.sel{background:#3f6b4a;color:#fff;border-color:#2f5a3a}
+#tmenu li.sel::before{display:none}
+#title .warn{color:#fff;text-align:center}
+body.tall #title{padding-bottom:calc(env(safe-area-inset-bottom,0px) + var(--s)*20px);padding-top:calc(env(safe-area-inset-top,0px) + var(--s)*30px)}
 #title .warn{font-size:calc(var(--s)*6px);margin-bottom:calc(var(--s)*1px)}
 /* customization */
 .custom{font-size:calc(var(--s)*6.5px)}
@@ -237,7 +245,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.29</div>
+        <div class="sub">mummon mökki · versio 0.30</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -649,7 +657,7 @@ function qbPress(q){AUTO=null;if(mode!=='world')return;blip(700,.04);
 /* ---------- kosketuskokeilu (v0.27): korkea näkymä ja napautusohjaus pihalla ja tuvassa ---------- */
 let TALLV=false,QPAD=0,AUTO=null,PADUSER=false;
 let TOUCHX=(()=>{try{const v=localStorage.getItem('mokki-touchx');if(v!=null)return v==='1';}catch(_){}return matchMedia('(pointer:coarse)').matches;})();
-function tallWanted(){return TOUCHX&&S&&S.started&&mode!=='title'&&innerHeight>innerWidth*1.2;}
+function tallWanted(){return TOUCHX&&S&&(S.started||mode==='title')&&innerHeight>innerWidth*1.2;}
 function toggleTouchX(){TOUCHX=!TOUCHX;try{localStorage.setItem('mokki-touchx',TOUCHX?'1':'0');}catch(_){}toast('Kosketuskokeilu '+(TOUCHX?'päällä':'pois'));}
 function bfsPath(goal){const key=(x,y)=>x+','+y,prev={},q=[[PL.x,PL.y]];prev[key(PL.x,PL.y)]=null;let found=null;
   while(q.length){const [x,y]=q.shift();if(goal(x,y)){found=[x,y];break;}for(const [d,[dx,dy]] of Object.entries(DIRS)){const nx=x+dx,ny=y+dy,k=key(nx,ny);if(k in prev)continue;if(solid(nx,ny))continue;prev[k]=[x,y,d];q.push([nx,ny]);}}
@@ -1739,7 +1747,7 @@ function drawPortrait(g,L){
 
 
 /* ---------- tila ---------- */
-let S=load(); const HAD_SAVE=!!S; if(!S)S=newState(); useMap(S.scene);
+let S=load(); const HAD_SAVE=!!S; if(!S)S=newState(); let TITLE_REAL=null;if(S.scene!=='piha'){TITLE_REAL=S.scene;S.scene='piha';} useMap(S.scene);
 let mode='title',frame=0,camX=0,camY=0,fade=null,dlg=null,menu=null,decor=null,build=null,custom=null,titleSel=0,titleConfirm=false;
 let grilling=0;const PARTS=[];const BF={t:0,x:150,y:150};
 const PL={x:S.px,y:S.py,px:S.px*TS,py:S.py*TS,dir:S.dir||'up',moving:false,tx:0,ty:0,turn:0,parity:0,justArrived:false,bumpCool:0};
@@ -2431,7 +2439,7 @@ function titlePress(b){const o=titleOpts();
   if(b==='up'||b==='down'){titleSel=(titleSel+(b==='up'?-1:1)+o.length)%o.length;blip(660,.03);renderTitle();return;}
   if(b==='b'&&titleConfirm){titleConfirm=false;titleSel=0;renderTitle();return;}
   if(b!=='a'&&b!=='start')return;blip(990,.06);const ch=o[titleSel];
-  if(ch==='Jatka'){if(XP_HYVITYS){const t=XP_HYVITYS;XP_HYVITYS=null;setTimeout(()=>{toast(t);hud();},600);}mode='world';renderTitle();useMap(S.scene);groundDirty=true;placePlayer(S.px,S.py,S.dir);if(S.scene!=='tupa'&&solid(S.px,S.py)){const sp={piha:[10,9],kyla:[18,15],polku:[7,1],raimo:[7,6],sieni:[8,14],laituri:[5,4],ranta:[6,8],jaska:[4,7],rtupa:[8,6]}[S.scene]||[10,9];placePlayer(sp[0],sp[1],'down');}CH=buildChar(S.look);hud();return;}
+  if(ch==='Jatka'){if(TITLE_REAL){S.scene=TITLE_REAL;TITLE_REAL=null;}if(XP_HYVITYS){const t=XP_HYVITYS;XP_HYVITYS=null;setTimeout(()=>{toast(t);hud();},600);}mode='world';renderTitle();useMap(S.scene);groundDirty=true;placePlayer(S.px,S.py,S.dir);if(S.scene!=='tupa'&&solid(S.px,S.py)){const sp={piha:[10,9],kyla:[18,15],polku:[7,1],raimo:[7,6],sieni:[8,14],laituri:[5,4],ranta:[6,8],jaska:[4,7],rtupa:[8,6]}[S.scene]||[10,9];placePlayer(sp[0],sp[1],'down');}CH=buildChar(S.look);hud();return;}
   if(ch==='Uusi peli'&&S.started){titleConfirm=true;titleSel=1;renderTitle();return;}
   if(ch==='Peru'){titleConfirm=false;titleSel=0;renderTitle();return;}
   // uusi peli
@@ -2650,7 +2658,7 @@ function lightSources(){const L=[];
   return L;}
 let LM=null;
 function drawLighting(){
-  const out=ambientAt(S.time),odk=darkness(out);
+  const out=ambientAt(mode==='title'?560:S.time),odk=darkness(out);
   if(S.scene==='jaska'){TFX.k+=((TFX.on?1:0)-TFX.k)*.06;if(TFX.k<.01&&!TFX.on)TFX.k=0;}
   let amb=(S.scene==='tupa'||S.scene==='rtupa')?lerpHex('#fff2e0','#7e7092',clamp(odk*1.15,0,1)):S.scene==='jaska'?lerpHex('#fff0dc','#c4a890',clamp(odk,0,1)):out;if(FOREST_SC[S.scene])amb=amb.map((v,i)=>Math.round(v*[.88,.94,.9][i]));if(S.scene==='jaska'&&TFX.k>0){const d=hexRgb('#3a2e40');amb=amb.map((v,i)=>Math.round(v+(d[i]-v)*TFX.k*.9));}const dk=darkness(amb);
   if(S.scene==='tupa'){const k=1-odk*.5;ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb('+out.map(v=>Math.round(v*k)).join(',')+')';for(const wx of [72,200])ctx.fillRect(wx+4-camX,10-camY,40,36);ctx.globalCompositeOperation='source-over';
