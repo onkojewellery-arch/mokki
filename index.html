@@ -245,7 +245,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.30</div>
+        <div class="sub">mummon mökki · versio 0.31</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -553,10 +553,11 @@ function rantaNimi(){return (S.cabins&&S.cabins.ranta&&S.cabins.ranta.name)||'Ra
 function buildJaska(){const W=10,H=9,G=[],O=[];
   for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push(y<2||y===H-1||x===0||x===W-1?'W':'F');}
   G[8][4]='o';
-  O.push({k:'jaska',x:3,y:2,w:1,h:1},{k:'keitin',x:1,y:2,w:1,h:1},{k:'tiski2',x:1,y:3,w:4,h:1},
+  O.push({k:'jaska',x:3,y:2,w:1,h:1},{k:'keitin',x:1,y:2,w:1,h:1},{k:'hylly',x:4,y:2,w:1,h:1},{k:'tiski2',x:1,y:3,w:4,h:1},
     {k:'jakkara',x:1,y:4,w:1,h:1},{k:'jakkara',x:2,y:4,w:1,h:1},
-    {k:'ruokalista',x:2,y:1,w:1,h:1},{k:'telkkari',x:7,y:1,w:1,h:1},{k:'pajatso',x:8,y:3,w:1,h:1},{k:'jukeboksi',x:1,y:6,w:1,h:1},
-    {k:'pubpoyta',x:5,y:5,w:2,h:1},{k:'pubpoyta',x:6,y:7,w:2,h:1,v:1},{k:'kara2',x:7,y:5,w:1,h:1},{k:'tuoppi',x:6,y:5,w:1,h:1});
+    {k:'ruokalista',x:2,y:1,w:1,h:1},{k:'valokuva',x:6,y:1,w:2,h:1},{k:'pajatso',x:1,y:6,w:1,h:1},{k:'jukeboksi',x:1,y:7,w:1,h:1},
+    {k:'seinapenkki',x:8,y:3,w:1,h:3},{k:'pubpoyta',x:6,y:4,w:2,h:1},{k:'pikkupoyta',x:7,y:6,w:1,h:1},
+    {k:'kara2',x:6,y:6,w:1,h:1},{k:'tuoppi',x:7,y:6,w:1,h:1});
   return {W,H,grid:G,objs:O};}
 const INDOOR={tupa:1,jaska:1,rtupa:1};
 const JASKA_LOOK={style:1,hair:'#7a4424',skin:'#eab48c',eye:'#4a6a3a',top:{c:'#c8463a'},pants:'#2e3038',glasses:'#2a2226'};
@@ -581,8 +582,8 @@ const TCARD={};function tarotImg(i){if(TCARD[i])return TCARD[i];const c=mk(44,72
     else{ell(g,22,24,6,6,'#eab48c');poly(g,[[12,66],[22,30],[32,66]],'#c8463a');R(g,16,16,12,3,'#e8c040');for(const x of [16,20,24,27])R(g,x,13,2,3,'#e8c040');for(let k=0;k<5;k++){ell(g,8+k*7,62,2,2,'#f4d35e');}}
     R(g,4,66,36,2,'#e8c040');});return TCARD[i]=c.toDataURL();}
 let TFX={on:false,k:0};
-function drawCandles(){ctx.globalAlpha=Math.min(1,TFX.k*1.4);for(const cx of [72,148]){R(ctx,cx-2,86,5,9,'#f4ecd8');R(ctx,cx-2,86,1,9,'#ffffff');R(ctx,cx-3,94,7,2,'#c8a040');const f=(frame>>2)%3;
-  R(ctx,cx,82-f%2,1,4,'#2a2a2a');ell(ctx,cx,80-(f===1?1:0),2,3+(f===2?1:0),'#ffb030');ell(ctx,cx,81,1,1,'#fff4c0');}ctx.globalAlpha=1;}
+function drawCandles(){const t=YOBJ.find(o=>o.k==='tiski2');if(!t)return;const [x0,y0]=sprPos(SPR.tiski2,t);ctx.globalAlpha=Math.min(1,TFX.k*1.4);
+  for(const c of [104,122]){const cx=x0+c,f=(frame>>2)%3;ell(ctx,cx,y0-1-(f===1?1:0),2,3+(f===2?1:0),'#ffb030');ell(ctx,cx,y0,1,1,'#fff4c0');}ctx.globalAlpha=1;}
 function tarotLuenta(){TFX.on=true;const same=S.tarot&&S.tarot.day===S.day;if(!same){S.tarot={day:S.day,i:Math.floor(Math.random()*TAROT.length)};addLog('Mandi luki minulle tarotkortin: '+TAROT[S.tarot.i].n+'.');save();}
   const c=TAROT[S.tarot.i],show=()=>{showPanel('<div class="tarot"><div class="tflip"><img src="'+tarotImg(S.tarot.i)+'" alt=""></div><div><b>'+c.n+'</b><p>Mandi: "'+c.t+'"</p></div></div><div class="foot">'+(same?'Sama kortti kuin aiemmin tänään · B sulkee':'A tai B sulkee')+'</div>','tarot');$('#panel').classList.add('tarotbox');};
   say(same?['Mandi: "Kortit eivät vaihda mieltään saman päivän aikana. Sama kortti kuin äsken."']:['Mandi sekoittaa pakkaa tottuneesti ja nostaa yhden kortin tiskille.'],show);}
@@ -936,9 +937,20 @@ function makePysakki(){return outlined(72,82,g=>{
   R(g,63,6,3,70,'#8a8e94');R(g,63,6,1,70,'#c8ccd0');
   R(g,56,2,16,12,'#2a2a2a');R(g,57,3,14,10,'#f2c230');R(g,59,6,10,4,'#1e1e1e');P(g,60,10,'#1e1e1e');P(g,67,10,'#1e1e1e');R(g,60,6,2,2,'#f2c230');R(g,63,6,2,2,'#f2c230');R(g,66,6,2,2,'#f2c230');
   R(g,57,14,14,4,'#f2ece0');R(g,58,15,12,1,'#3a3a3a');});}
-function makeTiski2(){return outlined(132,46,g=>{R(g,2,10,128,6,'#c8a070');R(g,2,10,128,1,'#e8c898');R(g,2,16,128,26,'#6a3a26');for(let x=2;x<130;x+=8){R(g,x,16,1,26,'#4e2a1a');R(g,x+1,16,1,26,'#7e4a32');}R(g,2,40,128,3,'#3a2016');
-  R(g,92,0,20,11,'#4a4e56');R(g,94,2,16,5,'#2a2e34');R(g,96,3,8,2,'#7ad0a0');R(g,94,8,16,2,'#8a8e94');
-  R(g,20,4,4,7,'#c8302a');R(g,26,5,4,6,'#e8c030');R(g,72,6,9,6,'#5a2a6a');R(g,73,5,9,6,'#6a3a7a');R(g,74,6,7,4,'#e8c040');R(g,76,7,3,2,'#6a3a7a');R(g,54,6,10,5,'#d8d8d0');R(g,56,4,6,2,'#f4f4ee');});}
+function makeHylly(){return outlined(34,58,g=>{R(g,3,4,28,52,'#3e2416');R(g,3,4,28,2,'#5a3822');for(const y of [18,34,50]){R(g,3,y,28,3,'#6a4428');R(g,3,y,28,1,'#8a5a34');}
+  const B=['#3a6a3a','#8a4a1a','#c8a040','#5a2a4a','#2a4a6a'];for(let s2=0;s2<3;s2++)for(let k=0;k<4;k++){const c=B[(s2*2+k)%5],x=6+k*6,y=8+s2*16;R(g,x,y,4,10,c);R(g,x+1,y-3,2,3,c);R(g,x,y+2,1,6,T(c,.35));}});}
+function makeSeinapenkki(){return outlined(34,100,g=>{R(g,22,4,10,92,'#3e2416');for(let y=4;y<96;y+=8){R(g,22,y,10,1,'#2a1810');R(g,23,y+1,3,6,'#4e2e1a');}R(g,22,4,2,92,'#5a3822');
+  R(g,2,12,22,82,'#4a2a16');for(let k=0;k<3;k++){const y=14+k*26;R(g,4,y,18,24,'#7a2c2a');R(g,5,y,16,2,'#a24a40');R(g,4,y+22,18,2,'#5a1e1c');R(g,20,y+2,2,20,'#5a1e1c');R(g,8,y+8,6,1,'#8e3a34');}
+  R(g,2,92,22,4,'#2e1a10');for(const y of [16,52,88])R(g,2,y,2,6,'#24140c');});}
+function makePikkupoyta(){return outlined(40,44,g=>{ell(g,20,14,16,8,'#3e2416');ell(g,20,13,16,8,'#6a4428');ell(g,20,12,13,6,'#7a5232');ell(g,16,10,5,2,'#8a6240');R(g,18,20,4,18,'#3e2416');ell(g,20,38,9,3,'#2a1810');});}
+function makeTiski2(){return outlined(132,56,g=>{
+  R(g,2,14,128,8,'#c8862e');R(g,2,14,128,2,'#e8aa4a');R(g,2,21,128,1,'#7a4a1a');R(g,0,22,132,3,'#4a2a16');
+  R(g,2,25,128,26,'#3e2416');for(let x=4;x<126;x+=31){R(g,x,28,27,19,'#4e2e1a');R(g,x,28,27,1,'#6a4428');R(g,x,46,27,1,'#24140c');R(g,x+26,28,1,19,'#24140c');}
+  R(g,2,50,128,2,'#b08a3a');R(g,2,50,128,1,'#e0c060');for(const x of [10,64,118])R(g,x,47,2,4,'#8a6a2a');
+  R(g,14,4,20,11,'#4a4e56');R(g,16,6,16,5,'#2a2e34');R(g,18,7,8,2,'#7ad0a0');R(g,14,12,20,2,'#8a8e94');
+  R(g,40,7,4,8,'#c8302a');R(g,46,8,4,7,'#e8c030');R(g,56,10,10,4,'#d8d8d0');R(g,58,8,6,2,'#f4f4ee');
+  for(const cx of [104,122]){R(g,cx-3,12,7,2,'#b08a3a');R(g,cx-1,8,3,4,'#c8a040');R(g,cx-1,2,3,7,'#f4ecd8');R(g,cx-1,2,1,7,'#ffffff');P(g,cx,1,'#2a2a2a');}
+  R(g,109,9,9,5,'#5a2a6a');R(g,110,8,9,5,'#6a3a7a');R(g,111,9,7,3,'#e8c040');R(g,113,10,3,1,'#6a3a7a');});}
 function makeKeitin(){return outlined(36,52,g=>{R(g,3,14,30,34,'#9aa0a6');R(g,3,14,30,2,'#c8ccd0');R(g,5,18,26,8,'#2a2a2a');R(g,7,20,22,4,'#c89a40');for(let i=0;i<5;i++)P(g,9+i*4,19,'#fff0b0');R(g,6,30,24,14,'#8a9096');R(g,9,33,6,2,'#3a3a3a');R(g,17,33,6,2,'#c83a2a');R(g,3,46,30,2,'#5a5e64');
   for(let i=0;i<4;i++)ell(g,10+i*5,8-i%2*3,2,2,'rgba(240,240,240,.6)');});}
 function makeJakkara(){return outlined(24,38,g=>{ell(g,12,10,9,4,'#b8302a');ell(g,12,9,8,3,'#d8483a');R(g,11,13,3,20,'#9aa0a6');R(g,11,13,1,20,'#d0d4d8');R(g,5,30,15,2,'#7a8086');ell(g,12,34,7,2,'#5a5e64');});}
@@ -1330,7 +1342,7 @@ function bottomRow(c){const d=c.getContext('2d').getImageData(0,0,c.width,c.heig
 function A(c){c.bot=bottomRow(c);return c;}
 function makeSprites(){
   SPR.kuusi=[makeSpruce(1),makeSpruce(2)].map(A);SPR.koivu=[makeBirch(1),makeBirch(2)].map(A);
-  SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());SPR.aita=A(makeAita());SPR.tyokalu=A(makeTyokalu());SPR.veranta=A(makeVeranta());SPR.verantaL=A(mk(SPR.veranta.width,SPR.veranta.height,g=>{g.translate(SPR.veranta.width,0);g.scale(-1,1);g.drawImage(SPR.veranta,0,0);}));SPR.ulkopoyta=A(makeUlkopoyta());SPR.grilli=A(makeGrilli());SPR.koju=A(makeKoju(false));SPR.koju2=A(makeKoju(true));SPR.pysakki=A(makePysakki());SPR.tiski2=A(makeTiski2());SPR.keitin=A(makeKeitin());SPR.jakkara=A(makeJakkara());SPR.ruokalista=A(makeRuokalista());SPR.telkkari=A(makeTelkkari());SPR.pajatso=A(makePajatso());SPR.jukeboksi=A(makeJukeboksi());SPR.pubpoyta=A(makePubpoyta(false));SPR.pubpoyta2=A(makePubpoyta(true));{const JN=buildNPC(JASKA_LOOK);for(const d in JN)JN[d].forEach(A);SPR.jaska=JN;const KN=buildNPC(KARA_LOOK);for(const d in KN)KN[d].forEach(A);SPR.kara=KN;}SPR.auto=A(makeAuto());SPR.autoKiinni=A(makeAutoKiinni());SPR.tuoppi=A(makeTuoppi());SPR.koira=[0,1].map(f=>A(makeKoira(f)));SPR.koiraNuk=A(makeKoiraNuk());SPR.kirppispoyta=A(makeKirppisPoyta());SPR.saappaat=A(makeSaappaat());SPR.soutuvene=A(makeSoutuvene(false));SPR.soutuveneK=A(makeSoutuvene(true));SPR.puomi=A(makePuomi());SPR.paalut=A(makePaalut());SPR.house3=A(makeHouse('#c9a04a',true));SPR.aitaV=A(makeAitaV());SPR.sammalkivi=A(makeMossRock());SPR.skanto=A(makeMossStump());
+  SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());SPR.aita=A(makeAita());SPR.tyokalu=A(makeTyokalu());SPR.veranta=A(makeVeranta());SPR.verantaL=A(mk(SPR.veranta.width,SPR.veranta.height,g=>{g.translate(SPR.veranta.width,0);g.scale(-1,1);g.drawImage(SPR.veranta,0,0);}));SPR.ulkopoyta=A(makeUlkopoyta());SPR.grilli=A(makeGrilli());SPR.koju=A(makeKoju(false));SPR.koju2=A(makeKoju(true));SPR.pysakki=A(makePysakki());SPR.tiski2=A(makeTiski2());SPR.hylly=A(makeHylly());SPR.seinapenkki=A(makeSeinapenkki());SPR.pikkupoyta=A(makePikkupoyta());SPR.keitin=A(makeKeitin());SPR.jakkara=A(makeJakkara());SPR.ruokalista=A(makeRuokalista());SPR.telkkari=A(makeTelkkari());SPR.pajatso=A(makePajatso());SPR.jukeboksi=A(makeJukeboksi());SPR.pubpoyta=A(makePubpoyta(false));SPR.pubpoyta2=A(makePubpoyta(true));{const JN=buildNPC(JASKA_LOOK);for(const d in JN)JN[d].forEach(A);SPR.jaska=JN;const KN=buildNPC(KARA_LOOK);for(const d in KN)KN[d].forEach(A);SPR.kara=KN;}SPR.auto=A(makeAuto());SPR.autoKiinni=A(makeAutoKiinni());SPR.tuoppi=A(makeTuoppi());SPR.koira=[0,1].map(f=>A(makeKoira(f)));SPR.koiraNuk=A(makeKoiraNuk());SPR.kirppispoyta=A(makeKirppisPoyta());SPR.saappaat=A(makeSaappaat());SPR.soutuvene=A(makeSoutuvene(false));SPR.soutuveneK=A(makeSoutuvene(true));SPR.puomi=A(makePuomi());SPR.paalut=A(makePaalut());SPR.house3=A(makeHouse('#c9a04a',true));SPR.aitaV=A(makeAitaV());SPR.sammalkivi=A(makeMossRock());SPR.skanto=A(makeMossStump());
   SPR.rock=A(makeRock());SPR.bush=A(makeBush(true));SPR.bushTyhja=A(makeBush(false));SPR.stump=A(makeStump());SPR.lippu=[0,1,2].map(makeLippu).map(A);SPR.pyykki=[0,1].map(makePyykki).map(A);
   SPR.halot=A(makeHalot());SPR.karry=A(makeKarry());SPR.tynnyri=A(makeTynnyri());SPR.mailbox=A(makeMailbox());SPR.mpyora=A(makeBike('#2f5a46','kukat'));
   SPR.shop=A(makeShop());SPR.bench=A(makeBench());SPR.lamp=A(makeLamp());SPR.maito=A(makeMaito());SPR.puhelin=A(makePuhelin());SPR.pyora=A(makeBike('#b8443a','pulla'));
@@ -1341,14 +1353,14 @@ const HOUSE_COLORS={haalistunut:['#b06a56',true],punainen:['#b04b37',false],kelt
 const HCACHE={};function houseSprite(k){const hc=HOUSE_COLORS[k]||HOUSE_COLORS.haalistunut;return HCACHE[k]||(HCACHE[k]=A(makeHouse(hc[0],hc[1])));}
 function sprFor(o){switch(o.k){
   case 'house':return houseSprite(mode==='paint'&&paint?PAINT_OPTS[paint.i].key:S.facade.color);
-  case 'puhelin':return SPR.puhelin;case 'veranta':return o.side==='lansi'?SPR.verantaL:SPR.veranta;case 'ulkotuoli':return o.ref&&o.ref.r%2?SPR.muovituoliL:SPR.muovituoli;case 'ulkopoyta':return SPR.ulkopoyta;case 'ruokalista':case 'telkkari':return null;case 'koju':return o.v?SPR.koju2:SPR.koju;case 'pubpoyta':return o.v?SPR.pubpoyta2:SPR.pubpoyta;case 'soutuvene':return o.v===2?SPR.soutuveneK:SPR.soutuvene;case 'rhalot':return SPR.halot;case 'vsign':return SPR.sign;case 'pmailbox':return SPR.mailbox;
+  case 'puhelin':return SPR.puhelin;case 'veranta':return o.side==='lansi'?SPR.verantaL:SPR.veranta;case 'ulkotuoli':return o.ref&&o.ref.r%2?SPR.muovituoliL:SPR.muovituoli;case 'ulkopoyta':return SPR.ulkopoyta;case 'ruokalista':case 'telkkari':case 'valokuva':return null;case 'koju':return o.v?SPR.koju2:SPR.koju;case 'pubpoyta':return o.v?SPR.pubpoyta2:SPR.pubpoyta;case 'soutuvene':return o.v===2?SPR.soutuveneK:SPR.soutuvene;case 'rhalot':return SPR.halot;case 'vsign':return SPR.sign;case 'pmailbox':return SPR.mailbox;
   case 'lippu':return SPR.lippu[(frame>>4)%3];case 'pyykki':return SPR.pyykki[(frame>>5)%2];
   case 'tree':return SPR[o.v][hash(o.x,o.y,11)<.5?0:1];
   case 'bush':return raspFull(o)?SPR.bush:SPR.bushTyhja;
   case 'raimo':return SPR.raimo[raimoDir][(frame%230)<7?1:0];
   case 'jaska':return SPR.jaska[jaskaDir][(frame%260)<7?1:0];
   case 'kara':return SPR.kara.down[(frame%300)<7?1:0];
-  case 'kara2':return SPR.kara.left[(frame%280)<7?1:0];
+  case 'kara2':return SPR.kara.right[(frame%280)<7?1:0];
   case 'auto':return karaDay()?SPR.auto:SPR.autoKiinni;
   case 'shed':return SPR.shed[S.flags.planks?0:1];case 'sauna':return (S.saunaSt||0)>=2?SPR.saunaB:null;
   case 'mustikka':return ((S.berryRefill||{})[o.x+','+o.y]||0)>S.day?SPR.mustikkaTyhja:SPR.mustikka;
@@ -1561,15 +1573,27 @@ function drawWindowView(g,wx){g.save();g.beginPath();g.rect(wx+4,10,40,36);g.cli
     R(g,hx-2,hy-3,20,3,'#7a4f2c');R(g,hx-2,hy-3,20,1,'#a8784a');R(g,hx-2,hy-1,20,1,'#4a2e1c');
   }
   g.restore();}
+const JASKA_LAMPS=[[176,30],[264,30],[300,182]];
 function buildJaskaGround(){ground=mk(320,288,g=>{
-  for(let y=64;y<280;y+=16)for(let x=0;x<320;x+=16){const dk=((x>>4)+(y>>4))%2===0;R(g,x,y,16,16,dk?'#8e3a30':'#e6d8b8');R(g,x,y,16,1,dk?'#a44a3e':'#f2e8cc');R(g,x,y+15,16,1,dk?'#762e26':'#cdbd98');}
-  for(let i=0;i<160;i++){const x=Math.floor(hash(i,1,701)*320),y=64+Math.floor(hash(i,2,701)*216);P(g,x,y,'rgba(60,40,20,.25)');}
-  for(let y=0;y<40;y++)R(g,0,y,320,1,lerpC('#c8b27a','#b09a62',y/40));for(let x=12;x<320;x+=24)R(g,x,0,1,40,'#a8925c');
-  R(g,0,40,320,24,'#5a3a26');for(let x=0;x<320;x+=8){R(g,x,40,1,24,'#4a2e1e');R(g,x+1,40,1,24,'#6e4a32');}R(g,0,40,320,2,'#7a5238');R(g,0,62,320,2,'#3a2416');
-  for(let i=0;i<6;i++){g.fillStyle='rgba(0,0,0,'+(0.28-i*.045)+')';g.fillRect(0,64+i,320,1);}
-  for(const x0 of [0,288]){R(g,x0,0,32,288,'#4e3222');for(let y=0;y<288;y+=8)R(g,x0,y,32,1,'#3e2618');R(g,x0===0?31:288,0,1,288,'#2a1a10');}
-  R(g,0,280,320,8,'#3a2416');R(g,128,272,32,16,'#6a4a32');R(g,130,274,28,12,'#8a6a3a');for(let x=132;x<156;x+=3)R(g,x,276,1,8,'#7a5a30');
-  R(g,128,286,32,2,'#ffe8b0');g.drawImage(SPR.ruokalista,60,4);g.drawImage(SPR.telkkari,220,6);});}
+  R(g,0,0,320,288,'#2a1a12');
+  const P2=['#6e4428','#7a4c2e','#684026','#82522f','#5e3a22'];
+  for(let y=64,k=0;y<280;y+=14,k++){const off=(k%3)*37;for(let x=-40+off,n=0;x<320;x+=96,n++){const c=P2[(k*3+n)%5];R(g,x,y,96,14,c);R(g,x,y,96,1,T(c,.16));R(g,x,y+13,96,1,'#2e1c12');R(g,x+95,y,1,14,'#2e1c12');
+      for(let q=0;q<5;q++)R(g,x+6+Math.floor(hash(x,y,q+710)*84),y+3+Math.floor(hash(y,x,q+711)*8),6+Math.floor(hash(q,x,712)*10),1,T(c,q%2?.12:-.14));
+      P(g,x+4,y+6,'#2a1810');P(g,x+90,y+6,'#2a1810');}}
+  for(let i=0;i<70;i++){const x=40+Math.floor(hash(i,3,713)*240),y=150+Math.floor(hash(i,4,713)*120);P(g,x,y,'rgba(240,200,140,.18)');}
+  for(let y=64;y<96;y+=16)for(let x=32;x<160;x+=16){const dk=((x>>4)+(y>>4))%2===0;R(g,x,y,16,16,dk?'#8e3a30':'#e6d8b8');R(g,x,y,16,1,dk?'#a44a3e':'#f2e8cc');R(g,x,y+15,16,1,dk?'#762e26':'#cdbd98');}
+  for(let y=0;y<40;y++)R(g,0,y,320,1,lerpC('#8a3430','#6e2826',y/40));for(let x=10;x<320;x+=20){R(g,x,0,1,40,'#7a2c28');R(g,x+1,0,1,40,'#94403a');}
+  R(g,0,38,320,3,'#c8862e');R(g,0,38,320,1,'#e8aa4a');R(g,0,41,320,23,'#3e2416');for(let x=0;x<320;x+=10){R(g,x,41,1,23,'#2e1a10');R(g,x+1,43,8,18,'#4a2c1a');R(g,x+1,43,8,1,'#5a3822');}R(g,0,62,320,2,'#24140c');
+  for(let i=0;i<6;i++){g.fillStyle='rgba(0,0,0,'+(0.3-i*.05)+')';g.fillRect(0,64+i,320,1);}
+  for(const x0 of [0,288]){R(g,x0,0,32,288,'#3a2216');for(let y=0;y<288;y+=10){R(g,x0,y,32,1,'#2a1810');R(g,x0+2,y+2,28,6,'#442a1a');}R(g,x0===0?31:288,0,1,288,'#1a0e08');}
+  R(g,0,280,320,8,'#24140c');R(g,128,272,32,16,'#6a4a32');R(g,130,274,28,12,'#8a5a3a');for(let x=132;x<156;x+=3)R(g,x,276,1,8,'#6a3a24');R(g,128,286,32,2,'#ffd890');
+  g.drawImage(SPR.ruokalista,60,4);
+  const fx=194,fy=6;R(g,fx,fy,44,32,'#3a2214');R(g,fx+1,fy+1,42,30,'#6a4428');R(g,fx+3,fy+3,38,26,'#e8dcc0');
+  for(let r=0;r<11;r++)R(g,fx+4,fy+4+r,36,1,lerpC('#d8c8a8','#c8b48c',r/11));for(let r=0;r<8;r++)R(g,fx+4,fy+15+r,36,1,lerpC('#9a8a70','#7a6a54',r/8));
+  R(g,fx+4,fy+14,36,1,'#6a5a44');R(g,fx+14,fy+19,26,2,'#5a4632');for(const px of [16,24,32,38])R(g,px+fx,fy+21,1,3,'#4a3828');
+  for(const [px,h] of [[18,5],[22,6],[27,5]]){R(g,fx+px,fy+19-h,2,h,'#3a2c20');R(g,fx+px,fy+19-h-2,2,2,'#4a3a2a');}R(g,fx+3,fy+27,38,2,'#cfc0a0');
+  for(const [lx,ly] of JASKA_LAMPS){if(lx>280){R(g,lx-8,ly-2,8,3,'#8a6a2a');R(g,lx-14,ly-6,8,10,'#c8862e');R(g,lx-13,ly-5,6,8,'#f0c060');R(g,lx-14,ly+4,8,2,'#7a4a1a');}
+    else{R(g,lx-1,ly-6,3,8,'#8a6a2a');ell(g,lx,ly+4,6,4,'#c8862e');ell(g,lx,ly+3,4,2,'#f0c060');R(g,lx-6,ly+4,13,2,'#7a4a1a');}}});}
 function buildTupa(){const wc=WALLS[S.wall][1],fl=FLOORS[S.floor];
   ground=mk(320,288,g=>{
     for(let y=2;y<=7;y++)for(let x=1;x<=8;x++)drawFloorTile(g,x*TS,y*TS,x,y,fl);
@@ -2120,6 +2144,10 @@ function interactYard(fx,fy){
     case 'keitin':return say('Rasvakeitin porisee. Ilma tuoksuu ranskalaisilta ja grillimakkaralta.');
     case 'jakkara':return say('Baarijakkara. Punainen istuin pyörii, kun sitä tönäisee.');
     case 'ruokalista':return say(['Liitutaulu: MAKKARAPERUNAT 6 mk · HAMPURILAINEN 5 mk','KAHVI JA MUNKKI 2 mk · LIMSA 1 mk','Alareunassa lukee pienellä: "Velaksi ei myydä. T. Mandi"']);
+    case 'valokuva':return say(['Vanha mustavalkoinen valokuva Vattulan venelaiturista.','Laiturilla seisoo kolme lasta onget kädessä. Joku on kirjoittanut kulmaan: kesä -78.']);
+    case 'hylly':return say('Hyllyllä on limsapulloja, siideriä ja Mandin oma purkki: KORTTIKAHVI.');
+    case 'seinapenkki':return say('Pitkä penkki seinän vierellä. Viininpunaiset pehmusteet ovat kuluneet juuri oikeista kohdista.');
+    case 'pikkupoyta':return say(karaEve()?'Pieni pyöreä pöytä seinävalon alla. Karan iltapaikka.':'Pieni pyöreä pöytä seinävalon alla. Illalla tässä istuu Kara.');
     case 'telkkari':return say('Nurkan telkkarissa pyörii ravilähetys. Ääni on pois päältä.');
     case 'pajatso':return say(['Vanha pajatso. Kolikkoreikä on teipattu umpeen.','Lasin takana kiiltävät messinkiset taskut.']);
     case 'jukeboksi':return say('Jukeboksissa soi iskelmä. Valot vilkkuvat kappaleen tahtiin.');
@@ -2643,7 +2671,8 @@ function lerpHex(a,b,t){const A=hexRgb(a),B=hexRgb(b);return A.map((v,i)=>Math.r
 function ambientAt(m){for(let i=0;i<AMB.length-1;i++){const [t0,c0]=AMB[i],[t1,c1]=AMB[i+1];if(m>=t0&&m<=t1)return lerpHex(c0,c1,(m-t0)/((t1-t0)||1));}return hexRgb(AMB[0][1]);}
 function darkness(rgb){return clamp(1-(rgb[0]*.3+rgb[1]*.55+rgb[2]*.15)/235,0,1);}
 function lightSources(){const L=[];
-  if(S.scene==='jaska'&&TFX.k>.05){const fl=Math.sin(frame*.31)*2+Math.sin(frame*.77);for(const cx of [72,148])L.push({x:cx,y:88,r:34+fl,c:'255,176,90'});L.push({x:112,y:62,r:40,c:'255,196,130'});}
+  if(S.scene==='jaska'){const k=TFX.k;for(const [lx,ly] of JASKA_LAMPS)if(k<.95)L.push({x:lx>280?lx-10:lx,y:ly+8,r:(lx>280?60:52)*(1-k*.85),c:'255,190,110'});
+    if(k>.05){const fl=Math.sin(frame*.31)*2+Math.sin(frame*.77),t=YOBJ.find(o=>o.k==='tiski2'),[x0,y0]=sprPos(SPR.tiski2,t);for(const cx of [104,122])L.push({x:x0+cx,y:y0,r:(34+fl)*k,c:'255,176,90'});L.push({x:112,y:62,r:42*k,c:'255,196,130'});}}
   if(S.scene!=='tupa'){for(const o of YOBJ){
       if(o.k==='house'||o.k==='house2'){const [x0,y0]=sprPos(sprFor(o),o);for(const wx of [22,108])L.push({x:x0+wx+18,y:y0+86,r:48,c:'255,200,120',win:[x0+wx+6,y0+75,24,22]});L.push({x:x0+102,y:y0+83,r:56,c:'255,214,140'});}
       else if(o.k==='veranta'){const [x0,y0]=sprPos(SPR.veranta,o);L.push({x:x0+35,y:y0+60,r:56,c:'255,214,150',win:[x0+8,y0+30,54,56]});}
@@ -2660,7 +2689,7 @@ let LM=null;
 function drawLighting(){
   const out=ambientAt(mode==='title'?560:S.time),odk=darkness(out);
   if(S.scene==='jaska'){TFX.k+=((TFX.on?1:0)-TFX.k)*.06;if(TFX.k<.01&&!TFX.on)TFX.k=0;}
-  let amb=(S.scene==='tupa'||S.scene==='rtupa')?lerpHex('#fff2e0','#7e7092',clamp(odk*1.15,0,1)):S.scene==='jaska'?lerpHex('#fff0dc','#c4a890',clamp(odk,0,1)):out;if(FOREST_SC[S.scene])amb=amb.map((v,i)=>Math.round(v*[.88,.94,.9][i]));if(S.scene==='jaska'&&TFX.k>0){const d=hexRgb('#3a2e40');amb=amb.map((v,i)=>Math.round(v+(d[i]-v)*TFX.k*.9));}const dk=darkness(amb);
+  let amb=(S.scene==='tupa'||S.scene==='rtupa')?lerpHex('#fff2e0','#7e7092',clamp(odk*1.15,0,1)):S.scene==='jaska'?lerpHex('#e2c4a0','#9a7a64',clamp(odk,0,1)):out;if(FOREST_SC[S.scene])amb=amb.map((v,i)=>Math.round(v*[.88,.94,.9][i]));if(S.scene==='jaska'&&TFX.k>0){const d=hexRgb('#3a2e40');amb=amb.map((v,i)=>Math.round(v+(d[i]-v)*TFX.k*.9));}const dk=darkness(amb);
   if(S.scene==='tupa'){const k=1-odk*.5;ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb('+out.map(v=>Math.round(v*k)).join(',')+')';for(const wx of [72,200])ctx.fillRect(wx+4-camX,10-camY,40,36);ctx.globalCompositeOperation='source-over';
     if(odk>.3){ctx.fillStyle='rgba(255,255,230,'+Math.min(1,(odk-.3)*2)+')';for(const [x,y] of [[78,12],[83,16],[112,13],[116,19],[204,12],[218,14],[229,11],[240,17]])ctx.fillRect(x-camX,y-camY,1,1);
       ctx.fillStyle='rgba(240,240,220,'+Math.min(.9,(odk-.3)*1.8)+')';ctx.fillRect(237-camX,12-camY,3,3);ctx.fillRect(236-camX,13-camY,1,1);
