@@ -245,7 +245,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.36</div>
+        <div class="sub">mummon mökki · versio 0.37</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -1270,7 +1270,7 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
   const H=L.hair,Hd=T(H,-.42),Hdd=T(H,-.66),Hl=T(H,.48),S=L.skin,Sd=T(S,-.26),C=L.top.c,Cd=T(C,-.36),Cl=T(C,.3),Pn=L.pants,Pd=T(Pn,-.38),Pl=T(Pn,.28),SH='#4a3022',SHl='#7a5238';
   const [sh,ss,sl]=hexHsl(S),BL=hslHex(toward(sh,0,10),clamp(ss+.18,0,1),sl*.95),MO=hslHex(toward(sh,0,8),clamp(ss+.25,0,1),sl*.62);
   const bob=(fr===1||fr===2)?-1:0,Y=o+oy+bob,X=x=>o+x,st=L.style;
-  const KN='#c0443a',KNd='#9a3028',KNl='#e0685a',CU='#f3ecd9',CUd='#cfc6b0';
+  const KN=L.pipoC||'#c0443a',KNd=L.pipoC?T(L.pipoC,-.4):'#9a3028',KNl=L.pipoC?T(L.pipoC,.25):'#e0685a',CU=L.pipoC?T(L.pipoC,.12):'#f3ecd9',CUd=L.pipoC?T(L.pipoC,-.25):'#cfc6b0';
   if(dir==='left'){
     if(st===1){R(g,X(17),Y+9,9,18,Hd);R(g,X(17),Y+9,7,17,H);for(let y=12;y<26;y+=3)R(g,X(19+(y%2)),Y+y,1,2,Hd);R(g,X(18),Y+26,6,1,Hd);}
     const legs=fr===1?[[9,16],[19,16]]:fr===2?[[13,16],[15,16]]:[[12,16],[16,16]];
@@ -1288,7 +1288,7 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
     R(g,X(18),Y+11,4,4,S);R(g,X(19),Y+12,2,2,Sd);
     ell(g,X(13),Y+2,4,1,Hl);R(g,X(10),Y+3,5,1,Hl);for(let y=4;y<18;y+=3)R(g,X(22),Y+y,1,2,Hd);R(g,X(24),Y+6,2,12,Hd);R(g,X(16),Y+17,9,2,Hd);
     if(st===2){ell(g,X(22),Y+1,4,3,Hd);ell(g,X(21),Y,3,2,H);P(g,X(20),Y-1,Hl);}
-    if((st===3||L.pipo)){ell(g,X(16),Y+3,10,6,KN);for(let x=8;x<26;x+=3)R(g,X(x),Y-1,1,7,KNd);ell(g,X(13),Y,4,2,KNl);R(g,X(6),Y+6,20,4,CU);R(g,X(6),Y+9,20,1,CUd);for(let x=7;x<26;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(18),Y-4,3,3,CU);P(g,X(17),Y-5,'#ffffff');}
+    if((st===3||L.pipo)){ell(g,X(16),Y+3,10,6,KN);for(let x=8;x<26;x+=3)R(g,X(x),Y-1,1,7,KNd);ell(g,X(13),Y,4,2,KNl);R(g,X(6),Y+6,20,4,CU);R(g,X(6),Y+9,20,1,CUd);for(let x=7;x<26;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(18),Y-4,3,3,CU);P(g,X(17),Y-5,L.pipoC?KNl:'#ffffff');}
   }else{
     const up=dir==='up';
     if(st===1&&!up){R(g,X(5),Y+8,5,19,Hd);R(g,X(22),Y+8,5,19,Hd);}
@@ -1317,7 +1317,7 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
       ell(g,X(13),Y+3,5,1,Hl);R(g,X(10),Y+4,4,1,Hl);for(let x=11;x<23;x+=4)R(g,X(x),Y+5,1,4,Hd);R(g,X(22),Y+4,3,6,Hd);
       if(st===1){R(g,X(5),Y+8,4,18,H);R(g,X(5),Y+8,1,17,Hl);R(g,X(23),Y+8,4,18,Hd);R(g,X(24),Y+8,2,17,H);P(g,X(6),Y+26,H);P(g,X(25),Y+26,Hd);}
       if(st===2){ell(g,X(16),Y-1,5,3,Hd);ell(g,X(16),Y-2,4,2,H);P(g,X(14),Y-3,Hl);}}
-    if((st===3||L.pipo)){ell(g,X(16),Y+3,11,6,KN);for(let x=7;x<26;x+=3)R(g,X(x),Y-2,1,8,KNd);ell(g,X(12),Y,4,2,KNl);R(g,X(5),Y+6,22,4,CU);R(g,X(5),Y+9,22,1,CUd);for(let x=6;x<27;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(16),Y-4,3,3,CU);P(g,X(15),Y-5,'#ffffff');}
+    if((st===3||L.pipo)){ell(g,X(16),Y+3,11,6,KN);for(let x=7;x<26;x+=3)R(g,X(x),Y-2,1,8,KNd);ell(g,X(12),Y,4,2,KNl);R(g,X(5),Y+6,22,4,CU);R(g,X(5),Y+9,22,1,CUd);for(let x=6;x<27;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(16),Y-4,3,3,CU);P(g,X(15),Y-5,L.pipoC?KNl:'#ffffff');}
   }
   if(L.cap){const Cp=L.cap,Cpd=T(Cp,-.35),Cpl=T(Cp,.3);
     if(dir==='left'){ell(g,X(16),Y+4,9,5,Cp);R(g,X(8),Y+4,16,5,Cp);ell(g,X(14),Y+1,4,1,Cpl);R(g,X(2),Y+8,10,2,Cpd);R(g,X(2),Y+8,10,1,Cp);}
@@ -1346,7 +1346,7 @@ function buildChar(look){const L={boots:look.shoes===1?'#d42a24':null,style:look
   const out={};for(const dir of ['down','up','left'])out[dir]=[0,1,2,3].map(f=>outlined(38,58,g=>drawCharRaw(g,dir,f===3?0:f,f===3,L),-.84));
   out.right=out.left.map(c=>mk(38,58,g=>{g.translate(38,0);g.scale(-1,1);g.drawImage(c,0,0);}));return out;}
 
-const RAIMO_LOOK={style:1,hair:'#6b4226',skin:'#eab48c',eye:'#7d8b98',top:{c:'#2c2c33'},hood:true,pipo:true,pants:'#3a4a6a',boots:'#3f6a3a',moustache:'#4e301c',beard:'#5a381e'};
+const RAIMO_LOOK={style:1,hair:'#6b4226',skin:'#eab48c',eye:'#7d8b98',top:{c:'#2c2c33'},hood:true,pipo:true,pipoC:'#2e2e34',pants:'#3a4a6a',boots:'#3f6a3a',moustache:'#4e301c',beard:'#5a381e'};
 function buildNPC(L){const out={};for(const dir of ['down','up','left'])out[dir]=[0,1].map(f=>outlined(38,58,g=>drawCharRaw(g,dir,0,f===1,L),-.84));
   out.right=out.left.map(c=>mk(38,58,g=>{g.translate(38,0);g.scale(-1,1);g.drawImage(c,0,0);}));return out;}
 let raimoDir='down';
