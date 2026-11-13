@@ -245,7 +245,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.31</div>
+        <div class="sub">mummon mökki · versio 0.32</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -553,11 +553,12 @@ function rantaNimi(){return (S.cabins&&S.cabins.ranta&&S.cabins.ranta.name)||'Ra
 function buildJaska(){const W=10,H=9,G=[],O=[];
   for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push(y<2||y===H-1||x===0||x===W-1?'W':'F');}
   G[8][4]='o';
-  O.push({k:'jaska',x:3,y:2,w:1,h:1},{k:'keitin',x:1,y:2,w:1,h:1},{k:'hylly',x:4,y:2,w:1,h:1},{k:'tiski2',x:1,y:3,w:4,h:1},
+  O.push({k:'jaska',x:3,y:2,w:1,h:1},{k:'keitin',x:1,y:2,w:1,h:1},{k:'hylly',x:4,y:1,w:1,h:1},{k:'tiski2',x:1,y:3,w:4,h:1},
     {k:'jakkara',x:1,y:4,w:1,h:1},{k:'jakkara',x:2,y:4,w:1,h:1},
-    {k:'ruokalista',x:2,y:1,w:1,h:1},{k:'valokuva',x:6,y:1,w:2,h:1},{k:'pajatso',x:1,y:6,w:1,h:1},{k:'jukeboksi',x:1,y:7,w:1,h:1},
-    {k:'seinapenkki',x:8,y:3,w:1,h:3},{k:'pubpoyta',x:6,y:4,w:2,h:1},{k:'pikkupoyta',x:7,y:6,w:1,h:1},
-    {k:'kara2',x:6,y:6,w:1,h:1},{k:'tuoppi',x:7,y:6,w:1,h:1});
+    {k:'ruokalista',x:2,y:1,w:1,h:1},{k:'valokuva',x:6,y:1,w:2,h:1},{k:'pajatso',x:5,y:2,w:1,h:1},{k:'jukeboksi',x:8,y:2,w:1,h:1},
+    {k:'seinapenkki',x:8,y:4,w:1,h:3},{k:'pubpoyta',x:5,y:5,w:2,h:1},{k:'pikkupoyta',x:1,y:6,w:1,h:1},
+    {k:'kara2',x:2,y:6,w:1,h:1},{k:'tuoppi',x:1,y:6,w:1,h:1});
+  G[2][4]='W';
   return {W,H,grid:G,objs:O};}
 const INDOOR={tupa:1,jaska:1,rtupa:1};
 const JASKA_LOOK={style:1,hair:'#7a4424',skin:'#eab48c',eye:'#4a6a3a',top:{c:'#c8463a'},pants:'#2e3038',glasses:'#2a2226'};
@@ -1353,14 +1354,14 @@ const HOUSE_COLORS={haalistunut:['#b06a56',true],punainen:['#b04b37',false],kelt
 const HCACHE={};function houseSprite(k){const hc=HOUSE_COLORS[k]||HOUSE_COLORS.haalistunut;return HCACHE[k]||(HCACHE[k]=A(makeHouse(hc[0],hc[1])));}
 function sprFor(o){switch(o.k){
   case 'house':return houseSprite(mode==='paint'&&paint?PAINT_OPTS[paint.i].key:S.facade.color);
-  case 'puhelin':return SPR.puhelin;case 'veranta':return o.side==='lansi'?SPR.verantaL:SPR.veranta;case 'ulkotuoli':return o.ref&&o.ref.r%2?SPR.muovituoliL:SPR.muovituoli;case 'ulkopoyta':return SPR.ulkopoyta;case 'ruokalista':case 'telkkari':case 'valokuva':return null;case 'koju':return o.v?SPR.koju2:SPR.koju;case 'pubpoyta':return o.v?SPR.pubpoyta2:SPR.pubpoyta;case 'soutuvene':return o.v===2?SPR.soutuveneK:SPR.soutuvene;case 'rhalot':return SPR.halot;case 'vsign':return SPR.sign;case 'pmailbox':return SPR.mailbox;
+  case 'puhelin':return SPR.puhelin;case 'veranta':return o.side==='lansi'?SPR.verantaL:SPR.veranta;case 'ulkotuoli':return o.ref&&o.ref.r%2?SPR.muovituoliL:SPR.muovituoli;case 'ulkopoyta':return SPR.ulkopoyta;case 'ruokalista':case 'telkkari':case 'valokuva':case 'hylly':return null;case 'koju':return o.v?SPR.koju2:SPR.koju;case 'pubpoyta':return o.v?SPR.pubpoyta2:SPR.pubpoyta;case 'soutuvene':return o.v===2?SPR.soutuveneK:SPR.soutuvene;case 'rhalot':return SPR.halot;case 'vsign':return SPR.sign;case 'pmailbox':return SPR.mailbox;
   case 'lippu':return SPR.lippu[(frame>>4)%3];case 'pyykki':return SPR.pyykki[(frame>>5)%2];
   case 'tree':return SPR[o.v][hash(o.x,o.y,11)<.5?0:1];
   case 'bush':return raspFull(o)?SPR.bush:SPR.bushTyhja;
   case 'raimo':return SPR.raimo[raimoDir][(frame%230)<7?1:0];
   case 'jaska':return SPR.jaska[jaskaDir][(frame%260)<7?1:0];
   case 'kara':return SPR.kara.down[(frame%300)<7?1:0];
-  case 'kara2':return SPR.kara.right[(frame%280)<7?1:0];
+  case 'kara2':return SPR.kara.left[(frame%280)<7?1:0];
   case 'auto':return karaDay()?SPR.auto:SPR.autoKiinni;
   case 'shed':return SPR.shed[S.flags.planks?0:1];case 'sauna':return (S.saunaSt||0)>=2?SPR.saunaB:null;
   case 'mustikka':return ((S.berryRefill||{})[o.x+','+o.y]||0)>S.day?SPR.mustikkaTyhja:SPR.mustikka;
@@ -1573,7 +1574,7 @@ function drawWindowView(g,wx){g.save();g.beginPath();g.rect(wx+4,10,40,36);g.cli
     R(g,hx-2,hy-3,20,3,'#7a4f2c');R(g,hx-2,hy-3,20,1,'#a8784a');R(g,hx-2,hy-1,20,1,'#4a2e1c');
   }
   g.restore();}
-const JASKA_LAMPS=[[176,30],[264,30],[300,182]];
+const JASKA_LAMPS=[[120,22],[252,22],[20,182]];
 function buildJaskaGround(){ground=mk(320,288,g=>{
   R(g,0,0,320,288,'#2a1a12');
   const P2=['#6e4428','#7a4c2e','#684026','#82522f','#5e3a22'];
@@ -1592,7 +1593,8 @@ function buildJaskaGround(){ground=mk(320,288,g=>{
   for(let r=0;r<11;r++)R(g,fx+4,fy+4+r,36,1,lerpC('#d8c8a8','#c8b48c',r/11));for(let r=0;r<8;r++)R(g,fx+4,fy+15+r,36,1,lerpC('#9a8a70','#7a6a54',r/8));
   R(g,fx+4,fy+14,36,1,'#6a5a44');R(g,fx+14,fy+19,26,2,'#5a4632');for(const px of [16,24,32,38])R(g,px+fx,fy+21,1,3,'#4a3828');
   for(const [px,h] of [[18,5],[22,6],[27,5]]){R(g,fx+px,fy+19-h,2,h,'#3a2c20');R(g,fx+px,fy+19-h-2,2,2,'#4a3a2a');}R(g,fx+3,fy+27,38,2,'#cfc0a0');
-  for(const [lx,ly] of JASKA_LAMPS){if(lx>280){R(g,lx-8,ly-2,8,3,'#8a6a2a');R(g,lx-14,ly-6,8,10,'#c8862e');R(g,lx-13,ly-5,6,8,'#f0c060');R(g,lx-14,ly+4,8,2,'#7a4a1a');}
+  g.drawImage(SPR.hylly,128,38);
+  for(const [lx,ly] of JASKA_LAMPS){if(lx<40){R(g,lx,ly-2,8,3,'#8a6a2a');R(g,lx+6,ly-6,8,10,'#c8862e');R(g,lx+7,ly-5,6,8,'#f0c060');R(g,lx+6,ly+4,8,2,'#7a4a1a');}
     else{R(g,lx-1,ly-6,3,8,'#8a6a2a');ell(g,lx,ly+4,6,4,'#c8862e');ell(g,lx,ly+3,4,2,'#f0c060');R(g,lx-6,ly+4,13,2,'#7a4a1a');}}});}
 function buildTupa(){const wc=WALLS[S.wall][1],fl=FLOORS[S.floor];
   ground=mk(320,288,g=>{
@@ -2671,7 +2673,7 @@ function lerpHex(a,b,t){const A=hexRgb(a),B=hexRgb(b);return A.map((v,i)=>Math.r
 function ambientAt(m){for(let i=0;i<AMB.length-1;i++){const [t0,c0]=AMB[i],[t1,c1]=AMB[i+1];if(m>=t0&&m<=t1)return lerpHex(c0,c1,(m-t0)/((t1-t0)||1));}return hexRgb(AMB[0][1]);}
 function darkness(rgb){return clamp(1-(rgb[0]*.3+rgb[1]*.55+rgb[2]*.15)/235,0,1);}
 function lightSources(){const L=[];
-  if(S.scene==='jaska'){const k=TFX.k;for(const [lx,ly] of JASKA_LAMPS)if(k<.95)L.push({x:lx>280?lx-10:lx,y:ly+8,r:(lx>280?60:52)*(1-k*.85),c:'255,190,110'});
+  if(S.scene==='jaska'){const k=TFX.k;for(const [lx,ly] of JASKA_LAMPS)if(k<.95)L.push({x:lx<40?lx+12:lx,y:ly+8,r:(lx<40?60:52)*(1-k*.85),c:'255,190,110'});
     if(k>.05){const fl=Math.sin(frame*.31)*2+Math.sin(frame*.77),t=YOBJ.find(o=>o.k==='tiski2'),[x0,y0]=sprPos(SPR.tiski2,t);for(const cx of [104,122])L.push({x:x0+cx,y:y0,r:(34+fl)*k,c:'255,176,90'});L.push({x:112,y:62,r:42*k,c:'255,196,130'});}}
   if(S.scene!=='tupa'){for(const o of YOBJ){
       if(o.k==='house'||o.k==='house2'){const [x0,y0]=sprPos(sprFor(o),o);for(const wx of [22,108])L.push({x:x0+wx+18,y:y0+86,r:48,c:'255,200,120',win:[x0+wx+6,y0+75,24,22]});L.push({x:x0+102,y:y0+83,r:56,c:'255,214,140'});}
