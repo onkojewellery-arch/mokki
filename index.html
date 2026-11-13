@@ -245,7 +245,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.35</div>
+        <div class="sub">mummon mökki · versio 0.36</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -1276,7 +1276,7 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
     const legs=fr===1?[[9,16],[19,16]]:fr===2?[[13,16],[15,16]]:[[12,16],[16,16]];
     legs.forEach(([lx],i)=>{const back=i===1;R(g,X(lx),Y+36,5,8,back?Pd:Pn);R(g,X(lx),Y+36,1,8,back?Pn:Pl);R(g,X(lx-2),Y+43,7,3,SH);R(g,X(lx-2),Y+43,7,1,SHl);});
     R(g,X(11),Y+33,11,5,Pn);R(g,X(11),Y+33,11,1,Pl);R(g,X(11),Y+32,11,2,'#4a3426');P(g,X(13),Y+32,'#d8b060');
-    R(g,X(11),Y+20,11,13,C);R(g,X(12),Y+19,9,1,C);R(g,X(11),Y+20,2,13,Cl);R(g,X(19),Y+20,3,13,Cd);R(g,X(13),Y+29,6,1,Cd);
+    R(g,X(11),Y+20,11,13,C);R(g,X(12),Y+19,9,1,C);R(g,X(11),Y+20,2,13,Cl);R(g,X(19),Y+20,3,13,Cd);R(g,X(13),Y+29,6,1,Cd);if(L.hood){R(g,X(15),Y+16,8,6,Cd);R(g,X(15),Y+16,8,1,Cl);R(g,X(12),Y+21,1,5,'#d8d8d8');}
     const ax=fr===1?-3:fr===2?3:0;R(g,X(14+ax),Y+21,4,10,C);R(g,X(14+ax),Y+21,1,10,Cl);R(g,X(17+ax),Y+21,1,10,Cd);R(g,X(14+ax),Y+30,4,3,S);P(g,X(17+ax),Y+32,Sd);
     R(g,X(14),Y+17,5,3,Sd);
     ell(g,X(16),Y+11,8,9,Sd);ell(g,X(15),Y+10,8,8,S);R(g,X(6),Y+13,2,3,S);P(g,X(6),Y+15,Sd);
@@ -1288,7 +1288,7 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
     R(g,X(18),Y+11,4,4,S);R(g,X(19),Y+12,2,2,Sd);
     ell(g,X(13),Y+2,4,1,Hl);R(g,X(10),Y+3,5,1,Hl);for(let y=4;y<18;y+=3)R(g,X(22),Y+y,1,2,Hd);R(g,X(24),Y+6,2,12,Hd);R(g,X(16),Y+17,9,2,Hd);
     if(st===2){ell(g,X(22),Y+1,4,3,Hd);ell(g,X(21),Y,3,2,H);P(g,X(20),Y-1,Hl);}
-    if(st===3){ell(g,X(16),Y+3,10,6,KN);for(let x=8;x<26;x+=3)R(g,X(x),Y-1,1,7,KNd);ell(g,X(13),Y,4,2,KNl);R(g,X(6),Y+6,20,4,CU);R(g,X(6),Y+9,20,1,CUd);for(let x=7;x<26;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(18),Y-4,3,3,CU);P(g,X(17),Y-5,'#ffffff');}
+    if((st===3||L.pipo)){ell(g,X(16),Y+3,10,6,KN);for(let x=8;x<26;x+=3)R(g,X(x),Y-1,1,7,KNd);ell(g,X(13),Y,4,2,KNl);R(g,X(6),Y+6,20,4,CU);R(g,X(6),Y+9,20,1,CUd);for(let x=7;x<26;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(18),Y-4,3,3,CU);P(g,X(17),Y-5,'#ffffff');}
   }else{
     const up=dir==='up';
     if(st===1&&!up){R(g,X(5),Y+8,5,19,Hd);R(g,X(22),Y+8,5,19,Hd);}
@@ -1301,6 +1301,7 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
     arm(6,aL,false);arm(23,aR,true);
     R(g,X(9),Y+20,14,13,C);R(g,X(10),Y+19,12,1,C);R(g,X(9),Y+20,2,13,Cl);R(g,X(20),Y+20,3,13,Cd);R(g,X(12),Y+28,1,4,Cd);R(g,X(18),Y+27,1,5,Cd);
     if(!up){R(g,X(14),Y+19,4,3,S);P(g,X(15),Y+22,S);P(g,X(16),Y+22,S);R(g,X(13),Y+19,1,3,Cd);R(g,X(18),Y+19,1,3,Cd);for(let y=23;y<31;y+=3)P(g,X(16),Y+y,Cd);}
+    if(L.hood){if(up){R(g,X(9),Y+16,14,7,Cd);R(g,X(10),Y+16,12,1,Cl);R(g,X(15),Y+18,2,4,T(C,-.55));}else{R(g,X(10),Y+18,12,3,Cd);R(g,X(10),Y+18,12,1,Cl);R(g,X(14),Y+20,4,2,S);R(g,X(14),Y+21,1,6,'#d8d8d8');R(g,X(17),Y+21,1,5,'#d8d8d8');R(g,X(11),Y+28,10,1,Cl);R(g,X(11),Y+28,1,4,Cl);R(g,X(20),Y+28,1,4,Cl);}}
     R(g,X(14),Y+17,4,3,Sd);
     ell(g,X(16),Y+11,9,9,Sd);ell(g,X(15),Y+10,8,8,S);R(g,X(6),Y+11,2,4,S);R(g,X(25),Y+11,2,4,Sd);
     if(up){ell(g,X(16),Y+10,10,9,H);ell(g,X(16),Y+11,9,8,H);R(g,X(13),Y+18,6,2,Sd);
@@ -1316,7 +1317,7 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
       ell(g,X(13),Y+3,5,1,Hl);R(g,X(10),Y+4,4,1,Hl);for(let x=11;x<23;x+=4)R(g,X(x),Y+5,1,4,Hd);R(g,X(22),Y+4,3,6,Hd);
       if(st===1){R(g,X(5),Y+8,4,18,H);R(g,X(5),Y+8,1,17,Hl);R(g,X(23),Y+8,4,18,Hd);R(g,X(24),Y+8,2,17,H);P(g,X(6),Y+26,H);P(g,X(25),Y+26,Hd);}
       if(st===2){ell(g,X(16),Y-1,5,3,Hd);ell(g,X(16),Y-2,4,2,H);P(g,X(14),Y-3,Hl);}}
-    if(st===3){ell(g,X(16),Y+3,11,6,KN);for(let x=7;x<26;x+=3)R(g,X(x),Y-2,1,8,KNd);ell(g,X(12),Y,4,2,KNl);R(g,X(5),Y+6,22,4,CU);R(g,X(5),Y+9,22,1,CUd);for(let x=6;x<27;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(16),Y-4,3,3,CU);P(g,X(15),Y-5,'#ffffff');}
+    if((st===3||L.pipo)){ell(g,X(16),Y+3,11,6,KN);for(let x=7;x<26;x+=3)R(g,X(x),Y-2,1,8,KNd);ell(g,X(12),Y,4,2,KNl);R(g,X(5),Y+6,22,4,CU);R(g,X(5),Y+9,22,1,CUd);for(let x=6;x<27;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(16),Y-4,3,3,CU);P(g,X(15),Y-5,'#ffffff');}
   }
   if(L.cap){const Cp=L.cap,Cpd=T(Cp,-.35),Cpl=T(Cp,.3);
     if(dir==='left'){ell(g,X(16),Y+4,9,5,Cp);R(g,X(8),Y+4,16,5,Cp);ell(g,X(14),Y+1,4,1,Cpl);R(g,X(2),Y+8,10,2,Cpd);R(g,X(2),Y+8,10,1,Cp);}
@@ -1345,7 +1346,7 @@ function buildChar(look){const L={boots:look.shoes===1?'#d42a24':null,style:look
   const out={};for(const dir of ['down','up','left'])out[dir]=[0,1,2,3].map(f=>outlined(38,58,g=>drawCharRaw(g,dir,f===3?0:f,f===3,L),-.84));
   out.right=out.left.map(c=>mk(38,58,g=>{g.translate(38,0);g.scale(-1,1);g.drawImage(c,0,0);}));return out;}
 
-const RAIMO_LOOK={style:1,hair:'#6b4226',skin:'#eab48c',eye:'#7d8b98',top:{c:'#b8443a'},pants:'#3a4a6a',boots:'#3f6a3a',plaid:'#2a2320',moustache:'#4e301c',beard:'#5a381e'};
+const RAIMO_LOOK={style:1,hair:'#6b4226',skin:'#eab48c',eye:'#7d8b98',top:{c:'#2c2c33'},hood:true,pipo:true,pants:'#3a4a6a',boots:'#3f6a3a',moustache:'#4e301c',beard:'#5a381e'};
 function buildNPC(L){const out={};for(const dir of ['down','up','left'])out[dir]=[0,1].map(f=>outlined(38,58,g=>drawCharRaw(g,dir,0,f===1,L),-.84));
   out.right=out.left.map(c=>mk(38,58,g=>{g.translate(38,0);g.scale(-1,1);g.drawImage(c,0,0);}));return out;}
 let raimoDir='down';
