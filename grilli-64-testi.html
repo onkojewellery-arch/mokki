@@ -6,9 +6,10 @@
 <title>Grilli 64 px</title>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
+@font-face{font-family:'MokkiNum';src:url(https://fonts.gstatic.com/s/jersey10/v4/GftH7vZKsggXMf9n_J5n_5jh6V89Sg.woff2) format('woff2');unicode-range:U+0030-0039;size-adjust:130%;font-display:swap}
 :root{color-scheme:dark;--bg:#1a110c;--ink:#f4e6cc;--panel:#f3e8cf;--panelInk:#3a2a1c;--accent:#3f6b4a}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Pixelify Sans',system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'MokkiNum','Pixelify Sans',system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 #hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px;z-index:3}
 #hud .t{background:rgba(20,12,8,.82);border-radius:8px;padding:6px 10px;font-size:15px;line-height:1.25;flex:1}
 #hud .t small{display:block;opacity:.7;font-size:12px}
@@ -170,12 +171,24 @@ function makeTable(){return outlined(146,104,g=>{
   R(g,46,8,8,22,'#c8302a');R(g,46,8,2,22,'#e86050');R(g,48,4,4,4,'#f4f4ee');R(g,58,10,8,20,'#e8c030');R(g,58,10,2,20,'#fff070');R(g,60,6,4,4,'#c84a2a');
   R(g,74,18,14,12,'#b8bcc0');R(g,74,18,14,2,'#eef2f4');R(g,76,12,10,8,'#fbfbf4');
   R(g,96,16,8,14,'#2a5a8a');R(g,96,16,2,14,'#4a8ac8');R(g,99,6,2,10,'#3a7a3a');ell(g,100,5,4,3,'#e8c040');P(g,100,5,'#c86a20');});}
-function makeBench(){return outlined(70,212,g=>{
-  R(g,50,4,18,204,'#3e2416');for(let y=4;y<208;y+=16){R(g,50,y,18,1,'#24140c');R(g,52,y+2,5,12,'#4e2e1a');}R(g,50,4,3,204,'#5a3822');R(g,48,2,22,4,'#6a4428');R(g,48,2,22,1,'#8a5a34');
-  R(g,6,18,46,186,'#4a2a16');
-  for(let k=0;k<3;k++){const y=22+k*60;R(g,10,y,40,56,'#7a2c2a');R(g,10,y,40,3,'#a24a40');R(g,10,y+53,40,3,'#5a1e1c');R(g,46,y+3,4,50,'#5a1e1c');R(g,10,y+3,2,50,'#8e3a34');
-    for(const [bx,by] of [[22,y+16],[34,y+16],[22,y+38],[34,y+38]]){P(g,bx,by,'#4a1412');P(g,bx+1,by,'#4a1412');P(g,bx,by-1,'#a24a40');for(let i=1;i<4;i++){P(g,bx-i,by-i,'#6a2422');}}}
-  R(g,4,18,6,188,'#5a3420');R(g,4,18,2,188,'#7a4c2c');R(g,4,200,48,8,'#2e1a10');for(const y of [24,110,196])R(g,4,y,6,8,'#24140c');});}
+function makeBench(){return outlined(76,216,g=>{
+  const V='#7a2c2a',VL='#a24a40',VD='#5a1e1c',VDD='#42141a',WD='#3e2416';
+  // selkänoja seinää vasten (yläpinta)
+  R(g,50,6,22,170,VD);R(g,52,4,18,4,VL);ell(g,61,6,10,4,V);R(g,50,6,2,170,V);
+  for(let y=20;y<172;y+=26){R(g,50,y,22,1,VDD);P(g,61,y+13,VDD);P(g,60,y+12,VL);}
+  // istuinpehmusteet
+  R(g,8,26,44,156,WD);
+  for(let k=0;k<3;k++){const y=28+k*50;R(g,10,y,40,47,V);R(g,11,y,38,3,VL);R(g,10,y+1,2,45,VL);R(g,47,y+2,3,44,VD);R(g,10,y+44,40,3,VD);
+    for(const by of [y+15,y+31]){P(g,24,by,VDD);P(g,25,by,VDD);P(g,24,by-1,VL);P(g,36,by,VDD);P(g,37,by,VDD);P(g,36,by-1,VL);}
+    R(g,12,y+5,10,1,'#b85a4e');}
+  // pohjoispään käsinoja
+  R(g,6,12,46,16,V);ell(g,29,13,23,4,VL);R(g,6,26,46,3,VD);R(g,6,12,3,16,VL);
+  // eteläpää: käsinojan ja selkänojan etupinta
+  R(g,6,176,46,14,VL);ell(g,29,177,23,4,'#b85a4e');R(g,6,190,46,18,V);R(g,6,190,46,2,VL);R(g,6,204,46,4,VD);R(g,8,196,42,1,VD);
+  R(g,50,168,22,40,VD);R(g,50,168,22,3,V);ell(g,61,169,10,3,V);R(g,50,168,2,40,V);R(g,70,168,2,40,VDD);
+  // puinen sokkeli ja jalat
+  R(g,4,206,70,6,WD);R(g,4,206,70,1,'#6a4428');R(g,6,212,5,4,'#2a1810');R(g,66,212,5,4,'#2a1810');
+  R(g,4,30,4,176,'#2e1a10');});}
 function makeSmallTable(){return outlined(80,96,g=>{ell(g,40,90,22,5,'#24140c');ell(g,40,88,20,4,'#3e2416');R(g,36,40,9,48,'#3e2416');R(g,36,40,3,48,'#5a3822');R(g,43,40,2,48,'#24140c');
   ell(g,40,30,37,15,'#3e2416');ell(g,40,27,37,15,'#6a4428');ell(g,40,26,33,12,'#7a5232');ell(g,32,22,12,4,'#8a6240');ell(g,40,26,33,12,'rgba(0,0,0,0)');
   for(let i=0;i<5;i++)R(g,14+i*11,24+((i*7)%5),8,1,'#6a4428');});}
@@ -246,7 +259,7 @@ const OBJ=[
   {k:'jakkara',x:2,y:4,w:1,h:1,dy:-4,spr:()=>SPR.stool},
   {k:'pajatso',x:5,y:2,w:1,h:1,dy:-2,spr:()=>SPR.pajatso,hit:1},
   {k:'jukeboksi',x:8,y:2,w:1,h:1,dy:-2,spr:()=>SPR.jukebox,hit:1},
-  {k:'penkki',x:8,y:4,w:1,h:3,dy:0,spr:()=>SPR.bench,hit:1},
+  {k:'penkki',x:8,y:4,w:1,h:3,dy:2,spr:()=>SPR.bench,hit:1},
   {k:'poyta',x:5,y:5,w:2,h:1,dy:0,spr:()=>SPR.table,hit:1},
   {k:'pikkupoyta',x:1,y:6,w:1,h:1,dy:-6,spr:()=>SPR.small,hit:1},
   {k:'tuoppi',x:1,y:6,w:1,h:1,dy:-62,z:1,spr:()=>SPR.tuoppi,eve:1,nosolid:1},
