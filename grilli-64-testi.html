@@ -13,8 +13,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 #hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px;z-index:3}
 #hud .t{background:rgba(20,12,8,.82);border-radius:8px;padding:6px 10px;font-size:15px;line-height:1.25;flex:1}
 #hud .t small{display:block;opacity:.7;font-size:12px}
-#hud button{font:inherit;font-size:14px;background:rgba(20,12,8,.82);color:var(--ink);border:1px solid #6a4a32;border-radius:999px;padding:8px 12px;cursor:pointer}
-#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+#hud button{font:inherit;font-size:14px;white-space:nowrap;background:rgba(20,12,8,.82);color:var(--ink);border:1px solid #6a4a32;border-radius:999px;padding:8px 12px;cursor:pointer}
+#cv{position:fixed;left:50%;top:50%;transform:translateX(-50%);image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 #dlg{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 12px);background:var(--panel);color:var(--panelInk);border:3px solid #6a4a32;border-radius:10px;padding:14px 16px;font-size:18px;line-height:1.35;z-index:4;display:none;max-width:640px;margin:0 auto}
 #dlg .ch{display:flex;flex-direction:column;gap:6px;margin-top:10px}
 #dlg .ch button{font:inherit;font-size:17px;text-align:left;background:#e6d8b8;color:var(--panelInk);border:0;border-radius:6px;padding:9px 12px;cursor:pointer}
@@ -23,11 +23,11 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 #card{position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:5;display:none;text-align:center}
 #card canvas{width:144px;height:216px;image-rendering:pixelated;border-radius:6px;box-shadow:0 0 40px rgba(255,180,90,.55)}
 #card b{display:block;margin-top:8px;font-size:18px;color:#ffe2a8;text-shadow:0 1px 3px #000}
-#hint{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 14px);text-align:center;font-size:13px;opacity:.6;z-index:2}
+#hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 14px);text-align:center;font-size:13px;z-index:2;background:rgba(20,12,8,.75);border-radius:999px;padding:5px 12px;white-space:nowrap;color:#d8c8b0}
 </style>
 </head>
 <body>
-<div id="hud"><div class="t" id="hudt">Mandin grilli<small>64 px testi</small></div><button id="aika">Ilta</button></div>
+<div id="hud"><div class="t" id="hudt">Mandin grilli<small>64 px testi</small></div><button id="zoom">Koko huone</button><button id="aika">Ilta</button></div>
 <canvas id="cv" width="640" height="576"></canvas>
 <div id="card"><canvas id="cardcv" width="48" height="72"></canvas><b id="cardn"></b></div>
 <div id="dlg"></div>
@@ -35,7 +35,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 <script>
 'use strict';
 const TS=64,W=10,H=9,CW=640,CH=576;
-const cv=document.getElementById('cv'),ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;
+const cv=document.getElementById('cv'),dctx=cv.getContext('2d'),world=mk(CW,CH,()=>{}),ctx=world.getContext('2d');ctx.imageSmoothingEnabled=false;
+let ZOOM=true,VWv=CW,VHv=CH,camX=0,camY=0;
 // ---------- apufunktiot ----------
 function mk(w,h,fn){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.imageSmoothingEnabled=false;fn(g);return c;}
 function R(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(x|0,y|0,w|0,h|0);}
@@ -327,7 +328,8 @@ function onTap(gx,gy){if(dlgOpen){advance();return;}
   const o=hitTest(gx,gy);if(o){if(o.x!==undefined&&o.w<=104&&o.k&&DECOR.includes(o)){interactObj(o);return;}goInteract(o);return;}
   const tx=Math.floor(gx/TS),ty=Math.floor(gy/TS);if(tx===4&&ty>=8){const p=bfs((x,y)=>x===4&&y===7);PL.path=p||[];PL.after=()=>{PL.dir='down';say('Ovesta pääsisi kylänraitille. Tässä testissä pysytään grillillä.');};return;}
   if(solidAt(tx,ty))return;const p=bfs((x,y)=>x===tx&&y===ty);if(p){PL.path=p;PL.after=null;}}
-cv.addEventListener('pointerdown',e=>{e.preventDefault();const r=cv.getBoundingClientRect();onTap((e.clientX-r.left)*CW/r.width,(e.clientY-r.top)*CH/r.height);});
+cv.addEventListener('pointerdown',e=>{e.preventDefault();const r=cv.getBoundingClientRect();onTap(Math.round(camX)+(e.clientX-r.left)*VWv/r.width,Math.round(camY)+(e.clientY-r.top)*VHv/r.height);});
+document.getElementById('zoom').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();ZOOM=!ZOOM;e.currentTarget.textContent=ZOOM?'Koko huone':'Lähennä';fit();});
 document.getElementById('aika').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();evening=!evening;hudUpd();});
 addEventListener('keydown',e=>{const k=e.key;if(dlgOpen){if(k===' '||k==='Enter'||k==='z'){advance();e.preventDefault();}
     if(DCH&&DQ.length===1&&/^[1-4]$/.test(k)){const c=DCH[+k-1];if(c){DCH=null;closeDlg(true);c[1]();}}return;}
@@ -368,10 +370,17 @@ function draw(){ctx.drawImage(ground,0,0);
   for(const [lx,ly,sd] of LAMPS)halo(sd?lx+18:lx,ly+6,26,'255,200,120',(evening?.35:.15)*lk);
   if(TFX.k>.02)for(const c of CANDLES)halo(cx0+1+c,cy0+14,22,'255,180,90',.5*TFX.k);
   ctx.globalCompositeOperation='source-over';}
-function fit(){const vw=innerWidth,vh=innerHeight,s=Math.min(vw/CW,(vh-150)/CH,2);cv.style.width=Math.round(CW*s)+'px';cv.style.height=Math.round(CH*s)+'px';}
+function fit(){const top=Math.ceil(document.getElementById('hud').getBoundingClientRect().bottom)+6,aw=innerWidth,ah=innerHeight-top-8;
+  if(ZOOM){VHv=CH;VWv=Math.min(CW,Math.max(240,Math.round(CH*aw/ah)));}else{VWv=CW;VHv=CH;}
+  cv.width=VWv;cv.height=VHv;dctx.imageSmoothingEnabled=false;const s=Math.min(aw/VWv,ah/VHv,3);
+  cv.style.width=Math.round(VWv*s)+'px';cv.style.height=Math.round(VHv*s)+'px';cv.style.top=Math.round(top+(ah-VHv*s)/2)+'px';
+  camX=clamp(PL.px+32-VWv/2,0,CW-VWv);}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function present(){const tx=clamp(PL.px+32-VWv/2,0,CW-VWv);camX+=(tx-camX)*.12;if(Math.abs(tx-camX)<.5)camX=tx;
+  dctx.fillStyle='#1a110c';dctx.fillRect(0,0,VWv,VHv);dctx.drawImage(world,Math.round(camX),Math.round(camY),VWv,VHv,0,0,VWv,VHv);}
 addEventListener('resize',fit);
 function init(){SPR.counter=makeCounter();SPR.keitin=makeKeitin();SPR.hylly=makeHylly();SPR.stool=makeStool();SPR.pajatso=makePajatso();SPR.jukebox=makeJukebox();SPR.table=makeTable();SPR.bench=makeBench();SPR.small=makeSmallTable();SPR.tuoppi=makeTuoppi();SPR.lamp=makeLamp(0);SPR.lampS=makeLamp(1);
-  buildGround();fit();hudUpd();(function loop(){update();draw();requestAnimationFrame(loop);})();}
+  buildGround();fit();hudUpd();(function loop(){update();draw();present();requestAnimationFrame(loop);})();}
 init();
 </script>
 </body>
