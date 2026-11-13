@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Grilli 64 px</title>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#1a110c;--ink:#f4e6cc;--panel:#f3e8cf;--panelInk:#3a2a1c;--accent:#3f6b4a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Pixelify Sans',system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+#hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px;z-index:3}
+#hud .t{background:rgba(20,12,8,.82);border-radius:8px;padding:6px 10px;font-size:15px;line-height:1.25;flex:1}
+#hud .t small{display:block;opacity:.7;font-size:12px}
+#hud button{font:inherit;font-size:14px;background:rgba(20,12,8,.82);color:var(--ink);border:1px solid #6a4a32;border-radius:999px;padding:8px 12px;cursor:pointer}
+#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+#dlg{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 12px);background:var(--panel);color:var(--panelInk);border:3px solid #6a4a32;border-radius:10px;padding:14px 16px;font-size:18px;line-height:1.35;z-index:4;display:none;max-width:640px;margin:0 auto}
+#dlg .ch{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+#dlg .ch button{font:inherit;font-size:17px;text-align:left;background:#e6d8b8;color:var(--panelInk);border:0;border-radius:6px;padding:9px 12px;cursor:pointer}
+#dlg .ch button:hover,#dlg .ch button:focus{background:var(--accent);color:#fff;outline:none}
+#dlg .more{float:right;opacity:.6}
+#card{position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:5;display:none;text-align:center}
+#card canvas{width:144px;height:216px;image-rendering:pixelated;border-radius:6px;box-shadow:0 0 40px rgba(255,180,90,.55)}
+#card b{display:block;margin-top:8px;font-size:18px;color:#ffe2a8;text-shadow:0 1px 3px #000}
+#hint{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 14px);text-align:center;font-size:13px;opacity:.6;z-index:2}
+</style>
+</head>
+<body>
+<div id="hud"><div class="t" id="hudt">Mandin grilli<small>64 px testi</small></div><button id="aika">Ilta</button></div>
+<canvas id="cv" width="640" height="576"></canvas>
+<div id="card"><canvas id="cardcv" width="48" height="72"></canvas><b id="cardn"></b></div>
+<div id="dlg"></div>
+<div id="hint">Napauta liikkuaksesi · napauta Mandia, Karaa tai esineitä</div>
+<script>
+'use strict';
+const TS=64,W=10,H=9,CW=640,CH=576;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;
+// ---------- apufunktiot ----------
+function mk(w,h,fn){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.imageSmoothingEnabled=false;fn(g);return c;}
+function R(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(x|0,y|0,w|0,h|0);}
+function P(g,x,y,c){g.fillStyle=c;g.fillRect(x|0,y|0,1,1);}
+function ell(g,cx,cy,rx,ry,c){g.fillStyle=c;for(let dy=-ry;dy<=ry;dy++){const w=Math.round(rx*Math.sqrt(Math.max(0,1-(dy*dy)/(ry*ry))));g.fillRect(cx-w,cy+dy,2*w+1,1);}}
+function hash(a,b,c){let h=(a*374761393+b*668265263+(c||0)*2147483647)|0;h=(h^(h>>>13))*1274126177|0;return((h^(h>>>16))>>>0)/4294967296;}
+function hx(c){return [parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)];}
+function toH(r,g,b){return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');}
+function shade(c,k){const [r,g,b]=hx(c);return k>=0?toH(r+(255-r)*k,g+(255-g)*k,b+(255-b)*k):toH(r*(1+k),g*(1+k),b*(1+k));}
+function lerpC(a,b,t){const A=hx(a),B=hx(b);return toH(A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t,A[2]+(B[2]-A[2])*t);}
+function outlined(w,h,fn,oc){const c=mk(w+2,h+2,g=>{g.translate(1,1);fn(g);});const g=c.getContext('2d'),d=g.getImageData(0,0,w+2,h+2),a=d.data,o=new Uint8ClampedArray(a),[r,gg,b]=hx(oc||'#1c100a');
+  for(let y=0;y<h+2;y++)for(let x=0;x<w+2;x++){const i=(y*(w+2)+x)*4;if(a[i+3])continue;let n=0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<w+2&&Y<h+2&&a[(Y*(w+2)+X)*4+3]>140)n=1;}if(n){o[i]=r;o[i+1]=gg;o[i+2]=b;o[i+3]=255;}}
+  g.putImageData(new ImageData(o,w+2,h+2),0,0);return c;}
+function flipH(c){return mk(c.width,c.height,g=>{g.translate(c.width,0);g.scale(-1,1);g.drawImage(c,0,0);});}
+// pieni 3×5 kirjasin liitutauluun ja kylttiin
+const GL={A:'010101111101101',B:'110101110101110',C:'011100100100011',D:'110101101101110',E:'111100110100111',F:'111100110100100',G:'011100101101011',H:'101101111101101',I:'111010010010111',J:'001001001101010',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'110101101101101',O:'010101101101010',P:'110101110100100',R:'110101110101101',S:'011100010001110',T:'111010010010010',U:'101101101101111',V:'101101101101010',Y:'101101010010010',
+ '0':'111101101101111','1':'010110010010111','2':'110001010100111','3':'110001010001110','4':'101101111001001','5':'111100110001110','6':'011100111101111','7':'111001010010010','8':'111101111101111','9':'111101111001110','+':'000010111010000','.':'000000000000010','-':'000000111000000',' ':'000000000000000','?':'110001010000010'};
+function txt(g,s,x,y,c,j){let X=x;for(const ch0 of s){const um=ch0==='Ä'||ch0==='Ö',ch=ch0==='Ä'?'A':ch0==='Ö'?'O':ch0,gl=GL[ch]||GL[' '];
+  for(let i=0;i<15;i++)if(gl[i]==='1'){const dx=i%3,dy=(i/3)|0;P(g,X+dx+(j?Math.round(hash(X,dy,7)*1-.5)*0:0),y+dy,c);}if(um){P(g,X,y-2,c);P(g,X+2,y-2,c);}X+=4;}}
+
+// ---------- hahmot ----------
+const LOOK={
+  mandi:{skin:'#f0c4a0',hair:'#6a3a20',style:'long',shirt:'#b83a30',pants:'#3a3a52',shoes:'#2a1a14',glasses:1,apron:1},
+  kara:{skin:'#f4cfae',hair:'#c8642a',style:'bun',shirt:'#6a4a8a',inner:'#e4d4e8',pants:'#3e5a86',shoes:'#5a3020'},
+  pelaaja:{skin:'#efc3a0',hair:'#5a3420',style:'short',shirt:'#c0392b',plaid:1,pants:'#34507a',shoes:'#2a1a14'}};
+function drawChar(g,L,dir,fr){
+  const cx=24,side=dir==='right',sw=fr===1?1:fr===3?-1:0;
+  const sk=L.skin,skD=shade(sk,-.16),skDD=shade(sk,-.3),hr=L.hair,hrD=shade(hr,-.28),hrL=shade(hr,.22);
+  const sh=L.shirt,shD=shade(sh,-.24),shL=shade(sh,.16),pa=L.pants,paD=shade(pa,-.25),paL=shade(pa,.12),so=L.shoes;
+  // pitkät hiukset taakse
+  if(L.style==='long'){if(dir==='up')R(g,cx-14,12,28,44,hrD);else if(side)R(g,cx-12,12,12,40,hrD);else{R(g,cx-15,14,6,38,hrD);R(g,cx+9,14,6,38,hrD);}}
+  // jalat
+  if(!side){const lL=26-(fr===1?3:0),lR=26-(fr===3?3:0);
+    R(g,cx-10,64,9,lL,pa);R(g,cx-10,64,2,lL,paL);R(g,cx+1,64,9,lR,paD);R(g,cx-1,64,2,10,paD);
+    R(g,cx-11,62+lL,11,6,so);R(g,cx-10,62+lL,4,1,shade(so,.3));R(g,cx+1,62+lR,11,6,so);R(g,cx+2,62+lR,4,1,shade(so,.3));}
+  else{const a=sw*5;R(g,cx-5-a,64,9,26,paD);R(g,cx-6-a,88,12,6,shade(so,-.2));R(g,cx-4+a,64,9,26,pa);R(g,cx-4+a,64,2,26,paL);R(g,cx-4+a,88,13,6,so);R(g,cx-2+a,88,5,1,shade(so,.3));}
+  // vartalo
+  const tw=side?18:26,tx=cx-tw/2;
+  R(g,tx,34,tw,32,sh);R(g,tx+1,33,tw-2,1,sh);R(g,tx,34,2,32,shL);R(g,tx+tw-4,34,4,32,shD);R(g,tx,62,tw,4,shD);
+  if(L.plaid){for(let y=36;y<66;y+=6)R(g,tx,y,tw,1,shD);for(let x=tx+3;x<tx+tw;x+=6)R(g,x,34,1,32,shD);for(let y=39;y<66;y+=6)for(let x=tx+1;x<tx+tw;x+=6)P(g,x,y,'#e8b04a');}
+  if(L.inner&&!side&&dir!=='up'){R(g,cx-3,35,6,30,L.inner);R(g,cx-3,35,1,30,shade(L.inner,-.15));for(const y of [44,52,60])P(g,cx-5,y,'#e8d0a0');}
+  if(L.inner&&side){R(g,tx+tw-4,36,3,28,L.inner);}
+  if(dir!=='up'&&!side){R(g,cx-4,33,8,3,sk);R(g,cx-3,36,6,2,sk);P(g,cx-1,38,sk);P(g,cx,38,sk);}
+  if(L.apron&&dir!=='up'){if(side){R(g,cx+2,46,9,26,'#efe4cc');R(g,cx+9,46,2,26,'#d4c6a6');R(g,cx-6,46,9,2,'#d4c6a6');}
+    else{R(g,cx-11,46,22,26,'#efe4cc');R(g,cx-11,46,22,2,'#fff8e8');R(g,cx+8,46,3,26,'#d4c6a6');R(g,cx-11,70,22,2,'#d4c6a6');R(g,cx-6,36,2,10,'#efe4cc');R(g,cx+4,36,2,10,'#efe4cc');R(g,cx-5,56,10,8,'#e2d4b4');R(g,cx-5,56,10,1,'#cbbb98');R(g,cx-13,46,2,3,'#d4c6a6');R(g,cx+11,46,2,3,'#d4c6a6');}}
+  // kädet
+  if(!side){for(const [ax,ph] of [[cx-17,sw],[cx+13,-sw]]){const oy=ph*2;R(g,ax,36+oy,5,14,ax<cx?shL:shD);R(g,ax,48+oy,5,11,ax<cx?sk:skD);R(g,ax,58+oy,5,5,ax<cx?sk:skD);R(g,ax,62+oy,5,1,skDD);}}
+  else{const oy=sw*3;R(g,cx-2+oy,36,6,14,shD);R(g,cx-2+oy,36,6,1,sh);R(g,cx-2+oy*1.5,49,6,10,sk);R(g,cx-2+oy*1.5,58,6,5,sk);R(g,cx+3+oy*1.5,49,1,13,skD);}
+  // kaula ja pää
+  R(g,cx-4,28,8,7,skD);
+  if(dir==='up'){ell(g,cx,19,13,14,hr);ell(g,cx-3,13,7,5,hrL);for(let x=cx-10;x<cx+11;x+=3)R(g,x,22,1,9,hrD);
+    if(L.style==='bun'){ell(g,cx,5,8,6,hr);ell(g,cx-2,3,4,2,hrL);R(g,cx-6,9,12,2,hrD);}
+    if(L.style==='short'){R(g,cx-12,27,24,3,hrD);}}
+  else if(side){ell(g,cx+2,20,11,13,sk);R(g,cx+11,21,3,4,sk);P(g,cx+13,25,skD);R(g,cx+3,30,8,2,skD);
+    R(g,cx+7,18,3,4,'#fff');R(g,cx+8,18,2,4,'#2a1a14');P(g,cx+8,18,'#fff');R(g,cx+6,15,5,1,hrD);R(g,cx+8,27,3,1,'#a0503c');P(g,cx+9,23,'#f2a0a0');R(g,cx+10,23,1,1,skD);
+    ell(g,cx,10,12,7,hr);R(g,cx-11,10,9,19,hr);ell(g,cx-6,20,5,9,hr);R(g,cx+5,9,8,4,hr);P(g,cx+12,13,hr);ell(g,cx-2,7,6,2,hrL);for(let y=13;y<30;y+=3)R(g,cx-10,y,6,1,hrD);
+    if(L.style!=='long'){R(g,cx-1,19,3,5,skD);P(g,cx,20,sk);}
+    if(L.style==='bun'){ell(g,cx-8,6,7,6,hr);ell(g,cx-9,4,3,2,hrL);}
+    if(L.style==='short')R(g,cx-12,24,8,6,hr);
+    if(L.glasses){R(g,cx+5,16,7,7,'#3a2a22');R(g,cx+6,17,5,5,'rgba(220,235,240,.35)');R(g,cx+6,17,5,5,'#f4e8e0');R(g,cx+7,18,3,4,'#fff');R(g,cx+8,18,2,4,'#2a1a14');R(g,cx-2,18,8,1,'#3a2a22');}}
+  else{ell(g,cx,20,12,13,sk);R(g,cx+6,14,5,16,skD);R(g,cx-12,18,2,6,skD);R(g,cx+11,18,2,6,skD);
+    for(const ex of [cx-7,cx+3]){R(g,ex,19,4,5,'#fff');R(g,ex+1,19,3,5,'#2a1a14');P(g,ex+1,19,'#fff');R(g,ex,16,5,1,hrD);}
+    R(g,cx,24,1,2,skD);R(g,cx-2,28,5,1,'#a0503c');P(g,cx-9,25,'#f2a0a0');P(g,cx-8,25,'#f2a0a0');P(g,cx+7,25,'#f2a0a0');P(g,cx+8,25,'#f2a0a0');
+    if(L.glasses){for(const ex of [cx-8,cx+2]){R(g,ex,18,7,1,'#3a2a22');R(g,ex,24,7,1,'#3a2a22');R(g,ex,18,1,7,'#3a2a22');R(g,ex+6,18,1,7,'#3a2a22');}R(g,cx-1,20,3,1,'#3a2a22');}
+    ell(g,cx,10,13,7,hr);R(g,cx-13,9,26,5,hr);ell(g,cx-4,6,7,2,hrL);
+    for(let x=cx-11;x<cx+12;x+=3){R(g,x,11,1,3+((x>>1)&1),hrD);}
+    if(L.style==='long'){R(g,cx-14,12,4,34,hr);R(g,cx+10,12,4,34,hr);R(g,cx-14,12,1,34,hrL);R(g,cx+13,12,1,34,hrD);}
+    if(L.style==='short'){R(g,cx-13,12,3,10,hr);R(g,cx+10,12,3,10,hr);}
+    if(L.style==='bun'){ell(g,cx,3,7,5,hr);ell(g,cx-2,2,3,2,hrL);R(g,cx-13,12,3,12,hr);R(g,cx+10,12,3,12,hr);R(g,cx+9,18,2,8,hr);}}
+}
+const CHAR={};
+function charSpr(name,dir,fr){const k=name+dir+fr;if(CHAR[k])return CHAR[k];const L=LOOK[name];
+  const base=d=>outlined(48,100,g=>drawChar(g,L,d,fr));CHAR[k]=dir==='left'?flipH(base('right')):base(dir);return CHAR[k];}
+
+// ---------- kalusteet ----------
+const SPR={};
+function woodGrain(g,x,y,w,h,c,seed,vert){for(let i=0;i<Math.max(3,(vert?w:h)/3);i++){const t=hash(i,seed,31);if(vert){const X=x+1+Math.floor(t*(w-2));R(g,X,y+2,1,h-4,shade(c,i%2?.1:-.14));}else{const Y=y+1+Math.floor(t*(h-2)),X=x+Math.floor(hash(i,seed,32)*w*.4),L=Math.floor(w*.3+hash(i,seed,33)*w*.6);R(g,X,Y,Math.min(L,x+w-X),1,shade(c,i%2?.1:-.14));}}}
+function makeCounter(){return outlined(260,122,g=>{
+  // työtaso
+  R(g,0,40,260,22,'#c8862e');for(let x=0;x<260;x+=52){R(g,x,40,52,22,x%104?'#c07e28':'#cc8a32');R(g,x+51,40,1,22,'#8a5418');}woodGrain(g,0,41,260,20,'#c8862e',4);
+  R(g,0,40,260,2,'#eab062');R(g,0,61,260,3,'#7a4a1a');R(g,0,64,260,4,'#3a2010');
+  // etupaneelit
+  R(g,0,68,260,48,'#3e2416');for(let x=6;x<254;x+=62){R(g,x,74,56,34,'#4e2e1a');R(g,x,74,56,2,'#6a4428');R(g,x,74,2,34,'#5e3a22');R(g,x,106,56,2,'#24140c');R(g,x+54,74,2,34,'#2a1810');R(g,x+6,80,44,22,'#563420');R(g,x+6,80,44,1,'#6e4828');woodGrain(g,x+7,81,42,20,'#563420',x,true);}
+  R(g,0,68,260,3,'#24140c');
+  // messinkitanko
+  R(g,0,110,260,4,'#b08a3a');R(g,0,110,260,1,'#f0d070');R(g,0,113,260,1,'#6a5020');for(const x of [16,128,240]){R(g,x,104,4,8,'#8a6a2a');R(g,x,104,1,8,'#d0b060');}
+  // kassakone
+  R(g,18,24,46,30,'#4a4e56');R(g,18,24,46,2,'#7a7e86');R(g,20,28,24,10,'#1e2226');R(g,22,30,20,6,'#2a3a30');txt(g,'6.00',24,31,'#7af0a0');
+  for(let r=0;r<3;r++)for(let c=0;c<5;c++)R(g,22+c*8,41+r*4,6,3,c===4?'#c84a3a':'#d8d8d0');R(g,48,28,14,10,'#3a3e44');R(g,18,52,46,4,'#2a2e34');
+  // pullot ja servetit
+  R(g,74,30,8,24,'#c8302a');R(g,74,30,2,24,'#e86050');R(g,76,24,4,6,'#f4f4ee');R(g,86,32,8,22,'#e8c030');R(g,86,32,2,22,'#fff070');R(g,88,26,4,6,'#c84a2a');
+  R(g,100,40,20,14,'#b8bcc0');R(g,100,40,20,2,'#e8ecf0');R(g,103,34,14,8,'#fbfbf4');R(g,103,34,14,1,'#ffffff');
+  // tarotpakka ja kynttilänjalat
+  for(const cx of [204,240]){ell(g,cx,56,8,3,'#8a6a2a');ell(g,cx,55,7,2,'#d8b050');R(g,cx-2,44,5,11,'#c8a040');R(g,cx-2,44,1,11,'#f0d070');ell(g,cx,44,5,2,'#d8b050');R(g,cx-3,22,7,22,'#f4ecd8');R(g,cx-3,22,2,22,'#ffffff');R(g,cx+2,22,2,22,'#dccfb0');R(g,cx,19,1,3,'#2a2a2a');}
+  R(g,212,46,20,12,'#3a1a4a');R(g,213,44,20,12,'#5a2a6a');R(g,214,45,18,10,'#6a3a7a');R(g,215,46,16,8,'#e8c040');R(g,216,47,14,6,'#5a2a6a');P(g,223,49,'#f8e080');P(g,222,50,'#f8e080');P(g,224,50,'#f8e080');P(g,223,51,'#f8e080');
+});}
+const CANDLES=[204,240];
+function makeKeitin(){return outlined(64,108,g=>{
+  R(g,2,44,60,62,'#8a9096');R(g,2,44,60,3,'#d0d4d8');R(g,2,44,3,62,'#b0b6bc');R(g,58,44,4,62,'#6a7076');R(g,6,54,24,46,'#9aa0a6');R(g,34,54,24,46,'#9aa0a6');R(g,6,54,24,1,'#c8ccd0');R(g,34,54,24,1,'#c8ccd0');R(g,26,74,2,8,'#5a5e64');R(g,36,74,2,8,'#5a5e64');
+  R(g,6,8,26,36,'#2a2a2e');R(g,6,8,26,3,'#4a4a50');R(g,8,12,22,6,'#3a3a40');P(g,26,14,'#ff4a3a');R(g,10,24,16,18,'rgba(200,220,230,.9)');R(g,11,30,14,12,'#5a2e14');R(g,11,30,14,2,'#7a4a24');R(g,10,24,2,18,'#e8f4f8');R(g,26,28,4,8,'#2a2a2e');R(g,8,42,22,2,'#c8302a');
+  R(g,36,22,24,22,'#9aa0a6');R(g,36,22,24,2,'#d8dce0');R(g,38,26,20,8,'#e0a83a');for(let x=39;x<57;x+=3)R(g,x,26,1,8,'#a87420');R(g,46,12,3,12,'#3a3a40');R(g,44,10,7,3,'#2a2a2e');});}
+function makeHylly(){return outlined(62,134,g=>{R(g,2,2,58,130,'#3e2416');R(g,6,6,50,122,'#24140c');R(g,2,2,58,3,'#5a3822');R(g,2,2,3,130,'#5a3822');
+  const B=['#2e6a3a','#7a3a14','#a8c8c0','#c88a2a','#5a2a4a','#2a4a6a','#8a2a24'];
+  for(let s=0;s<3;s++){const y=36+s*40;R(g,4,y,54,6,'#7a4c2a');R(g,4,y,54,1,'#a87444');R(g,4,y+5,54,1,'#2a1810');
+    let x=8;while(x<52){const c=B[Math.floor(hash(x,s,3)*B.length)],w=6+Math.floor(hash(x,s,4)*3),h=18+Math.floor(hash(x,s,5)*8);if(x+w>54)break;
+      R(g,x,y-h,w,h,c);R(g,x+1,y-h,1,h,shade(c,.35));R(g,x+w-1,y-h,1,h,shade(c,-.3));R(g,x+w/2-1,y-h-6,3,6,c);R(g,x+w/2-1,y-h-8,3,2,'#c8a040');if(hash(x,s,6)>.4)R(g,x,y-h+6,w,5,'#efe2c0');x+=w+2;}}
+  R(g,30,108,20,10,'#4a3022');R(g,30,108,20,2,'#6a4430');});}
+function makeStool(){return outlined(44,80,g=>{ell(g,22,72,15,5,'#3a3e44');ell(g,22,71,14,4,'#6a6e74');R(g,20,24,5,46,'#9aa0a6');R(g,20,24,1,46,'#f0f4f8');R(g,24,24,1,46,'#5a5e64');ell(g,22,52,12,3,'#9aa0a6');ell(g,22,51,10,2,'#5a5e64');
+  ell(g,22,18,19,8,'#8a2a24');ell(g,22,15,19,8,'#c8392f');ell(g,18,13,10,3,'#e86a5a');R(g,4,18,36,2,'#6a1e1a');});}
+function makePajatso(){return outlined(64,132,g=>{
+  R(g,4,8,56,112,'#6a2e1e');R(g,4,8,4,112,'#8a4a2e');R(g,56,8,4,112,'#4a1e12');R(g,10,120,6,10,'#3a1a10');R(g,48,120,6,10,'#3a1a10');
+  R(g,6,2,52,22,'#b8302a');R(g,6,2,52,2,'#e86050');R(g,6,22,52,2,'#7a1e1a');txt(g,'PAJATSO',18,10,'#f8e8c0');for(const x of [10,52])ell(g,x,12,2,2,'#f0c040');
+  R(g,10,28,44,64,'#efe2c0');R(g,10,28,44,2,'#d4c49c');
+  for(let y=34;y<70;y+=6)for(let x=14+((y/6)%2)*3;x<52;x+=6){P(g,x,y,'#c8a040');P(g,x,y+1,'#6a5020');}
+  for(let i=0;i<5;i++){const x=13+i*8;R(g,x,74,6,8,'#b8302a');R(g,x+1,74,4,5,'#efe2c0');txt(g,['1','2','5','2','1'][i],x+1,84,'#7a1e1a');}
+  for(let i=0;i<8;i++)P(g,42-i,30+i*4,'rgba(255,255,255,.6)');for(let i=0;i<14;i++)P(g,20+i,30+i*2,'rgba(255,255,255,.35)');
+  R(g,10,96,44,20,'#b8bcc0');R(g,10,96,44,2,'#eef2f4');R(g,14,100,16,4,'#2a2a2e');R(g,34,102,16,10,'#6a6e74');R(g,36,104,12,6,'#3a3e44');ell(g,42,107,2,1,'#e8c040');});}
+function makeJukebox(){return outlined(72,132,g=>{
+  R(g,4,40,64,86,'#5a2a18');R(g,4,40,8,86,'#7a3e22');R(g,60,40,8,86,'#3e1c10');
+  ell(g,36,40,32,30,'#c8ccd0');ell(g,36,40,29,27,'#e8802a');ell(g,36,40,25,23,'#f0c040');ell(g,36,40,21,19,'#c83a2a');ell(g,36,42,17,15,'#2a1a1a');R(g,4,40,64,30,'#5a2a18');
+  ell(g,36,40,32,1,'#5a2a18');R(g,4,40,64,2,'#3e1c10');
+  for(let i=0;i<5;i++){P(g,14+i*2,26-i*3,'#fff4c0');P(g,58-i*2,26-i*3,'#fff4c0');}
+  ell(g,36,30,9,7,'#3a2a2a');ell(g,36,30,8,6,'#1a1212');ell(g,36,30,3,2,'#c83a2a');P(g,36,30,'#fff');R(g,24,32,24,3,'#c8ccd0');
+  R(g,14,46,44,24,'#efe2c0');R(g,14,46,44,2,'#ffffff');for(let r=0;r<5;r++){R(g,17,50+r*4,16,1,'#8a7a60');R(g,38,50+r*4,16,1,'#8a7a60');}R(g,35,48,1,20,'#c8b898');
+  for(let i=0;i<8;i++)R(g,15+i*5,74,4,4,['#e84a3a','#f0c040','#4aa860','#4a8ad8'][i%4]);
+  R(g,14,82,44,32,'#2a1a14');for(let x=16;x<56;x+=4){R(g,x,82,2,32,'#b8bcc0');P(g,x,82,'#ffffff');}R(g,14,82,44,2,'#d8dce0');
+  R(g,4,118,64,10,'#b8bcc0');R(g,4,118,64,2,'#eef2f4');R(g,4,126,64,2,'#6a6e74');});}
+function makeTable(){return outlined(146,104,g=>{
+  for(const [x0,fl] of [[2,1],[124,-1]]){const bx=fl>0?x0:x0+18;R(g,x0,52,20,8,'#6a3a20');R(g,x0,52,20,2,'#8a5430');R(g,x0+2,60,3,40,'#4a2a16');R(g,x0+15,60,3,40,'#4a2a16');
+    const back=fl>0?x0:x0+16;R(g,back,6,4,52,'#5a321c');R(g,back,6,1,52,'#7a4a2a');for(let y=8;y<50;y+=10)R(g,back,y,4,2,'#3e2214');R(g,back-1,4,6,4,'#6a3a20');}
+  R(g,20,62,6,36,'#3e2214');R(g,120,62,6,36,'#3e2214');R(g,20,62,2,36,'#5a3420');R(g,120,62,2,36,'#5a3420');R(g,24,94,98,4,'#3a2010');
+  R(g,14,24,118,28,'#7a4a2a');for(let y=24;y<52;y+=7){R(g,14,y,118,1,'#5a321c');}woodGrain(g,14,25,118,26,'#7a4a2a',9);R(g,14,24,118,2,'#9a6a40');R(g,14,52,118,8,'#5a321c');R(g,14,52,118,1,'#3a2010');R(g,14,59,118,1,'#2a1810');
+  R(g,46,8,8,22,'#c8302a');R(g,46,8,2,22,'#e86050');R(g,48,4,4,4,'#f4f4ee');R(g,58,10,8,20,'#e8c030');R(g,58,10,2,20,'#fff070');R(g,60,6,4,4,'#c84a2a');
+  R(g,74,18,14,12,'#b8bcc0');R(g,74,18,14,2,'#eef2f4');R(g,76,12,10,8,'#fbfbf4');
+  R(g,96,16,8,14,'#2a5a8a');R(g,96,16,2,14,'#4a8ac8');R(g,99,6,2,10,'#3a7a3a');ell(g,100,5,4,3,'#e8c040');P(g,100,5,'#c86a20');});}
+function makeBench(){return outlined(70,212,g=>{
+  R(g,50,4,18,204,'#3e2416');for(let y=4;y<208;y+=16){R(g,50,y,18,1,'#24140c');R(g,52,y+2,5,12,'#4e2e1a');}R(g,50,4,3,204,'#5a3822');R(g,48,2,22,4,'#6a4428');R(g,48,2,22,1,'#8a5a34');
+  R(g,6,18,46,186,'#4a2a16');
+  for(let k=0;k<3;k++){const y=22+k*60;R(g,10,y,40,56,'#7a2c2a');R(g,10,y,40,3,'#a24a40');R(g,10,y+53,40,3,'#5a1e1c');R(g,46,y+3,4,50,'#5a1e1c');R(g,10,y+3,2,50,'#8e3a34');
+    for(const [bx,by] of [[22,y+16],[34,y+16],[22,y+38],[34,y+38]]){P(g,bx,by,'#4a1412');P(g,bx+1,by,'#4a1412');P(g,bx,by-1,'#a24a40');for(let i=1;i<4;i++){P(g,bx-i,by-i,'#6a2422');}}}
+  R(g,4,18,6,188,'#5a3420');R(g,4,18,2,188,'#7a4c2c');R(g,4,200,48,8,'#2e1a10');for(const y of [24,110,196])R(g,4,y,6,8,'#24140c');});}
+function makeSmallTable(){return outlined(80,96,g=>{ell(g,40,90,22,5,'#24140c');ell(g,40,88,20,4,'#3e2416');R(g,36,40,9,48,'#3e2416');R(g,36,40,3,48,'#5a3822');R(g,43,40,2,48,'#24140c');
+  ell(g,40,30,37,15,'#3e2416');ell(g,40,27,37,15,'#6a4428');ell(g,40,26,33,12,'#7a5232');ell(g,32,22,12,4,'#8a6240');ell(g,40,26,33,12,'rgba(0,0,0,0)');
+  for(let i=0;i<5;i++)R(g,14+i*11,24+((i*7)%5),8,1,'#6a4428');});}
+function makeTuoppi(){return outlined(22,26,g=>{R(g,2,4,14,20,'#d8e8e8');R(g,3,8,12,15,'#e0a030');R(g,3,8,12,3,'#f0c050');for(let y=10;y<22;y+=3)P(g,6+(y%4),y,'#fff0b0');
+  ell(g,9,5,8,3,'#fffaf0');ell(g,6,3,3,2,'#ffffff');ell(g,12,4,3,2,'#f4ecd8');R(g,16,9,4,10,'#c8dcdc');R(g,17,11,2,6,'rgba(0,0,0,0)');R(g,17,11,2,6,'#3e2416');R(g,3,6,1,17,'#ffffff');R(g,2,23,14,2,'#b8c8c8');});}
+function makeLamp(side){return outlined(26,24,g=>{if(side){R(g,0,8,8,3,'#8a6a2a');R(g,0,8,8,1,'#d0b060');}else{R(g,11,0,4,10,'#8a6a2a');R(g,11,0,1,10,'#d0b060');}
+  const cx=side?16:13;ell(g,cx,14,10,6,'#c8862e');R(g,cx-10,14,21,6,'rgba(0,0,0,0)');ell(g,cx,14,10,6,'#c8862e');ell(g,cx,13,8,4,'#f0c060');R(g,cx-10,17,21,3,'#7a4a1a');R(g,cx-6,20,13,2,'#fff4c0');for(let x=cx-7;x<cx+8;x+=4)R(g,x,10,1,7,'#a86a20');});}
+
+// ---------- pohja ----------
+let ground;
+function buildGround(){ground=mk(CW,CH,g=>{
+  R(g,0,0,CW,CH,'#2a1a12');
+  // lankkulattia
+  const PC=['#6e4428','#7a4c2e','#684026','#82522f','#5e3a22','#744830'];
+  for(let y=128,k=0;y<560;y+=24,k++){let x=64-Math.floor(hash(k,1,77)*180);let n=0;
+    while(x<576){const L=150+Math.floor(hash(k,n,78)*130),c=PC[Math.floor(hash(k,n,79)*PC.length)];
+      R(g,x,y,L,24,c);R(g,x,y,L,1,shade(c,.18));R(g,x,y+22,L,2,'#2e1c12');R(g,x+L-1,y,1,24,'#2a1810');R(g,x+L-2,y,1,24,shade(c,-.2));
+      for(let q=0;q<9;q++){const gy=y+3+Math.floor(hash(x,q,80)*17),gx=x+4+Math.floor(hash(q,x,81)*(L-40)),gl=12+Math.floor(hash(q,y,82)*40);R(g,gx,gy,gl,1,shade(c,q%2?.1:-.13));if(q%3===0)R(g,gx+gl,gy+1,8,1,shade(c,-.1));}
+      if(hash(x,y,83)>.6){const kx=x+20+Math.floor(hash(x,y,84)*(L-40)),ky=y+8+Math.floor(hash(x,y,85)*8);ell(g,kx,ky,4,2,shade(c,-.25));ell(g,kx,ky,2,1,shade(c,-.4));}
+      for(const nx of [x+6,x+L-8]){R(g,nx,y+6,2,2,'#2a1810');R(g,nx,y+15,2,2,'#2a1810');P(g,nx,y+6,'#8a7058');}
+      x+=L;n++;}}
+  // kulunut reitti ovelta tiskille
+  for(let i=0;i<1800;i++){const y=260+Math.floor(hash(i,1,90)*296),cx=288+Math.sin(y/40)*4,x=Math.floor(cx+(hash(i,2,90)-.5)*70*(0.6+hash(i,3,90)*.5));P(g,x,y,'rgba(240,200,150,.16)');}
+  for(let i=0;i<900;i++){const x=64+Math.floor(hash(i,4,90)*256),y=258+Math.floor(hash(i,5,90)*40);P(g,x,y,'rgba(240,200,150,.14)');}
+  // keittiön ruutulattia
+  for(let y=128;y<192;y+=16)for(let x=64;x<320;x+=16){const d=((x>>4)+(y>>4))%2===0;R(g,x,y,16,16,d?'#8e3a30':'#e6d8b8');R(g,x,y,16,1,d?'#a44a3e':'#f4ead0');R(g,x,y+15,16,1,d?'#762e26':'#cdbd98');R(g,x+15,y,1,16,d?'#762e26':'#d4c4a0');if(hash(x,y,91)>.7)P(g,x+4+Math.floor(hash(x,y,92)*8),y+5,d?'#7a2e26':'#c8b894');}
+  // takaseinä: viininpunainen tapetti
+  for(let y=0;y<80;y++)R(g,0,y,CW,1,lerpC('#8a3430','#6a2624',y/80));
+  for(let x=0;x<CW;x+=16){R(g,x,6,1,74,'#7a2c28');R(g,x+8,6,1,74,'#94403a');}
+  for(let y=14;y<78;y+=16)for(let x=4;x<CW;x+=16){const X=x+((y>>4)%2)*8;P(g,X,y,'#a4544a');P(g,X-1,y+1,'#a4544a');P(g,X+1,y+1,'#a4544a');P(g,X,y+2,'#a4544a');P(g,X,y+1,'#c8862e');}
+  R(g,0,0,CW,6,'#3e2416');R(g,0,5,CW,1,'#24140c');R(g,0,6,CW,2,'rgba(0,0,0,.25)');
+  // tuolilista
+  R(g,0,76,CW,8,'#c8862e');R(g,0,76,CW,2,'#eab062');R(g,0,83,CW,1,'#7a4a1a');
+  // paneelit
+  R(g,0,84,CW,40,'#3e2416');for(let x=4;x<CW;x+=56){R(g,x,88,50,32,'#4e2e1a');R(g,x,88,50,2,'#6a4428');R(g,x,88,2,32,'#5e3a22');R(g,x,118,50,2,'#24140c');R(g,x+48,88,2,32,'#2a1810');R(g,x+6,93,38,22,'#563420');R(g,x+6,93,38,1,'#6e4828');woodGrain(g,x+7,94,36,20,'#563420',x,true);}
+  R(g,0,122,CW,6,'#24140c');R(g,0,122,CW,1,'#5a3822');
+  for(let i=0;i<10;i++){g.fillStyle='rgba(0,0,0,'+(.34-i*.034)+')';g.fillRect(0,128+i,CW,1);}
+  // sivuseinät
+  for(const x0 of [0,576]){R(g,x0,0,64,CH,'#3a2216');for(let x=x0;x<x0+64;x+=16){R(g,x,0,16,CH,hash(x,1,93)>.5?'#3e2418':'#36200f');R(g,x,0,1,CH,'#24140c');R(g,x+1,0,1,CH,'#4e2e1e');woodGrain(g,x+2,0,13,CH,'#3e2418',x,true);}
+    R(g,x0===0?60:576,0,4,CH,'#1a0e08');for(let i=0;i<8;i++){g.fillStyle='rgba(0,0,0,'+(.3-i*.035)+')';g.fillRect(x0===0?64+i:575-i,128,1,432);}}
+  // alaseinä ja ovi
+  R(g,0,560,CW,16,'#24140c');R(g,0,560,CW,2,'#4a2c1a');R(g,256,556,64,20,'#e8c890');R(g,256,556,64,2,'#fff0c8');R(g,256,556,3,20,'#6a4a32');R(g,317,556,3,20,'#6a4a32');
+  R(g,262,526,52,28,'#6a3a24');R(g,264,528,48,24,'#8a5030');for(let x=266;x<310;x+=4)R(g,x,530,2,20,'#6a3a24');R(g,262,526,52,1,'#a86a40');
+  // liitutaulu (Mandin käsiala)
+  const bx=110,by=10;R(g,bx,by,104,64,'#5a3822');R(g,bx+1,by+1,102,62,'#7a4c2c');R(g,bx+4,by+4,96,56,'#1e2a24');for(let i=0;i<60;i++)P(g,bx+5+Math.floor(hash(i,1,94)*94),by+5+Math.floor(hash(i,2,94)*54),'rgba(255,255,255,.07)');
+  txt(g,'MANDIN',bx+38,by+8,'#f0b860');R(g,bx+36,by+14,28,1,'#f0b860');
+  const ML=[['MAKKARAPER.','6'],['HAMPURILAINEN','5'],['KAHVI+MUNKKI','2'],['LIMSA','1'],['TAROT','?']];
+  ML.forEach(([a,b],i)=>{txt(g,a,bx+8,by+20+i*7,'#ece8de');txt(g,b,bx+86,by+20+i*7,'#f4f0e6');});
+  ell(g,bx+80,by+55,3,3,'#f0b860');ell(g,bx+80,by+55,1,1,'#1e2a24');R(g,bx+4,by+60,96,3,'#7a4c2c');R(g,bx+18,by+60,8,2,'#f4f4ee');R(g,bx+30,by+60,5,2,'#e8c040');
+  // vanha valokuva venelaiturista
+  const fx=386,fy=8;R(g,fx,fy,92,64,'#2a180e');R(g,fx+2,fy+2,88,60,'#5a3a22');R(g,fx+5,fy+5,82,54,'#c8a050');R(g,fx+7,fy+7,78,50,'#e8dcc0');
+  for(let r=0;r<20;r++)R(g,fx+8,fy+8+r,76,1,lerpC('#e2d2b0','#cdb88e',r/20));
+  ell(g,fx+24,fy+27,14,4,'#8a7a5c');ell(g,fx+60,fy+26,18,5,'#7a6a4e');R(g,fx+8,fy+27,76,2,'#6a5a44');
+  for(let r=0;r<20;r++)R(g,fx+8,fy+29+r,76,1,lerpC('#a8987a','#7a6a52',r/20));for(let i=0;i<18;i++)R(g,fx+10+Math.floor(hash(i,3,95)*66),fy+31+Math.floor(hash(i,4,95)*16),6,1,'#b8a888');
+  R(g,fx+30,fy+36,54,4,'#4a3a28');R(g,fx+30,fy+36,54,1,'#6a5a44');for(const px of [34,46,58,70,82])R(g,px+fx,fy+40,2,7,'#3a2c20');
+  for(const [px,h] of [[44,11],[52,13],[61,10]]){R(g,fx+px,fy+36-h,3,h,'#2e241a');ell(g,fx+px+1,fy+36-h-2,2,2,'#2e241a');}
+  R(g,fx+46,fy+18,1,9,'#3a2c20');R(g,fx+46,fy+18,10,1,'#3a2c20');R(g,fx+62,fy+16,1,10,'#3a2c20');
+  txt(g,'KESÄ -78',fx+50,fy+50,'#5a4630');for(let i=0;i<40;i++)P(g,fx+8+Math.floor(hash(i,5,96)*76),fy+8+Math.floor(hash(i,6,96)*48),'rgba(90,70,40,.18)');
+});}
+
+// ---------- kartta ja esineet ----------
+const OBJ=[
+  {k:'keitin',x:1,y:2,w:1,h:1,dy:2,spr:()=>SPR.keitin,hit:1},
+  {k:'mandi',x:3,y:2,w:1,h:1,dy:-4,spr:()=>charSpr('mandi','down',0),hit:1},
+  {k:'hylly',x:4,y:2,w:1,h:1,dy:0,spr:()=>SPR.hylly,hit:1},
+  {k:'tiski',x:1,y:3,w:4,h:1,dy:4,spr:()=>SPR.counter,hit:1},
+  {k:'jakkara',x:1,y:4,w:1,h:1,dy:-4,spr:()=>SPR.stool},
+  {k:'jakkara',x:2,y:4,w:1,h:1,dy:-4,spr:()=>SPR.stool},
+  {k:'pajatso',x:5,y:2,w:1,h:1,dy:-2,spr:()=>SPR.pajatso,hit:1},
+  {k:'jukeboksi',x:8,y:2,w:1,h:1,dy:-2,spr:()=>SPR.jukebox,hit:1},
+  {k:'penkki',x:8,y:4,w:1,h:3,dy:0,spr:()=>SPR.bench,hit:1},
+  {k:'poyta',x:5,y:5,w:2,h:1,dy:0,spr:()=>SPR.table,hit:1},
+  {k:'pikkupoyta',x:1,y:6,w:1,h:1,dy:-6,spr:()=>SPR.small,hit:1},
+  {k:'tuoppi',x:1,y:6,w:1,h:1,dy:-62,z:1,spr:()=>SPR.tuoppi,eve:1,nosolid:1},
+  {k:'kara',x:2,y:6,w:1,h:1,dy:-6,spr:()=>charSpr('kara','left',(Math.floor(frame/90)%7===0)?0:0),hit:1,eve:1}];
+const DECOR=[{k:'lista',x:110,y:10,w:104,h:64},{k:'kuva',x:386,y:8,w:92,h:64},{k:'lamppu',x:226,y:30,w:28,h:26},{k:'lamppu',x:490,y:30,w:28,h:26},{k:'lamppu',x:40,y:352,w:28,h:26}];
+const LAMPS=[[240,44,0],[504,44,0],[54,362,1]];
+let evening=true,frame=0,money=50,TFX={k:0,t:0};
+const PL={x:4,y:7,px:4*TS,py:7*TS,dir:'up',path:[],moving:false,step:0,after:null};
+function vis(o){return !o.eve||evening;}
+function solidAt(x,y){if(x<1||x>8||y<2||y>7)return !(x===4&&y===8);for(const o of OBJ)if(vis(o)&&!o.nosolid&&x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h)return o;if(y===2&&(x===2))return true;return false;}
+function bfs(goal){const sx=PL.x,sy=PL.y,Q=[[sx,sy]],prev={};prev[sx+','+sy]=null;
+  while(Q.length){const [x,y]=Q.shift();if(goal(x,y)){const p=[];let k=x+','+y;while(prev[k]!==null&&prev[k]!==undefined){p.unshift(k.split(',').map(Number));k=prev[k];}return p;}
+    for(const [dx,dy] of [[0,-1],[1,0],[0,1],[-1,0]]){const X=x+dx,Y=y+dy,K=X+','+Y;if(K in prev||X<0||Y<0||X>=W||Y>=H||solidAt(X,Y))continue;prev[K]=x+','+y;Q.push([X,Y]);}}return null;}
+function sprPos(o){const s=o.spr();return [o.x*TS+o.w*TS/2-s.width/2,(o.y+o.h)*TS-s.height+(o.dy||0),s];}
+
+// ---------- vuorovaikutus ----------
+const dlg=document.getElementById('dlg');let DQ=[],DCH=null,dlgOpen=false,onClose=null;
+function say(lines,choices,close){DQ=Array.isArray(lines)?lines.slice():[lines];DCH=choices||null;onClose=close||null;dlgOpen=true;showLine();}
+function showLine(){const l=DQ[0];let h=l;if(DQ.length===1&&DCH){h+='<div class="ch">'+DCH.map((c,i)=>'<button data-i="'+i+'">'+c[0]+'</button>').join('')+'</div>';}else h+='<span class="more">▼</span>';
+  dlg.innerHTML=h;dlg.style.display='block';document.getElementById('hint').style.display='none';
+  dlg.querySelectorAll('button').forEach(b=>b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();const c=DCH[+b.dataset.i];DCH=null;closeDlg(true);c[1]();}));}
+function advance(){if(!dlgOpen)return;if(DQ.length===1&&DCH)return;DQ.shift();if(DQ.length)showLine();else closeDlg();}
+function closeDlg(silent){dlgOpen=false;dlg.style.display='none';const f=onClose;onClose=null;if(f&&!silent)f();}
+dlg.addEventListener('pointerdown',e=>{e.preventDefault();advance();});
+function hudUpd(){document.getElementById('hudt').innerHTML='Mandin grilli · '+money+' mk<small>64 px testi · '+(evening?'ilta':'päivä')+'</small>';document.getElementById('aika').textContent=evening?'Päivä':'Ilta';}
+const TAROT=[{n:'Aurinko',t:'Tänään kannattaa tehdä yksi asia loppuun asti. Loput ehtii huomenna.',c:'#f0c040'},{n:'Kuu',t:'Kaikkea ei tarvitse tietää heti. Kuuntele, mitä naapuri kertoo.',c:'#c8d4f0'},{n:'Tähti',t:'Pieni haave on lähempänä kuin luulet. Laita markka säästöön.',c:'#f8e8a0'}];
+function drawCard(t){const c=document.getElementById('cardcv'),g=c.getContext('2d');g.imageSmoothingEnabled=false;R(g,0,0,48,72,'#f4ead0');R(g,2,2,44,68,'#5a2a6a');R(g,4,4,40,64,'#2a1838');
+  for(let i=0;i<30;i++)P(g,5+Math.floor(hash(i,1,97)*38),5+Math.floor(hash(i,2,97)*50),'rgba(255,240,200,.5)');
+  if(t.n==='Aurinko'){ell(g,24,30,10,10,t.c);for(let a=0;a<12;a++){const x=24+Math.cos(a/12*6.28)*15,y=30+Math.sin(a/12*6.28)*15;R(g,x-1,y-1,3,3,t.c);}ell(g,24,30,6,6,'#f8e080');}
+  else if(t.n==='Kuu'){ell(g,24,30,11,11,t.c);ell(g,29,27,10,10,'#2a1838');}
+  else{for(const [dx,dy] of [[0,-12],[0,12],[-12,0],[12,0],[-6,-6],[6,6],[6,-6],[-6,6]])R(g,24+dx/ (Math.abs(dx)>6||Math.abs(dy)>6?1:1)-1,30+dy-1,3,3,t.c);ell(g,24,30,4,4,'#fff8d0');}
+  R(g,8,56,32,8,'#f4ead0');txt(g,t.n.toUpperCase(),24-t.n.length*2,58,'#3a1a4a');}
+function tarot(){TFX.t=1;say(['Mandi himmentää valot ja sytyttää tiskin kynttilät.','Hän sekoittaa pakkaa tottuneesti ja nostaa yhden kortin tiskille.'],null,()=>{
+  const t=TAROT[Math.floor(Math.random()*TAROT.length)];drawCard(t);document.getElementById('cardn').textContent=t.n;document.getElementById('card').style.display='block';
+  say(['”'+t.n+'.” Mandi naputtaa korttia. ”'+t.t+'”'],null,()=>{document.getElementById('card').style.display='none';TFX.t=0;});});}
+function interactObj(o){if(!o)return;PL.path=[];
+  switch(o.k){
+    case 'mandi':case 'tiski':faceTo(3,3);return say('Mandi nojaa tiskiin. ”Kahvia, makkaraperunat vai kortti pöytään?”',[
+      ['Kahvi ja munkki (2 mk)',()=>{if(money<2)return say('Rahat eivät riitä.');money-=2;hudUpd();say(['Mandi kaataa kahvia ja nostaa munkin paperille.','Munkki on vielä lämmin.']);}],
+      ['Makkaraperunat (6 mk)',()=>{if(money<6)return say('Rahat eivät riitä.');money-=6;hudUpd();say(['Mandi nostaa ranskalaiset altaasta ja pilkkoo makkaran päälle.','Sinappia ja ketsuppia, juuri niin kuin pitää.']);}],
+      ['Tarot-luenta',tarot],['Hei hei',()=>say('”Tervetuloa uudestaan.”')]]);
+    case 'kara':return say(['Kara nostaa tuoppia. ”Iltaa! Tänään myin yhden maton.”','”Siinä oli koko päivän tulosraportti.”']);
+    case 'tuoppi':return say('Karan tuoppi. Vaahto on vielä paikallaan.');
+    case 'pajatso':return say(['Vanha pajatso. Markka kilahtaa naulojen välissä…','…ja putoaa ykköskuppiin. Melkein.']);
+    case 'jukeboksi':return say('Jukeboksi soittaa hiljaa vanhaa iskelmää. Valot kiertävät kaarta pitkin.');
+    case 'penkki':return say('Pitkä penkki seinän vierellä. Viininpunaiset pehmusteet ovat kuluneet juuri oikeista kohdista.');
+    case 'poyta':return say('Pöydällä on ketsuppi, sinappi, servetit ja maljakossa yksi voikukka.');
+    case 'pikkupoyta':return say(evening?'Pieni pyöreä pöytä seinävalon alla. Karan iltapaikka.':'Pieni pyöreä pöytä seinävalon alla. Illalla tässä istuu Kara.');
+    case 'jakkara':return say('Punainen baarijakkara. Se pyörähtää puoli kierrosta.');
+    case 'keitin':return say('Kahvinkeitin porisee ja friteeraus odottaa seuraavaa annosta.');
+    case 'hylly':return say('Hyllyllä on limsapulloja, siideriä ja Mandin oma purkki: KORTTIKAHVI.');
+    case 'lista':return say(['Mandin käsin kirjoittama lista:','MAKKARAPERUNAT 6 · HAMPURILAINEN 5 · KAHVI JA MUNKKI 2 · LIMSA 1 · TAROT ?']);
+    case 'kuva':return say(['Vanha valokuva Vattulan venelaiturista.','Laiturilla seisoo kolme lasta onget kädessä. Kulmaan on kirjoitettu: kesä -78.']);
+    case 'lamppu':return say('Pieni seinälamppu. Meripihkan värinen lasi lämmittää valon.');}}
+function faceTo(x,y){const dx=x-PL.x,dy=y-PL.y;PL.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');}
+function goInteract(o){const tiles=[];for(let x=o.x;x<o.x+o.w;x++)for(let y=o.y;y<o.y+o.h;y++)tiles.push([x,y]);
+  if(o.k==='mandi'||o.k==='tiski')for(let x=1;x<=4;x++)tiles.push([x,3]);
+  const adj=(x,y)=>tiles.some(([tx,ty])=>Math.abs(tx-x)+Math.abs(ty-y)===1);
+  if(adj(PL.x,PL.y)){const t=tiles.find(([tx,ty])=>Math.abs(tx-PL.x)+Math.abs(ty-PL.y)===1);faceTo(t[0],t[1]);interactObj(o);return;}
+  const p=bfs(adj);if(!p){interactObj(o);return;}PL.path=p;PL.after=()=>{const t=tiles.find(([tx,ty])=>Math.abs(tx-PL.x)+Math.abs(ty-PL.y)===1);if(t)faceTo(t[0],t[1]);interactObj(o);};}
+function hitTest(gx,gy){const list=OBJ.filter(o=>vis(o)&&o.hit!==undefined||o.k==='tuoppi'&&vis(o)).map(o=>{const [x,y,s]=sprPos(o);return {o,x,y,w:s.width,h:s.height,b:(o.y+o.h)*TS+(o.z||0)};}).sort((a,b)=>b.b-a.b);
+  for(const r of list){if(gx>=r.x&&gx<r.x+r.w&&gy>=r.y&&gy<r.y+r.h){const s=r.o.spr(),px=s.getContext('2d').getImageData(Math.floor(gx-r.x),Math.floor(gy-r.y),1,1).data[3];if(px>0)return r.o;}}
+  for(const d of DECOR)if(gx>=d.x&&gx<d.x+d.w&&gy>=d.y&&gy<d.y+d.h)return d;return null;}
+function onTap(gx,gy){if(dlgOpen){advance();return;}
+  const o=hitTest(gx,gy);if(o){if(o.x!==undefined&&o.w<=104&&o.k&&DECOR.includes(o)){interactObj(o);return;}goInteract(o);return;}
+  const tx=Math.floor(gx/TS),ty=Math.floor(gy/TS);if(tx===4&&ty>=8){const p=bfs((x,y)=>x===4&&y===7);PL.path=p||[];PL.after=()=>{PL.dir='down';say('Ovesta pääsisi kylänraitille. Tässä testissä pysytään grillillä.');};return;}
+  if(solidAt(tx,ty))return;const p=bfs((x,y)=>x===tx&&y===ty);if(p){PL.path=p;PL.after=null;}}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();const r=cv.getBoundingClientRect();onTap((e.clientX-r.left)*CW/r.width,(e.clientY-r.top)*CH/r.height);});
+document.getElementById('aika').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();evening=!evening;hudUpd();});
+addEventListener('keydown',e=>{const k=e.key;if(dlgOpen){if(k===' '||k==='Enter'||k==='z'){advance();e.preventDefault();}
+    if(DCH&&DQ.length===1&&/^[1-4]$/.test(k)){const c=DCH[+k-1];if(c){DCH=null;closeDlg(true);c[1]();}}return;}
+  const D={ArrowUp:[0,-1,'up'],ArrowDown:[0,1,'down'],ArrowLeft:[-1,0,'left'],ArrowRight:[1,0,'right']}[k];
+  if(D&&!PL.moving){PL.dir=D[2];const X=PL.x+D[0],Y=PL.y+D[1];if(!solidAt(X,Y)&&Y<8)PL.path=[[X,Y]];e.preventDefault();}
+  if(k===' '||k==='Enter'||k==='z'){const d={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[PL.dir];const o=solidAt(PL.x+d[0],PL.y+d[1]);if(o&&o!==true)interactObj(o);e.preventDefault();}});
+
+// ---------- päivitys ja piirto ----------
+function update(){frame++;TFX.k+=(TFX.t-TFX.k)*.06;if(Math.abs(TFX.t-TFX.k)<.002)TFX.k=TFX.t;
+  if(!PL.moving&&PL.path.length){const [nx,ny]=PL.path[0];if(solidAt(nx,ny)){PL.path=[];}else{faceTo(nx,ny);PL.moving=true;PL.tx=nx;PL.ty=ny;}}
+  if(PL.moving){const sp=4,gx=PL.tx*TS,gy=PL.ty*TS;PL.px+=Math.sign(gx-PL.px)*Math.min(sp,Math.abs(gx-PL.px));PL.py+=Math.sign(gy-PL.py)*Math.min(sp,Math.abs(gy-PL.py));PL.step++;
+    if(PL.px===gx&&PL.py===gy){PL.x=PL.tx;PL.y=PL.ty;PL.moving=false;PL.path.shift();if(!PL.path.length&&PL.after){const f=PL.after;PL.after=null;f();}}}}
+let lightC=mk(CW,CH,()=>{});
+function draw(){ctx.drawImage(ground,0,0);
+  const items=[];for(const o of OBJ)if(vis(o)){const [x,y,s]=sprPos(o);items.push({b:(o.y+o.h)*TS+(o.z||0),fn:()=>{if(o.k==='mandi'||o.k==='kara'){ell(ctx,x+s.width/2,(o.y+o.h)*TS-8,15,5,'rgba(0,0,0,.28)');}ctx.drawImage(s,Math.round(x),Math.round(y));
+    if(o.k==='keitin'){for(let i=0;i<3;i++){const t=(frame*.5+i*20)%60;ctx.globalAlpha=.5*(1-t/60);ell(ctx,x+48+Math.sin((frame+i*30)/15)*3,y+8-t*.6,3+t/20,2+t/30,'#ffffff');}ctx.globalAlpha=1;}
+    if(o.k==='mandi'&&frame%240<8){R(ctx,x+16,y+20,4,2,'#f0c4a0');R(ctx,x+26,y+20,4,2,'#f0c4a0');}
+    if(o.k==='kara'&&frame%300<8){R(ctx,x+30,y+19,4,3,'#f4cfae');}}});}
+  const fr=PL.moving?[1,0,3,0][Math.floor(PL.step/6)%4]:0,ps=charSpr('pelaaja',PL.dir,fr);
+  items.push({b:PL.py+TS,fn:()=>{ell(ctx,PL.px+32,PL.py+TS-8,15,5,'rgba(0,0,0,.28)');ctx.drawImage(ps,Math.round(PL.px+32-ps.width/2),Math.round(PL.py+TS-ps.height-6));}});
+  items.sort((a,b)=>a.b-b.b).forEach(i=>i.fn());
+  for(const [lx,ly,sd] of LAMPS)ctx.drawImage(sd?SPR.lampS:SPR.lamp,sd?lx-12:lx-14,ly-14);
+  // kynttilän liekit
+  const ct=OBJ.find(o=>o.k==='tiski'),[cx0,cy0]=sprPos(ct);
+  if(TFX.k>.02){ctx.globalAlpha=Math.min(1,TFX.k*1.5);for(const c of CANDLES){const X=cx0+1+c,Y=cy0+1+19,f=(frame>>2)%3;ell(ctx,X,Y-4-(f===1?1:0),3,5+(f===2?1:0),'#ffa828');ell(ctx,X,Y-3,2,3,'#ffe070');P(ctx,X,Y-2,'#ffffff');}ctx.globalAlpha=1;}
+  // valaistus
+  const amb=lerpC(evening?'#a8846a':'#f0dcc0',  '#3a2a3e',TFX.k*.85);
+  const L=lightC.getContext('2d');L.globalCompositeOperation='source-over';L.fillStyle=amb;L.fillRect(0,0,CW,CH);L.globalCompositeOperation='lighter';
+  const glow=(x,y,r,c,a)=>{const gr=L.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,'rgba('+c+','+a+')');gr.addColorStop(1,'rgba('+c+',0)');L.fillStyle=gr;L.fillRect(x-r,y-r,2*r,2*r);};
+  const lk=1-TFX.k*.85,la=evening?.55:.25;
+  for(const [lx,ly,sd] of LAMPS)if(lk>.05)glow(sd?lx+16:lx,ly+20,sd?190:170,'255,176,96',la*lk);
+  glow(288,250,160,'255,170,90',(evening?.18:.08)*lk);
+  if(TFX.k>.02){const fl=Math.sin(frame*.31)*4+Math.sin(frame*.77)*2;for(const c of CANDLES)glow(cx0+1+c,cy0+16,(110+fl)*TFX.k,'255,170,80',.75*TFX.k);glow(224,118,90*TFX.k,'255,190,130',.6*TFX.k);}
+  ctx.globalCompositeOperation='multiply';ctx.drawImage(lightC,0,0);ctx.globalCompositeOperation='source-over';
+  // hehku lamppujen ja kynttilöiden ympärillä
+  ctx.globalCompositeOperation='lighter';
+  const halo=(x,y,r,c,a)=>{const gr=ctx.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,'rgba('+c+','+a+')');gr.addColorStop(1,'rgba('+c+',0)');ctx.fillStyle=gr;ctx.fillRect(x-r,y-r,2*r,2*r);};
+  for(const [lx,ly,sd] of LAMPS)halo(sd?lx+18:lx,ly+6,26,'255,200,120',(evening?.35:.15)*lk);
+  if(TFX.k>.02)for(const c of CANDLES)halo(cx0+1+c,cy0+14,22,'255,180,90',.5*TFX.k);
+  ctx.globalCompositeOperation='source-over';}
+function fit(){const vw=innerWidth,vh=innerHeight,s=Math.min(vw/CW,(vh-150)/CH,2);cv.style.width=Math.round(CW*s)+'px';cv.style.height=Math.round(CH*s)+'px';}
+addEventListener('resize',fit);
+function init(){SPR.counter=makeCounter();SPR.keitin=makeKeitin();SPR.hylly=makeHylly();SPR.stool=makeStool();SPR.pajatso=makePajatso();SPR.jukebox=makeJukebox();SPR.table=makeTable();SPR.bench=makeBench();SPR.small=makeSmallTable();SPR.tuoppi=makeTuoppi();SPR.lamp=makeLamp(0);SPR.lampS=makeLamp(1);
+  buildGround();fit();hudUpd();(function loop(){update();draw();requestAnimationFrame(loop);})();}
+init();
+</script>
+</body>
+</html>
