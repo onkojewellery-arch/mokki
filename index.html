@@ -68,6 +68,12 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
 #hud{position:absolute;left:calc(var(--s)*3px);top:calc(var(--s)*3px);background:rgba(20,30,24,.72);color:#f3ecd9;
   padding:calc(var(--s)*1px) calc(var(--s)*3px);border-radius:calc(var(--s)*2px);font-size:calc(var(--s)*6px)}
 #toast.low{top:auto;bottom:calc(var(--s)*4px)}
+#quest{position:absolute;z-index:5;left:calc(var(--s)*3px);background:rgba(20,30,24,.86);color:#f3ecd9;border-radius:calc(var(--s)*2px);padding:calc(var(--s)*1.4px) calc(var(--s)*3.5px) calc(var(--s)*1.8px);
+  border-left:calc(var(--s)*1.2px) solid #a6d873;transition:opacity .45s ease,transform .45s ease;max-width:80%;pointer-events:none}
+#quest small{display:block;font-size:calc(var(--s)*4.6px);color:#a6d873;letter-spacing:.06em;text-transform:uppercase}
+#quest b{display:block;font-size:calc(var(--s)*6.4px);font-weight:600;margin-top:calc(var(--s)*.4px)}
+#quest.out{opacity:0;transform:translateY(calc(var(--s)*-2px))}
+#quest.done{border-left-color:#f4d35e}#quest.done small{color:#f4d35e}
 #hud .lv{display:flex;align-items:center;gap:calc(var(--s)*2px);margin-top:calc(var(--s)*.6px)}
 #hud .xb{display:inline-block;width:calc(var(--s)*34px);height:calc(var(--s)*2.5px);background:rgba(255,255,255,.2);border-radius:9px;overflow:hidden}
 #hud .xb i{display:block;height:100%;background:#a6d873}
@@ -241,11 +247,11 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
     <canvas id="cv" width="320" height="288"></canvas>
     <div id="ui">
       <div id="hud" class="hide"></div>
-      <div id="toast" class="hide"></div>
+      <div id="toast" class="hide"></div><div id="quest" class="hide"><small></small><b></b></div>
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.37</div>
+        <div class="sub">mummon mökki · versio 0.38</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -305,7 +311,7 @@ const TOPS=[{n:'Punainen',c:'#c0443a'},{n:'Sininen',c:'#3e6aa8'},{n:'Keltainen',
 const PANTS=[['Farkut','#3a4f7a'],['Ruskeat','#6a4a30'],['Mustat','#2c2c34'],['Vihreät','#4a5a34']];
 const FLOORS=[{n:'Lankku',c:'#b98a5a'},{n:'Vaalea',c:'#dcc196'},{n:'Tumma',c:'#7a5236'},{n:'Harmaa',c:'#a59d90'},{n:'Ruudut',c:'#e8e0cc',c2:'#5a7a96',checker:true}];
 const WALLS=[['Hirsi','#a8794a'],['Valkoinen','#e6dcc4'],['Sininen','#9fb9cf'],['Vihreä','#a3b98d'],['Punamulta','#b0574a'],['Keltainen','#d9b65e']];
-const TASKS=[['hahmo','Luo hahmosi'],['kirje','Lue mummon kirje tuvassa'],['paita','Etsi jotain lämmintä kaapista'],
+const TASKS=[['hahmo','Luo hahmosi'],['reitti','Löydä tie mummon mökille'],['kirje','Lue mummon kirje tuvassa'],['paita','Etsi jotain lämmintä kaapista'],
   ['siirra','Siirrä huonekalua (Valikko → Sisusta)'],['laudat','Hae lautoja puuvajasta'],['kuisti','Rakenna kuisti (Valikko → Rakenna)'],
   ['kukka','Istuta kukka'],['vihannes','Istuta vihannes'],['makkara','Grillaa makkara']];
 
@@ -331,7 +337,8 @@ function levelFor(xp){let l=1;for(let i=1;i<XP_LEVELS.length;i++)if(xp>=XP_LEVEL
 const XP_KEYS={sato:10,myynti:10,kuisti:10,maalaus:10,sauna:20,loylyt:5,maistaminen:5,raimo:10,sieni:5};
 let XP_HYVITYS=null;
 const SAVE_KEY='mokki-v01';
-function migrate(s){s.inv=s.inv||{};s.inv.maali=s.inv.maali||0;s.money=s.money||0;s.log=s.log||[];s.flags=s.flags||{};
+function migrate(s){s.inv=s.inv||{};s.inv.maali=s.inv.maali||0;s.money=s.money||0;s.log=s.log||[];s.flags=s.flags||{};s.tasks=s.tasks||{};
+  if(s.started&&!s.flags.bussi)s.tasks.reitti=true;if(s.flags.bussi&&!s.flags.reitti){s.flags.reitti=1;s.tasks.hahmo=true;}
   s.facade=s.facade||{color:'haalistunut',renovated:false};if(s.time==null)s.time=540;
   if(s.porch&&!s.flags.kunnostus){s.flags.kunnostus=true;s.log.push('Kuisti rakennettu.');}
   if(s.furn&&!s.furn.some(f=>f.t==='tiski')){
@@ -2191,6 +2198,13 @@ function jingle(){[523,659,784,1046].forEach((f,i)=>setTimeout(()=>blip(f,.09,'s
 /* ---------- UI ---------- */
 let toastQ=[],toastT=0;
 function toast(t){toastQ.push(t);}
+let questQ=[],questT=0;
+function questNote(a,b,dur,done){questQ.push({a,b,dur:dur||240,done});}
+function updateQuest(){const el=$('#quest');if(!el)return;if(mode==='title'||mode==='custom'){el.classList.add('hide');return;}
+  if(questT>0){questT--;if(questT===28)el.classList.add('out');if(questT===0)el.classList.add('hide');return;}
+  if(questQ.length){const q=questQ.shift();el.querySelector('small').textContent=q.a;el.querySelector('b').textContent=q.b;el.classList.toggle('done',!!q.done);
+    const h=$('#hud'),par=el.offsetParent||el.parentElement,hr=h.getBoundingClientRect(),pr=par.getBoundingClientRect();el.style.top=(hr.bottom-pr.top+6)+'px';
+    el.classList.remove('hide');el.classList.add('out');void el.offsetWidth;el.classList.remove('out');questT=q.dur;}}
 function toastNow(t){toastQ.length=0;const el=$('#toast');el.textContent=t;el.classList.remove('hide');el.classList.toggle('low',mode==='shop'||mode==='panel');toastT=150;}
 function updateToast(){const el=$('#toast');if(toastT>0){toastT--;if(toastT===0)el.classList.add('hide');return;}
   if(toastQ.length){el.textContent=toastQ.shift();el.classList.remove('hide');el.classList.toggle('low',mode==='shop'||mode==='panel');toastT=150;}}
@@ -2382,11 +2396,7 @@ function customPress(b){const n=CROWS.length+1;
   else if(b==='a'){if(custom.sel===CROWS.length)finishCustom();else{custom.sel++;blip(660,.03);renderCustom();}}
   else if(b==='b'||b==='start')finishCustom();}
 function finishCustom(){const inp=$('#pname');S.name=(inp.value||'').trim()||'Leeni Meikäläinen';inp.blur();const c=custom;custom=null;$('#custom').classList.add('hide');mode='world';blip(990,.06);hud();
-  if(c.ctx==='new'){S.started=true;
-    say(['Bussi jätti sinut kylän raitille. Loppumatka kuljettiin jalan koivujen välistä.',
-      'Tässä se on: mummon mökki. Punainen, vähän vino ja juuri sellainen kuin muistit.',
-      'Mummo muutti kylälle lähemmäs palveluita. Puhelimessa hän sanoi: "Mökki on nyt sinun."',
-      'A = puhu ja tutki · pidä B pohjassa = juokse · VALIKKO = tehtävät ja rakentaminen.'],()=>task('hahmo'));}
+  if(c.ctx==='new'){S.started=true;startBusIntro();}
   else save();}
 
 /* ---------- pihasauna ---------- */
@@ -2489,6 +2499,38 @@ function award(key,amt,label){S.xpGot=S.xpGot||{};if(S.xpGot[key])return;S.xpGot
   S.xp=(S.xp||0)+amt;S.taso=Math.max(S.taso||1,levelFor(S.xp));toast('+'+amt+' XP · '+label);
   const after=curLevel();if(after>=3&&before<3)setTimeout(()=>toast('Vattulan Sanomissa on uutisia rantamökistä'),2500);if(after>before){toast('Mökkitaso '+after+'!');setTimeout(jingle,300);addLog('Mökkitaso nousi tasolle '+after+'.');}save();hud();}
 
+/* ---------- aloitus Vattulan bussipysäkiltä (v0.38) ---------- */
+let BUS=null;
+function startBusIntro(){S.flags.bussi=1;S.scene='kyla';useMap('kyla');placePlayer(34,14,'down');groundDirty=true;PARTS.length=0;AUTO=null;
+  BUS={x:30*TS+8,y:16*TS,v:0,t:0,gone:0};mode='cutscene';hud();}
+function updateBus(){if(!BUS)return;const B=BUS;B.t++;
+  if(B.t===20)for(let i=0;i<4;i++)setTimeout(()=>blip(70+i*6,.12,'sawtooth',.012),i*110);
+  if(B.t>55){B.v=Math.min(B.v+.075,5);B.x+=B.v;if(frame%5===0)PARTS.push({x:B.x+2,y:B.y-12,vx:-.3-Math.random()*.2,vy:-.25,life:0,max:60,c:'#cfcfc8',s:1,smoke:true});}
+  else if(frame%9===0)PARTS.push({x:B.x+2,y:B.y-12,vx:-.25,vy:-.2,life:0,max:50,c:'#d8d8d0',s:1,smoke:true});
+  if(B.x>camX+VW+12){B.gone++;if(B.gone>28){BUS=null;mode='world';busIntroTexts();}}}
+function busIntroTexts(){const ctl=TOUCHX?'Napauta maata kävelläksesi ja napauta asioita tutkiaksesi. Vihko, reppu ja valikko löytyvät alareunasta.':'A = puhu ja tutki · pidä B pohjassa = juokse · VALIKKO = tehtävät ja rakentaminen.';
+  say(['”Hups. Puhelin jäi kaupunkiin.”',
+    'Bussi jätti sinut Vattulan pysäkille. Loppumatka kuljetaan jalan koivujen välistä.',
+    'Mummo muutti kylälle lähemmäs palveluita. Puhelimessa hän sanoi: ”Mökki on nyt sinun.”',ctl,
+    '”Muistankohan vielä reitin mummon mökille?”'],()=>{S.tasks.hahmo=true;S.flags.reitti=1;addLog('Saavuin bussilla Vattulaan. Puhelin jäi kaupunkiin.');save();questNote('Uusi tehtävä','Löydä tie mummon mökille');});}
+function checkReitti(){if(mode!=='world'||S.scene!=='piha'||S.flags.reitti!==1||S.tasks.reitti)return;
+  S.tasks.reitti=true;S.flags.reitti=2;addLog('Löysin mummon mökille.');jingle();save();
+  questNote('Tehtävä valmis','Löysit mummon mökille',150,true);questNote('Uusi tehtävä','Lue mummon kirje tuvassa');
+  say('Tässä se on: mummon mökki. Punainen, vähän vino ja juuri sellainen kuin muistit.');}
+function makeBus(){return outlined(172,96,g=>{
+  const C='#f0e8d4',Cd='#d8ccb0',Cl='#fffaf0',ST='#2f6a8a',RD='#c0443a',GL='#2a3a48',GLl='#4a6a80';
+  ell(g,86,90,80,5,'rgba(0,0,0,.28)');
+  R(g,4,6,162,10,'#dcd4c0');R(g,4,6,162,2,Cl);R(g,20,8,30,5,'#c8c0ac');R(g,70,8,24,5,'#c8c0ac');
+  R(g,2,14,166,66,C);R(g,2,14,166,2,Cl);R(g,2,14,2,66,Cl);R(g,2,76,166,4,Cd);
+  for(let x=8;x<120;x+=22){R(g,x,20,19,24,GL);R(g,x+1,21,6,22,GLl);P(g,x+2,22,'#8ab0c8');}
+  R(g,124,20,18,52,GL);R(g,125,21,16,50,'#34485a');R(g,132,20,2,52,Cd);R(g,126,22,3,48,GLl);
+  poly(g,[[146,18],[160,18],[168,30],[168,58],[146,58]],GL);R(g,148,20,8,36,GLl);R(g,146,58,22,4,Cd);
+  R(g,120,8,44,9,'#1c1c20');HDM.txt(g,'KAUPUNKI',126,10,'#f4b040');
+  R(g,2,48,166,6,ST);R(g,2,48,166,1,'#4a8ab0');R(g,2,56,166,2,RD);
+  R(g,164,64,4,6,'#f8f0c0');R(g,2,62,3,8,'#d83a2a');R(g,166,24,4,2,'#2a2a2a');R(g,168,24,2,10,'#2a2a2a');
+  for(const wx of [34,128]){ell(g,wx,74,15,11,'#3a3a40');ell(g,wx,80,11,11,'#1e1e22');ell(g,wx,80,5,5,'#8a8e94');ell(g,wx,80,2,2,'#4a4e54');}
+  R(g,2,80,166,2,'#6a6458');},-.7);}
+function drawBus(){if(!BUS)return;if(!SPR.bus)SPR.bus=A(makeBus());const sp=SPR.bus,x=Math.round(BUS.x),y=BUS.y-sp.bot-1+(BUS.v<.2&&BUS.t%30<15?1:0);ctx.drawImage(sp,x,y);}
 /* ---------- tehtävät ---------- */
 function task(id){if(S.tasks[id])return;S.tasks[id]=true;const t=TASKS.find(x=>x[0]===id);toast('✓ '+t[1].replace(/ \(.*\)/,''));jingle();save();
   if(TASKS.every(x=>S.tasks[x[0]])&&!S.flags.taso2){S.flags.taso2=true;S.taso=Math.max(S.taso||1,2);save();hud();
@@ -2972,7 +3014,7 @@ function drawHare(){const H=HARE;if(!H)return;const ph=H.t%26,hop=ph<16?Math.rou
   ell(ctx,X(5),y-3,3,3,body);P(ctx,X(7),y-3,'#1a1410');P(ctx,X(8),y-2,dark);
   R(ctx,X(3),y-11,1,8,dark);R(ctx,X(5),y-10,1,7,body);P(ctx,X(3),y-11,'#2a2018');P(ctx,X(5),y-10,'#2a2018');
   ell(ctx,X(-6),y-1,2,2,'#f2efe6');ctx.globalAlpha=1;}
-function update(){frame++;updateHare();updQbar();updTall();if(S&&S.scene==='raimo')updateDog();
+function update(){frame++;updateHare();updQbar();updTall();updateQuest();if(mode==='cutscene')updateBus();checkReitti();if(S&&S.scene==='raimo')updateDog();
   if(saunaSmoke>0){saunaSmoke--;if(S.scene==='piha'&&frame%9===0){const so=YOBJ.find(o=>o.k==='sauna');if(so&&SPR.saunaB){const [x0,y0]=sprPos(SPR.saunaB,so);PARTS.push({x:x0+76+Math.random()*4,y:y0+8,vx:.2+Math.random()*.1,vy:-.45,life:0,max:170,c:'#eeeeea',s:1,smoke:true});}}}
   if(frame%30===0){growPlants();updatePlantHint();}
   if(mode==='world'&&frame%60===0&&S.time<1439){S.time++;hud();}
@@ -3025,7 +3067,7 @@ function draw(){
     if(sc==='rtupa'&&rantaR()){const RL=rantaR().furn||[];for(const f of RL.filter(q=>isRug(q.t)))if(!(decor&&decor.held&&decor.src===f))drawFurn(ctx,f,f.x*TS,f.y*TS);for(const f of RL.filter(q=>isVase(q.t)))list.push({y:furnKey(f,RL),d:()=>{if(decor&&decor.held&&decor.src===f)return;drawFurn(ctx,f,f.x*TS,f.y*TS);}});}}
   else{for(const f of S.furn.filter(q=>isRug(q.t))){if(decor&&decor.held&&decor.src===f)continue;drawFurn(ctx,f,f.x*TS,f.y*TS);}for(const f of S.furn){if(decor&&decor.held&&decor.src===f)continue;if(isRug(f.t))continue;
     list.push({y:furnKey(f,S.furn),d:()=>drawFurn(ctx,f,f.x*TS,f.y*TS)});}}
-  if(!(mode==='title'&&sc==='piha'))list.push({y:PL.py+TS+.5,d:drawPlayer});if(sc==='jaska'&&TFX.k>.05)list.push({y:4*TS+1,d:drawCandles});if(sc==='polku'&&HARE)list.push({y:(HARE.row+1)*TS-1,d:drawHare});
+  if(!(mode==='title'&&sc==='piha'))list.push({y:PL.py+TS+.5,d:drawPlayer});if(sc==='jaska'&&TFX.k>.05)list.push({y:4*TS+1,d:drawCandles});if(sc==='polku'&&HARE)list.push({y:(HARE.row+1)*TS-1,d:drawHare});if(BUS&&sc==='kyla')list.push({y:BUS.y+.5,d:drawBus});
   list.sort((a,b)=>a.y-b.y).forEach(o=>o.d());
   if(sc==='piha'){const w=(frame>>3)%2,bx=Math.round(BF.x),by=Math.round(BF.y);P(ctx,bx,by,'#2a1d24');P(ctx,bx,by+1,'#2a1d24');
     if(w){R(ctx,bx-3,by-2,3,3,'#fff6e8');R(ctx,bx+1,by-2,3,3,'#fff6e8');P(ctx,bx-3,by-2,'#f4c8d8');}else{R(ctx,bx-1,by-3,1,3,'#fff6e8');R(ctx,bx+1,by-3,1,3,'#fff6e8');}}
