@@ -251,7 +251,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.40</div>
+        <div class="sub">mummon mökki · versio 0.41</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -590,22 +590,52 @@ function jaskaTalk(skipOrder){jaskaDir='down';
   if(!S.flags.jaskaTuttu){S.flags.jaskaTuttu=true;save();return say(['Mandi: "No moikka! Mandi tässä. Istu alas, täällä ei tarvitse esittäytyä kahdesti."','Mandi: "Sinä olet se mummon mökin uusi asukas. Koko kylä tietää jo, kylä on pieni."'],jaskaTalk);}
   const buy=(p,t,log)=>{if(S.money<p){blip(180,.12);return say('Mandi: "Se tekee '+p+' markkaa. Tuu takaisin, kun kukkaro on lihonut."');}
     S.money-=p;save();hud();blip(990,.06);toast('−'+p+' mk');if(log&&!S.flags[log]){S.flags[log]=true;addLog(t[t.length-1]);}say(t);};
-  ask('Mandi nojaa tiskiin. "Kahvia, makkaraperunat vai kortti pöytään? Kaikki onnistuu."',['Kahvi ja munkki (2 mk)','Makkaraperunat (6 mk)','Tarot-luenta','Jutellaan','Hei hei'],i=>{
+  const ko=S.flags.jaskaTuttu?mandiKorttiOpt():null;
+  ask('Mandi nojaa tiskiin. "Kahvia, makkaraperunat vai kortti pöytään? Kaikki onnistuu."',['Kahvi ja munkki (2 mk)','Makkaraperunat (6 mk)','Tarot-luenta','Jutellaan'].concat(ko?[ko[0]]:[],['Hei hei']),i=>{
+    if(ko&&i===4)return ko[1]();
     if(i===0)return buy(2,['Mandi kaataa kahvia ja nostaa munkin paperille.','Munkki on vielä lämmin. Sokeri rapisee sormissa.'],'');
     if(i===1)return buy(6,['Mandi nostaa ranskalaiset altaasta ja pilkkoo makkaran päälle.','Makkaraperunat sinapilla ja ketsupilla. Juuri niin kuin pitääkin.'],'jaskaMp');
     if(i===2)return tarotLuenta();
     if(i===3)return say(nextLine('m',MANDI_JUORUT));});}
+/* ---------- tehtävä: Mandin kadonnut tarot-kortti (v0.41) ---------- */
+const TALON_VIINI_HINTA=4; /* mk – talon viinin hinta yhdessä paikassa */
+const KORTTI_TAVOITE=['','Kysy Karalta kortista. Kara istuu Mandin grillillä iltaisin.','Tarjoa Karalle lasillinen talon viiniä ('+TALON_VIINI_HINTA+' mk).','Kysy Karalta uudelleen Mandin kortista.','Tutki torin laitaa: vanhan puhelinkopin kynnys.','Palauta Kuu-kortti Mandille grillille.','Valmis'];
+function kortti(){S.kortti=S.kortti||{v:0,viini:false,loydetty:false,palkinto:false};return S.kortti;}
+function korttiStart(){const K=kortti();if(K.v>0)return;K.v=1;addLog('Mandin pakasta on kadonnut Kuu-kortti. Lupasin etsiä sitä.');save();questNote('Uusi tehtävä','Mandin kadonnut tarot-kortti');}
+function mandiKorttiOpt(){const K=kortti();if(K.v===0)return ['Kysy tarot-korteista',()=>say(['Mandi: "Korteista? No, yksi on kateissa. Kuu. Juuri se, joka tietää, mitä jää sanomatta.','Pakka toimii ilmankin, mutta tuntuu kuin olisi lähtenyt saunaan ilman pyyhettä.','Kara istuu täällä iltaisin ja näkee kaiken. Kysy häneltä, jos jaksat."'],korttiStart)];
+  if(K.v>=1&&K.v<=4)return ['Kuu-kortista…',()=>say(K.v<4?'Mandi: "Kysyitkö Karalta? Hän on täällä iltaisin. Talon viini tekee hänestä puheliaan, mutta ei liian."':'Mandi: "Torilla? Pidin siellä kesällä yhden kortin luentoja. Tuuli oli kova. Voi kortti raukka."')];
+  if(K.v===5&&(S.inv.kuukortti||0)>0)return ['Palauta Kuu-kortti',korttiFinale];return null;}
+function korttiFinale(){const K=kortti();if(K.palkinto)return;
+  say(['Ojennat Mandille Kuu-kortin. Hän pitelee sitä kuin kirjettä vanhalta ystävältä.','Mandi: "Puhelinkopin kynnyksen alta? Tietysti. Kuu viihtyy siellä, missä joku on joskus soittanut tärkeän puhelun."','Mandi himmentää grillin valot ja sytyttää tiskin kynttilät.'],()=>{
+    K.palkinto=true;K.v=6;S.inv.kuukortti=0;S.flags.kuutaulu=true;addLog('Palautin Mandille Kuu-kortin. Hän teki minulle ensimmäisen Kuu-luennan ja antoi pienen Kuu-taulun mökin seinälle.');save();
+    TFX.on=true;showPanel('<div class="tarot"><div class="tflip"><img src="'+tarotImg(3)+'" alt=""></div><div><b>Kuu</b><p>Mandi: "Kuu. Kaikki ei näy heti, eikä tarvitsekaan. Ota tämä pieni taulu mökin seinälle. Se muistuttaa, että hukassa olevat asiat löytyvät yleensä kynnyksen alta."</p></div></div><div class="foot">Palkinto: Kuu-seinätaulu mummon mökkiin · A tai B sulkee</div>','tarot');$('#panel').classList.add('tarotbox');
+    jingle();questNote('Tehtävä valmis','Mandin kadonnut tarot-kortti',180,true);setTimeout(()=>questNote('Palkinto','Kuu-seinätaulu mummon mökin seinällä'),3200);});}
+function karaKorttiTalk(){const K=kortti(),P=TALON_VIINI_HINTA,opts=[],acts=[];
+  if(K.v===1){opts.push('Kysy Mandin kortista');acts.push(()=>{K.v=2;save();say(['Kara: "Mandin kortti? Muistan nähneeni sen. Muistan myös, että muistini on parhaimmillaan toisen lasillisen kohdalla.','Tämä tässä on ensimmäinen. Talon viiniä, tietenkin."']);});}
+  if(K.v===2){opts.push('Tarjoa talon viiniä ('+P+' mk)');acts.push(()=>{if(K.viini)return;
+      if(S.money<P){blip(180,.12);return say('Talon viini maksaa '+P+' mk. Sinulla on '+S.money+' mk. Palaa, kun kukkarossa on enemmän.');}
+      ask('Tarjotaanko Karalle lasillinen talon viiniä? Se maksaa '+P+' mk.',['Tarjoa ('+P+' mk)','Ei nyt'],i=>{if(i!==0||K.viini)return;S.money-=P;K.viini=true;K.v=3;save();hud();blip(990,.06);toast('−'+P+' mk · lasillinen talon viiniä Karalle');
+        say(['Mandi kaataa uuden lasillisen talon viiniä ja nostaa sen Karan eteen.','Kara: "Kiitos. Tunnen jo, kuinka muisti verryttelee."']);});});
+    opts.push('Kysy Mandin kortista');acts.push(()=>say('Kara: "Kortti, niin. Se on aivan kielen päällä. Ehkä lasillinen talon viiniä nostaisi sen siitä."'));}
+  if(K.v===3){opts.push('Entäs se Mandin kortti?');acts.push(()=>{K.v=4;save();say(['Kara: "Nyt muistan. Mandi piti kesällä torilla yhden kortin luentoja. Yksi kortti kerrallaan, kuten nimi lupaa.','Sitten tuli puuska. Se vei pari hintalappua kirppikseltäni, ja ilmeisesti myös yhden kortin.','Lappujen perään en lähtenyt. Ne lensivät torin laitaa kohti, sinne vanhan puhelinkopin suuntaan."'],()=>questNote('Uusi vihje','Tutki torin laitaa puhelinkopin luona'));});}
+  if(K.v===4){opts.push('Entäs se Mandin kortti?');acts.push(()=>say('Kara: "Torin laita, puhelinkoppi. Jos löydät hintalappuni, ne saa pitää. Kaksi markkaa kumpikin, ei neuvotella."'));}
+  opts.push('Jutellaan');acts.push(()=>say(nextLine('kp',KARA_ILTA)));opts.push('Hei hei');acts.push(()=>{});
+  ask('Kara istuu pöydässään lasillinen talon viiniä edessään.',opts,i=>acts[i]());}
+function puhelinKortti(){const K=kortti();if(K.v!==4||K.loydetty)return false;
+  K.loydetty=true;K.v=5;S.inv.kuukortti=1;addLog('Löysin Mandin Kuu-kortin puhelinkopin kynnyksen alta.');save();jingle();
+  say(['Puhelinkopin kynnyksen alta pilkottaa kartonkia. Kaksi hintalappua ja…','…tarot-kortti! Kuu, hieman taipunut mutta ehjä.'],()=>{toast('Kuu-kortti reppuun');questNote('Seuraavaksi','Palauta Kuu-kortti Mandille');});return true;}
 /* ---------- tarot (v0.25) ---------- */
-const TAROT=[{n:'Aurinko',t:'Aurinko! Vie kahvi kuistille. Tiskit kestää sen kyllä.'},{n:'Erakko',t:'Erakko. Käy metsässä. Jos joku kysyy sienipaikkaa, et löytänyt mitään.'},{n:'Keisarinna',t:'Keisarinna. Laita kukat pöytään ihan omaksi iloksesi.'}];
+const TAROT=[{n:'Aurinko',t:'Aurinko! Vie kahvi kuistille. Tiskit kestää sen kyllä.'},{n:'Erakko',t:'Erakko. Käy metsässä. Jos joku kysyy sienipaikkaa, et löytänyt mitään.'},{n:'Keisarinna',t:'Keisarinna. Laita kukat pöytään ihan omaksi iloksesi.'},{n:'Kuu',t:'Kuu. Kaikki ei näy heti, eikä tarvitsekaan. Katso tänään kynnysten alle.'}];
 const TCARD={};function tarotImg(i){if(TCARD[i])return TCARD[i];const c=mk(44,72,g=>{R(g,0,0,44,72,'#f2e6c8');R(g,2,2,40,68,'#3a2a4a');R(g,4,4,36,64,i===0?'#5a9ad0':i===1?'#2a2a44':'#4a7a4a');
     if(i===0){for(let k=0;k<12;k++){const a=k*Math.PI/6;line(g,22,30,22+Math.round(Math.cos(a)*15),30+Math.round(Math.sin(a)*15),'#f4c040');}ell(g,22,30,8,8,'#f8d850');ell(g,22,30,6,6,'#ffe890');P(g,20,28,'#8a5a20');P(g,24,28,'#8a5a20');R(g,20,33,5,1,'#8a5a20');R(g,4,54,36,14,'#6ab04a');}
     else if(i===1){for(let k=0;k<14;k++)P(g,6+Math.floor(hash(k,1,901)*32),6+Math.floor(hash(k,2,901)*20),'#f0f0d0');poly(g,[[16,64],[22,26],[28,64]],'#8a8a9a');ell(g,22,26,4,4,'#9a9aaa');R(g,28,34,2,26,'#6a4a2a');ell(g,32,36,3,4,'#f8d050');P(g,32,36,'#fff4b0');}
+    else if(i===3){R(g,4,4,36,64,'#1e2a4a');for(let k=0;k<16;k++)P(g,6+Math.floor(hash(k,3,903)*32),6+Math.floor(hash(k,4,903)*30),'#f0f0d0');ell(g,22,24,10,10,'#f4ecc0');ell(g,27,21,9,9,'#1e2a4a');P(g,16,22,'#c8c09a');for(let y=48;y<64;y+=3)R(g,6+((y/3)%2)*3,y,30,1,'#3a4a7a');ell(g,22,52,6,1,'#f4ecc0');R(g,8,40,4,10,'#5a5a6a');R(g,32,40,4,10,'#5a5a6a');}
     else{ell(g,22,24,6,6,'#eab48c');poly(g,[[12,66],[22,30],[32,66]],'#c8463a');R(g,16,16,12,3,'#e8c040');for(const x of [16,20,24,27])R(g,x,13,2,3,'#e8c040');for(let k=0;k<5;k++){ell(g,8+k*7,62,2,2,'#f4d35e');}}
     R(g,4,66,36,2,'#e8c040');});return TCARD[i]=c.toDataURL();}
 let TFX={on:false,k:0};
 function drawCandles(){const t=YOBJ.find(o=>o.k==='tiski2');if(!t)return;const [x0,y0]=sprPos(SPR.tiski2,t);ctx.globalAlpha=Math.min(1,TFX.k*1.4);
   for(const c of [204,240]){const cx=x0+(c+1)/2,cy=y0+9.5,f=(frame>>2)%3,h=f===2?6:5;ctx.fillStyle='#ffa828';ctx.fillRect(cx-1.5,cy-h+(f===1?-.5:0),3.5,h);ctx.fillRect(cx-1,cy-h-1,2.5,1);ctx.fillStyle='#ffe070';ctx.fillRect(cx-.5,cy-3,1.5,2.5);ctx.fillStyle='#fff';ctx.fillRect(cx,cy-1.5,.5,1);}ctx.globalAlpha=1;}
-function tarotLuenta(){TFX.on=true;const same=S.tarot&&S.tarot.day===S.day;if(!same){S.tarot={day:S.day,i:Math.floor(Math.random()*TAROT.length)};addLog('Mandi luki minulle tarotkortin: '+TAROT[S.tarot.i].n+'.');save();}
+function tarotLuenta(){TFX.on=true;const same=S.tarot&&S.tarot.day===S.day;if(!same){S.tarot={day:S.day,i:Math.floor(Math.random()*(kortti().v>=6?4:3))};addLog('Mandi luki minulle tarotkortin: '+TAROT[S.tarot.i].n+'.');save();}
   const c=TAROT[S.tarot.i],show=()=>{showPanel('<div class="tarot"><div class="tflip"><img src="'+tarotImg(S.tarot.i)+'" alt=""></div><div><b>'+c.n+'</b><p>Mandi: "'+c.t+'"</p></div></div><div class="foot">'+(same?'Sama kortti kuin aiemmin tänään · B sulkee':'A tai B sulkee')+'</div>','tarot');$('#panel').classList.add('tarotbox');};
   say(same?['Mandi: "Kortit eivät vaihda mieltään saman päivän aikana. Sama kortti kuin äsken."']:['Mandi sekoittaa pakkaa tottuneesti ja nostaa yhden kortin tiskille.'],show);}
 const KARA_LOOK={style:1,hair:'#e3c46e',skin:'#f6d3b3',eye:'#4a6fa5',top:{c:'#34343c'},pants:'#26262c'};
@@ -627,6 +657,8 @@ const KARA_TORI=[
   ['Kara: "Kun joku sanoo täällä ihan sama, asiasta puhutaan vielä jouluna."'],
   ['Kara: "Muutin kaupungista maalle. Laatikoita oli kolmekymmentä, ja mökkiin mahtui kaksitoista."']];
 const KARA_ILTA=[
+  ['Kara kohottaa lasiaan. "Talon viini. Mandi sanoo, että vuosikerta on tämä vuosi.','Se on rehellisin viinikortti, jonka olen nähnyt."'],
+  ['Kara: "Kaupungissa tilasin viinin listalta ja teeskentelin ymmärtäväni.','Täällä sanon talon viiniä, ja Mandi kaataa. Molemmat tiedämme, mitä tapahtuu."'],
   ['Kara: "Luulin, että Lumi välttelee minua. Olin ehtinyt miettiä kolme syytä.','Kävi ilmi, että sillä oli kuulokkeet."'],
   ['Kara: "Entisessä työssäni opin tunnistamaan, milloin päätös oli tehty ennen kokousta.','Täällä sen tietää siitä, että Petri on jo lainannut peräkärryn."'],
   ['Kara: "Nostin tänään saappaiden hintaa, koska joku katsoi niitä kahdesti.','Hän katsoikin kelloa. Se oli saappaiden takana."'],
@@ -687,7 +719,7 @@ function makeKoiraNuk(){return outlined(46,26,g=>{const O=['#8a3e14','#b85a20','
   ell(g,32,15,6,5,O[1]);ell(g,31,13,4,2,O[2]);R(g,36,15,6,3,O[2]);R(g,36,17,6,1,'#f0d0a8');R(g,41,15,2,2,D);
   R(g,32,14,3,1,D);poly(g,[[27,13],[28,5],[31,12]],O[1]);poly(g,[[28,12],[28,8],[30,12]],'#6a3010');poly(g,[[31,12],[34,6],[35,13]],O[0]);});}
 /* ---------- Karan illat Mandin grillillä ---------- */
-function karaPubTalk(){say(nextLine('kp',KARA_ILTA));}
+function karaPubTalk(){const K=kortti();if(K.v>=1&&K.v<=4)return karaKorttiTalk();say(nextLine('kp',KARA_ILTA));}
 /* ---------- pikanapit (v0.26) ---------- */
 function onTerrace(){const p=S.porch;if(!p||!p.terrace||S.scene!=='piha')return false;const r=terraceRect(p);return PL.x>=r.x&&PL.x<r.x+r.w&&PL.y>=r.y&&PL.y<r.y+r.h;}
 function qbCtxKind(){const sc=S.scene;if(sc==='tupa'||sc==='rtupa')return 'sisusta';if(sc==='piha')return onTerrace()?'terassi':'remontoi';if(sc==='ranta'&&S.flags.rantaOstettu)return 'remontoi';return '';}
@@ -1598,8 +1630,10 @@ function makeBench(){return outlined(76,216,g=>{
 function makeSmallTable(){return outlined(80,96,g=>{ell(g,40,90,22,5,'#24140c');ell(g,40,88,20,4,'#3e2416');R(g,36,40,9,48,'#3e2416');R(g,36,40,3,48,'#5a3822');R(g,43,40,2,48,'#24140c');
   ell(g,40,30,37,15,'#3e2416');ell(g,40,27,37,15,'#6a4428');ell(g,40,26,33,12,'#7a5232');ell(g,32,22,12,4,'#8a6240');ell(g,40,26,33,12,'rgba(0,0,0,0)');
   for(let i=0;i<5;i++)R(g,14+i*11,24+((i*7)%5),8,1,'#6a4428');});}
-function makeTuoppi(){return outlined(22,26,g=>{R(g,2,4,14,20,'#d8e8e8');R(g,3,8,12,15,'#e0a030');R(g,3,8,12,3,'#f0c050');for(let y=10;y<22;y+=3)P(g,6+(y%4),y,'#fff0b0');
-  ell(g,9,5,8,3,'#fffaf0');ell(g,6,3,3,2,'#ffffff');ell(g,12,4,3,2,'#f4ecd8');R(g,16,9,4,10,'#c8dcdc');R(g,17,11,2,6,'rgba(0,0,0,0)');R(g,17,11,2,6,'#3e2416');R(g,3,6,1,17,'#ffffff');R(g,2,23,14,2,'#b8c8c8');});}
+function makeTuoppi(){return outlined(22,26,g=>{/* Karan lasi talon viiniä */
+  ell(g,11,8,7,7,'#e4eef0');R(g,4,2,15,6,'rgba(0,0,0,0)');g.clearRect(3,0,17,4);ell(g,11,4,7,2,'#f4fafa');
+  ell(g,11,9,6,5,'#8a1e2e');R(g,5,6,13,3,'#a8283a');ell(g,11,6,6,1,'#c04050');P(g,8,9,'#d06070');P(g,8,10,'#b83848');
+  R(g,5,3,1,8,'#ffffff');R(g,10,15,2,7,'#d8e4e4');R(g,10,15,1,7,'#ffffff');ell(g,11,22,6,2,'#d8e4e4');ell(g,11,22,4,1,'#f4fafa');});}
 function makeLamp(side){return outlined(26,24,g=>{if(side){R(g,0,8,8,3,'#8a6a2a');R(g,0,8,8,1,'#d0b060');}else{R(g,11,0,4,10,'#8a6a2a');R(g,11,0,1,10,'#d0b060');}
   const cx=side?16:13;ell(g,cx,14,10,6,'#c8862e');R(g,cx-10,14,21,6,'rgba(0,0,0,0)');ell(g,cx,14,10,6,'#c8862e');ell(g,cx,13,8,4,'#f0c060');R(g,cx-10,17,21,3,'#7a4a1a');R(g,cx-6,20,13,2,'#fff4c0');for(let x=cx-7;x<cx+8;x+=4)R(g,x,10,1,7,'#a86a20');});}
 
@@ -1724,6 +1758,7 @@ function ground(){const wc=WALLS[S.wall][1],fl=FLOORS[S.floor];const c=mk(640,57
   R(g,316,26,20,6,'#5a3a22');R(g,322,26,8,6,'#2a2320');ell(g,326,29,2,2,'#f0e0a0');
   R(g,325,68,2,22,'#d9a441');ell(g,326,90,5,5,'#d9a441');ell(g,325,89,2,2,'#f4d77a');R(g,314,68,1,16,'#a8a8a8');R(g,338,68,1,20,'#a8a8a8');ell(g,314,88,3,5,'#7a6a40');ell(g,338,92,3,5,'#7a6a40');
   win2(g,144,true);win2(g,400,false);
+  if(S.flags.kuutaulu){R(g,526,8,44,52,'#3a2416');R(g,528,10,40,48,'#7a5232');R(g,531,13,34,42,'#1e2a4a');for(let k=0;k<12;k++)P(g,533+Math.floor(hash(k,5,904)*30),15+Math.floor(hash(k,6,904)*24),'#f0f0d0');ell(g,548,30,8,8,'#f4ecc0');ell(g,552,27,7,7,'#1e2a4a');for(let y=46;y<54;y+=3)R(g,533,y,30,1,'#3a4a7a');R(g,547,5,2,4,'#8a8e94');}
   // sivuseinät
   for(const sx of [0,576]){R(g,sx,128,64,384,'#3e2b1e');for(let y=128;y<512;y+=32){R(g,sx+4,y,56,28,'#4a3424');R(g,sx+4,y,56,2,'#5e4330');R(g,sx+4,y+26,56,2,'#36261a');for(let i=0;i<4;i++)R(g,sx+8+Math.floor(hash(sx,y,i)*36),y+6+i*5,12,1,'#43301f');}}
   R(g,52,128,12,384,'#6e4c34');R(g,52,128,4,384,'#8a6244');R(g,576,128,12,384,'#6e4c34');R(g,584,128,4,384,'#4a3424');
@@ -2110,6 +2145,7 @@ function buildTupa(){if(hdOn()){ground=HDT.ground();return;}const wc=WALLS[S.wal
         for(let i=0;i<8;i++)ell(g,cx+3+(i%2)*6,10+i*5,1,1,'#e2786a');R(g,cx,30,14,2,'#c0443a');}
       R(g,wx-10,1,68,6,'#b8443a');R(g,wx-10,1,68,1,'#d8665a');for(let x=0;x<68;x+=6)ell(g,wx-7+x,7,3,1,'#b8443a');
       R(g,wx-4,48,56,4,'#e2dac6');R(g,wx-4,51,56,2,'#9a8c70');}
+    if(S.flags.kuutaulu){R(g,263,4,22,26,'#3a2416');R(g,264,5,20,24,'#7a5232');R(g,266,7,16,20,'#1e2a4a');ell(g,274,15,4,4,'#f4ecc0');ell(g,276,13,3,3,'#1e2a4a');P(g,268,9,'#f0f0d0');P(g,280,10,'#f0f0d0');P(g,269,22,'#f0f0d0');}
     R(g,128,14,20,24,'#7a4f2c');R(g,130,16,16,20,'#e8dcc0');R(g,132,18,12,8,'#9ab8d0');R(g,132,26,12,8,'#79b653');R(g,135,21,6,12,'#3a3030');R(g,134,25,8,8,'#c0443a');ell(g,138,21,2,2,'#f2cdb0');R(g,128,14,20,1,'#9a6a40');
     poly(g,[[150,10],[176,10],[163,2]],'#5a3a22');R(g,152,10,22,3,'#7a4f2c');sbox(g,153,12,20,22,'#8a5a32');
     ell(g,163,21,6,6,'#f0ead8');ell(g,163,21,5,5,'#fffaf0');R(g,163,17,1,5,'#2a2320');R(g,163,21,3,1,'#2a2320');R(g,158,13,10,3,'#5a3a22');R(g,161,13,4,3,'#2a2320');
@@ -2432,6 +2468,7 @@ function renderVihko(){if(vihkoPage>=vihkoPages())vihkoPage=0;
   let h='<div class="vtabs">'+VTABS.map((t,i)=>'<span data-p="'+i+'"'+(i===vihkoPage?' class="on"':'')+'>'+t+'</span>').join('')+'</div>';
   if(vihkoPage===0){const L=curLevel(),[,f,hi]=levelProgress(),open=TASKS.filter(t=>!S.tasks[t[0]]),done=TASKS.length-open.length;
     h+=vCard('Mökkitaso '+L,(S.xp||0)+(hi?' / '+hi:'')+' XP',vBar(hi?f:1,1)+(hi?'Seuraava taso: '+(hi-(S.xp||0))+' XP vielä.':'Korkein taso tähän asti.'),LEVEL_OPENS[L+1]?'Tasolla '+(L+1)+': '+LEVEL_OPENS[L+1]:'');
+    {const K=kortti();if(K.v>=1&&K.v<=5)h+=vCard('Mandin kadonnut tarot-kortti','vaihe '+K.v+'/5','',KORTTI_TAVOITE[K.v]);}
     for(const o of ORDERS){const st=orderSt(o.id);if(st==='hyv'){const have=Math.min(S.inv[o.item]||0,o.q);h+=vCard('Tilaus: '+o.n,have+' / '+o.q,vBar(have,o.q)+o.q+' '+o.u+' → '+o.paikka+' · palkkio '+o.mk+' mk + 10 XP',have>=o.q?'Vie toimitus: '+o.paikka+'.':'Kerää vielä '+(o.q-have)+'.');}}
     h+='<div class="ptitle sub">Seuraavaksi</div>'+(open.length?'<ul class="tasks">'+open.slice(0,4).map(t=>'<li><span class="ck">·</span><span>'+t[1]+'</span></li>').join('')+'</ul>':'<p class="dream">Kaikki aloitustehtävät on tehty. Hyvää työtä!</p>');
     h+='<p class="vdone">✓ Tehty '+done+' / '+TASKS.length+' aloitustehtävää</p>';}
@@ -2449,7 +2486,7 @@ function renderVihko(){if(vihkoPage>=vihkoPages())vihkoPage=0;
   h+='<div class="foot">◀ ▶ sivut · B sulje</div>';showPanel(h,'vihko');
   document.querySelectorAll('#panel .vtabs span').forEach(t=>t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();vihkoPage=+t.dataset.p;blip(660,.03);renderVihko();}));}
 function showInv(){const I=S.inv;const rows=[['Rahaa',S.money+' mk'],['Lautoja',I.lautoja],['Julkisivumaalia',I.maali],['Kehäkukan siemeniä',I.kehakukka],['Porkkanan siemeniä',I.porkkana_s],['Makkaroita',I.makkara],['Porkkanoita',I.porkkana],['Mustikat',I.mustikka?I.mustikka+' l':0],['Vadelmat',I.vadelma?I.vadelma+' l':0],['Kantarellit',I.kantarelli?I.kantarelli+' l':0],['Kiukaita',I.kiuas],['Ämpärillinen vettä',I.vesi],['Klapeja',I.klapi],['Nauloja',I.naulat],['Ikkunalaseja',I.lasi],['Öljykannu ja ruuvimeisseli',(rantaR()&&rantaR().tyokalut&&!rantaR().ovi)?'✓':0],['Petrin vasara (lainassa)',I.vasara]].filter(r=>r[1]&&r[1]!=='0 mk'||r[0]==='Rahaa');
-  if(S.unlocked.villapaita)rows.push(['Vaarin villapaita','✓']);if((S.recipes||{}).mustikkapiirakka)rows.push(['Resepti: mustikkapiirakka','✓']);if(S.flags.kirje)rows.push(['Mummon kirje','✓']);
+  if(S.unlocked.villapaita)rows.push(['Vaarin villapaita','✓']);if((S.recipes||{}).mustikkapiirakka)rows.push(['Resepti: mustikkapiirakka','✓']);if(S.flags.kirje)rows.push(['Mummon kirje','✓']);if((S.inv.kuukortti||0)>0)rows.push(['Mandin Kuu-kortti','1']);
   showPanel('<div class="ptitle">Reppu</div><ul class="tasks">'+rows.map(r=>'<li><span style="flex:1">'+r[0]+'</span><span>'+r[1]+'</span></li>').join('')+
   '</ul><div class="foot">Mökkitaso '+curLevel()+' · '+(S.xp||0)+' XP · Grillaustaito '+(S.grill>=3?2:1)+'</div>','inv');}
 
@@ -2695,7 +2732,7 @@ function interactYard(fx,fy){
     case 'kara':case 'kirppispoyta':return karaTalk();
     case 'auto':if(karaDay())return karaTalk();return say(karaEve()?['Peräkontti on kiinni.','Kara viettää illat Mandin grillillä.']:'Peräkontti on kiinni. Kirppis aukeaa taas aamulla.');
     case 'kara2':return karaPubTalk();
-    case 'tuoppi':return say('Karan tuoppi. Vaahto on jo laskeutunut.');
+    case 'tuoppi':return say(['Karan lasi talon viiniä. Punaista, ja Mandin mukaan juuri sopivan halpaa.','Kara pitää lasia kuin kokouksessa kahvikuppia.']);
     case 'maukka':return say('Shh, Maukka nukkuu.');
     case 'koju':return say(o.v?['Torikoju. Pöydällä on tyhjiä mansikkalaatikoita.','Lauantaisin tässä myydään uusia perunoita ja mansikoita.']:['Torikoju raidallisen katoksen alla.','Kyltin mukaan täällä on lauantaisin kalaa ja leipää.']);
     case 'pysakki':return say(['Bussipysäkki ja katos, jossa on penkki.','Aikataulun mukaan kaupunkiin kulkee bussi kerran päivässä. Tämänpäiväinen meni jo.']);
@@ -2733,7 +2770,7 @@ function interactYard(fx,fy){
     case 'rhalot':return say('Petrin halkopino. Jokainen halko on samassa kulmassa, kuin viivoittimella.');
     case 'skanto':return say('Sammaloitunut kanto. Sen kolossa asuu joku, joka ei halua tulla häirityksi.');
     case 'sammalkivi':return say(['Sammaleinen kivi. Sammal on paksua kuin villasukka.','Kiven juurella on varjoista ja kosteaa. Hyvää sienimaata.','Kivi on lämmin auringon puolelta ja viileä varjon puolelta.','Kiven kyljessä kasvaa jäkälää, harmaata ja pehmeää.'][(o.x+o.y)%4]);
-    case 'puhelin':return say('Luuri on vielä paikallaan. Ovessa lukee 1 mk / puhelu.');
+    case 'puhelin':if(puhelinKortti())return;return say('Luuri on vielä paikallaan. Ovessa lukee 1 mk / puhelu.'+(kortti().v===4?'':''));
     case 'mailbox':return openMail();
     case 'bench':return say('Penkki järven rannalla. Täältä näkee vastarannan mökit.');
     case 'mpyora':return say('Mummon vanha pyörä nojaa vajan seinään. Ketju on ruosteessa, mutta kello soi yhä.');
@@ -2784,7 +2821,7 @@ function soilInteract(x,y){const k=x+','+y,pl=S.plants[k];
   if(pl.st>=3)return say('Kehäkukka kukkii oranssina. Pörriäinen kävi jo kylässä.');
   say([['Siemen lepää mullassa.','Pieni verso on noussut!','Kasvaa hyvää vauhtia.'][pl.st],readyText(pl)+'.']);}
 function interactTupa(fx,fy){
-  if(fy<=1){const yo=isNight();if(fx===2||fx===3)return say(yo?'Takapihan koivu hohtaa valkoisena pimeässä. Tikkataulu on vain varjo rungossa.':'Ikkunasta näkyy takapihan koivu ja tikkataulu. Västäräkki keikkuu nurmella.');
+  if(fy<=1){const yo=isNight();if(fx===8&&S.flags.kuutaulu)return say(['Pieni Kuu-taulu, Mandin lahja.','Kuu katsoo tupaan vähän vinosti, ihan kuin tietäisi jotain.']);if(fx===2||fx===3)return say(yo?'Takapihan koivu hohtaa valkoisena pimeässä. Tikkataulu on vain varjo rungossa.':'Ikkunasta näkyy takapihan koivu ja tikkataulu. Västäräkki keikkuu nurmella.');
     if(fx===6||fx===7)return say(yo?'Kuuset ovat mustia hahmoja. Halkopinon luona rapisee jotain, ehkä siili.':'Ikkunasta näkyy takapihan kuusikko ja vaarin halkopino.');
     if(fx===4||fx===5)return say('Käkikello. Se on aina viisi minuuttia edellä, ihan tarkoituksella.');
     return say('Hirsiseinään on merkitty lyijykynällä pituuksia vuosien varrelta. Yksi niistä on sinun.');}
