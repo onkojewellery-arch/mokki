@@ -69,7 +69,7 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
   padding:calc(var(--s)*1px) calc(var(--s)*3px);border-radius:calc(var(--s)*2px);font-size:calc(var(--s)*6px)}
 #toast.low{top:auto;bottom:calc(var(--s)*4px)}
 #mg{position:absolute;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(var(--s)*6px + env(safe-area-inset-bottom,0px));width:min(92%,calc(var(--s)*150px));background:rgba(20,30,24,.92);color:#f3ecd9;border:calc(var(--s)*1px) solid #121a15;border-radius:calc(var(--s)*3px);padding:calc(var(--s)*3px) calc(var(--s)*4px);box-shadow:0 calc(var(--s)*1px) calc(var(--s)*4px) rgba(0,0,0,.35)}
-#panel .kuva{display:flex;justify-content:center;margin:calc(var(--s)*3px) 0}#panel .kuva img{width:100%;max-width:calc(var(--s)*150px);image-rendering:pixelated;transform:rotate(-1.5deg);box-shadow:0 calc(var(--s)*1px) calc(var(--s)*3px) rgba(0,0,0,.35)}#panel .kuvateksti{text-align:center;font-style:italic;color:#7a6f5a}
+#panel .kuva{display:flex;justify-content:center;margin:calc(var(--s)*3px) 0}#panel .kuva img{width:100%;max-width:calc(var(--s)*150px);image-rendering:pixelated;transform:rotate(-1.5deg);box-shadow:0 calc(var(--s)*1px) calc(var(--s)*3px) rgba(0,0,0,.35)}#panel .tasks li.lue{cursor:pointer;color:#2f6e42;font-weight:bold}#panel .kuvateksti{text-align:center;font-style:italic;color:#7a6f5a}
 #mg .mgt{font-size:calc(var(--s)*5px);color:#a6d873;letter-spacing:.05em;text-transform:uppercase}
 #mg .mgmsg{font-size:calc(var(--s)*6.2px);line-height:1.35;margin:calc(var(--s)*2px) 0;min-height:calc(var(--s)*14px)}
 #mg .mgbig{font-size:calc(var(--s)*14px);font-weight:700;color:#f4d35e;text-align:center;margin:calc(var(--s)*2px) 0;animation:mgp .4s ease-in-out infinite alternate}
@@ -266,7 +266,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.43</div>
+        <div class="sub">mummon mökki · versio 0.44</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -343,7 +343,7 @@ function defaultFurn(){return [
   {id:'sanky',t:'sanky',x:8,y:5,r:0},
   {id:'matto',t:'matto',x:4,y:6,r:0},
   {id:'nojatuoli',t:'nojatuoli',x:1,y:6,r:3}];}
-function newState(){return {v:1,started:false,kukka:{v:0},penkki:null,look:{hair:0,hairC:0,skin:0,eye:0,glasses:0,top:0,pants:0,shoes:0},unlocked:{},
+function newState(){return {v:1,started:false,kukka:{v:0},penkki:null,matti:{},look:{hair:0,hairC:0,skin:0,eye:0,glasses:0,top:0,pants:0,shoes:0},unlocked:{},
   name:'Leeni Meikäläinen',scene:'piha',px:10,py:10,dir:'up',day:1,inv:{lautoja:0,kehakukka:0,porkkana_s:0,makkara:0,porkkana:0,maali:0,mustikka:0,vadelma:0,kiuas:0,vesi:0,klapi:0,vasara:0,naulat:0},
   flags:{},tasks:{},plants:{},xp:0,xpGot:{},taso:1,saunaSt:0,berryRefill:{},raimo:{st:0,vasara:0,laudat:false},recipes:{},radioOn:false,radioCount:0,cabins:{mummo:{name:'Mummon mökki'}},porch:null,furn:defaultFurn(),store:[],tfurn:[],floor:0,wall:0,grill:0,coolerDay:0,money:0,facade:{color:'haalistunut',renovated:false},log:[],time:540};}
 
@@ -364,8 +364,10 @@ const KUKAT=[{id:'kehakukka',n:'Kehäkukka',acc:'kehäkukan',siemen:'Kehäkukan 
 const KUKKA={};for(const k of KUKAT){KUKKA[k.id]=k;GROW_MS[k.id]=k.ms;GROW[k.id]=600;}
 const KUKKAPENKKI=[[12,13],[13,13],[14,13]],KUKKA_TAVOITE=2;
 const PENKKI_NEED={lautoja:3,naulat:2};
+/* ---------- v0.44 testiarvot: Myrskyluodon Matti ---------- */
+const MATTI_XP=20,MATTI_MATKA_MIN=15;
 const PENKKI_CANDS=[{n:'takapihan koivun luona',x:10,y:1,w:2,h:1},{n:'kukkapenkin vieressä',x:15,y:13,w:2,h:1},{n:'saunapolun varrella',x:7,y:13,w:2,h:1}];
-const XP_KEYS={kortti:15,halko:5,kala:5,sato:10,myynti:10,kuisti:10,maalaus:10,sauna:20,loylyt:5,maistaminen:5,raimo:10,sieni:5,terassi:15,keittio:20,tilausP:10,tilausK:10};
+const XP_KEYS={matti:20,kortti:15,halko:5,kala:5,sato:10,myynti:10,kuisti:10,maalaus:10,sauna:20,loylyt:5,maistaminen:5,raimo:10,sieni:5,terassi:15,keittio:20,tilausP:10,tilausK:10};
 let XP_HYVITYS=null;
 const SAVE_KEY='mokki-v01';
 function migrate(s){s.inv=s.inv||{};s.inv.maali=s.inv.maali||0;s.money=s.money||0;s.log=s.log||[];s.flags=s.flags||{};s.tasks=s.tasks||{};if(s.look&&s.look.glasses==null)s.look.glasses=0;
@@ -393,7 +395,10 @@ function migrate(s){s.inv=s.inv||{};s.inv.maali=s.inv.maali||0;s.money=s.money||
   if(s.porch&&s.porch.terrace&&!(s.xpGot||{}).terassi){s.xpGot=s.xpGot||{};s.xpGot.terassi=true;s.xp=(s.xp||0)+XP_KEYS.terassi;XP_HYVITYS=(XP_HYVITYS?XP_HYVITYS+' · ':'')+'+15 XP · Terassi (hyvitys)';}
   s.orders=s.orders||{};
   if(s.kortti&&s.kortti.palkinto&&!(s.xpGot||{}).kortti){s.xpGot=s.xpGot||{};s.xpGot.kortti=true;s.xp=(s.xp||0)+TAROT_XP;XP_HYVITYS=(XP_HYVITYS?XP_HYVITYS+' · ':'')+'+'+TAROT_XP+' XP · Mandin tarot-tehtävä (hyvitys)';}
-  for(const k of ['polli','sarki','ahven','kirves','onki','paivankakkara','ruiskaunokki'])s.inv[k]=s.inv[k]||0;s.kukka=s.kukka||{v:0};if(s.penkki===undefined)s.penkki=null;s.taso=Math.max(s.taso||1,levelFor(s.xp||0));
+  for(const k of ['polli','sarki','ahven','kirves','onki','paivankakkara','ruiskaunokki'])s.inv[k]=s.inv[k]||0;s.kukka=s.kukka||{v:0};if(s.penkki===undefined)s.penkki=null;s.matti=s.matti||{};s.inv.kirjeet=s.inv.kirjeet||0;
+  if(!s.flags.lautaVapaa){s.flags.lautaVapaa=true;const RC=s.cabins&&s.cabins.ranta;if(RC&&RC.furn){RC.store=RC.store||[];const hit=(f,x,y)=>{const [w,h]=dims(f);return x>=f.x&&x<f.x+w&&y>=f.y&&y<f.y+h;};
+    for(let i=RC.furn.length-1;i>=0;i--){const f=RC.furn[i];if(isRug(f.t)||isVase(f.t)||!hit(f,9,7))continue;RC.furn.splice(i,1);RC.store.push({id:f.id,t:f.t,r:f.r||0});
+      for(let j=RC.furn.length-1;j>=0;j--){const v=RC.furn[j];if(isVase(v.t)&&hit(f,v.x,v.y)){RC.furn.splice(j,1);RC.store.push({id:v.id,t:v.t,r:0});}}}}}s.taso=Math.max(s.taso||1,levelFor(s.xp||0));
   return s;}
 function save(){if(!S||!S.started)return;S.px=PL.x;S.py=PL.y;S.dir=PL.dir;try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
 function load(){try{const t=localStorage.getItem(SAVE_KEY);if(!t)return null;const s=JSON.parse(t);return s&&s.v===1?migrate(s):null;}catch(e){return null;}}
@@ -494,6 +499,7 @@ const SHORE={
   ranta:(x,y)=>{const f=X=>32*(15.2+Math.max(0,11-X/32)*1.9)+7*Math.sin(X/53+1)+6*(vnoise(X*.03,2,78)-.5);const sy=f(x),sl=(f(x+4)-f(x-4))/8;return (y-sy)/Math.sqrt(1+sl*sl);}};
 function kylaShoreY(x){return 32*(22.6+0.9*Math.sin(x/190+.5))+6*Math.sin(x/37)+6*(vnoise(x*.025,3,79)-.5);}
 SHORE.kyla=(x,y)=>{const sy=kylaShoreY(x),sl=(kylaShoreY(x+4)-kylaShoreY(x-4))/8;return (y-sy)/Math.sqrt(1+sl*sl);};
+SHORE.matti=(x,y)=>{const cx=8*32,cy=6*32,rx=6.3*32,ry=4.7*32,dx=(x-cx)/rx,dy=(y-cy)/ry;return (Math.sqrt(dx*dx+dy*dy)-1)*Math.min(rx,ry)+10*(vnoise(x*.02,y*.02,91)-.5)+5*Math.sin(x/37+y/53);};
 function shoreTiles(G,fn,W,H){for(let y=0;y<H;y++)for(let x=0;x<W;x++){const d=fn(x*32+16,y*32+16);if(d>6)G[y][x]='w';else if(d>-18)G[y][x]='s';}}
 /* ---------- Venelaituri (v0.18) ---------- */
 function buildLaituri(){const W=16,H=14,G=[],O=[];
@@ -508,6 +514,19 @@ function buildLaituri(){const W=16,H=14,G=[],O=[];
     O.push({k:'tree',x,y,w:1,h:1,v:v||(hash(x,y,73)<.55?'kuusi':'koivu')});G[y][x]='g';};
   for(let x=0;x<14;x++)tree(x,0);for(let y=1;y<8;y++)tree(0,y);
   [[1,1],[2,1],[4,1],[6,1],[7,1],[9,1],[13,1],[12,1],[13,2],[2,7],[14,0],[15,0],[15,1],[14,1]].forEach(([x,y])=>tree(x,y));
+  return {W,H,grid:G,objs:O};}
+/* ---------- Matin saari (v0.44) ---------- */
+function buildMatti(){const W=16,H=14,G=[],O=[];
+  for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push(hash(x,y,93)<0.12?'f':'g');}
+  shoreTiles(G,SHORE.matti,W,H);
+  for(let y=9;y<H;y++)if(G[y][8]==='w')G[y][8]='P';
+  for(const [x,y] of [[7,6],[7,7],[8,7],[8,8],[8,9]])if(G[y][x]!=='w'&&G[y][x]!=='P')G[y][x]='p';
+  O.push({k:'mhouse',x:6,y:2,w:4,h:3},{k:'matti',x:7,y:5,w:1,h:1},{k:'mpenkki',x:9,y:5,w:2,h:1},{k:'kahvipoyta',x:11,y:5,w:1,h:1},
+    {k:'rhalot',x:5,y:4,w:1,h:1},{k:'tynnyri',x:10,y:3,w:1,h:1},{k:'karry',x:11,y:7,w:1,h:1},
+    {k:'mvene',x:9,y:11,w:1,h:3},{k:'petrisaari',x:9,y:10,w:1,h:1},
+    {k:'rock',x:3,y:8,w:1,h:1},{k:'rock',x:12,y:9,w:1,h:1},{k:'rock',x:6,y:10,w:1,h:1});
+  for(const [x,y] of [[2,9],[3,10],[13,8],[1,6],[14,5],[12,10]])if(G[y]&&G[y][x]==='w')O.push({k:'kaisla',x,y,w:1,h:1});
+  for(const [x,y,v] of [[3,4,'koivu'],[12,2,'kuusi'],[13,4,'kuusi'],[2,6,'koivu'],[4,2,'kuusi'],[11,3,'koivu']]){const ch=G[y][x];if((ch==='g'||ch==='f')&&!O.some(o=>x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h))O.push({k:'tree',x,y,w:1,h:1,v});}
   return {W,H,grid:G,objs:O};}
 /* ---------- Rantamökki (v0.18) ---------- */
 function buildRanta(){const W=25,H=25,G=[],O=[];
@@ -531,10 +550,10 @@ function buildRanta(){const W=25,H=25,G=[],O=[];
 function rantaR(){return S&&S.cabins&&S.cabins.ranta||null;}
 function defaultRFurn(){return [{id:'rpoyta',t:'poyta',x:7,y:4,r:0},{id:'rtuoli1',t:'tuoli',x:6,y:4,r:3},{id:'rtuoli2',t:'tuoli',x:9,y:4,r:1},{id:'rkasvi',t:'kasvi',x:4,y:2,r:0}];}
 function buildRtupa(side){const W=17,H=9,G=[];for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push('W');}
-  for(let y=2;y<=7;y++)for(let x=4;x<=12;x++)G[y][x]='F';G[8][8]='o';
+  for(let y=2;y<=7;y++)for(let x=4;x<=12;x++)G[y][x]='F';G[8][8]='o';const O0=[{k:'irtolauta',x:9,y:8,w:1,h:1}];
   if(side==='ita'){for(let y=3;y<=7;y++)for(let x=14;x<=15;x++)G[y][x]='F';G[5][13]='F';}
   if(side==='lansi'){for(let y=3;y<=7;y++)for(let x=1;x<=2;x++)G[y][x]='F';G[5][3]='F';}
-  return {W,H,grid:G,objs:[]};}
+  return {W,H,grid:G,objs:O0};}
 function syncRanta(){const R=rantaR(),O=MAPS.rtupa.objs;for(let i=O.length-1;i>=0;i--)if(O[i].k==='rf')O.splice(i,1);if(!R)return;
   for(const f of R.furn||[]){if(isRug(f.t)||isVase(f.t))continue;const [w,h]=dims(f);O.push({k:'rf',x:f.x,y:f.y,w,h,ref:f});}}
 function furnKey(f,L){if(isRug(f.t))return -1;if(isVase(f.t)){const tb=L.find(q=>q.t==='poyta'&&(()=>{const [qw,qh]=dims(q);return f.x>=q.x&&f.x<q.x+qw&&f.y>=q.y&&f.y<q.y+qh;})());if(tb)return (tb.y+dims(tb)[1])*TS+.5;}return (f.y+dims(f)[1])*TS;}
@@ -831,7 +850,7 @@ function bfsPath(goal){const key=(x,y)=>x+','+y,prev={},q=[[PL.x,PL.y]];prev[key
   if(!found)return null;const steps=[];let c=key(found[0],found[1]);while(prev[c]){const [px,py,d]=prev[c];steps.unshift(d);c=key(px,py);}return {steps,end:found};}
 function dirTo(ax,ay,bx,by){return bx>ax?'right':bx<ax?'left':by>ay?'down':'up';}
 function walkToAdjacent(tiles,act,label){const set=new Set(tiles.map(([x,y])=>x+','+y));
-  const p=bfsPath((x,y)=>!set.has(x+','+y)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>set.has((x+dx)+','+(y+dy))));
+  const p=bfsPath((x,y)=>!set.has(x+','+y)&&(S.scene==='tupa'||(YARD[y]||[])[x]!=='o')&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>set.has((x+dx)+','+(y+dy))));
   if(!p){toastNow('Tuonne ei pääse tästä.');blip(180,.1);return;}
   const [ex,ey]=p.end;const adj=tiles.find(([x,y])=>Math.abs(x-ex)+Math.abs(y-ey)===1);AUTO={steps:p.steps,face:dirTo(ex,ey,adj[0],adj[1]),act,scene:S.scene,mark:[adj[0],adj[1]]};}
 function tapTarget(gx,gy){const tx=Math.floor(gx/TS),ty=Math.floor(gy/TS);
@@ -879,7 +898,7 @@ function updDbar(){const bar=document.getElementById('dbar');if(!bar)return;let 
 const PAD_MODES={penkki:1,sit:1,keittio:1,mg:1,cutscene:1,world:1,dialog:1,menu:1,panel:1,decor:1,build:1,terrace:1,veranta:1,paint:1,custom:1,busy:1,title:1,shop:1};
 function updTall(){const w=!!tallWanted();if(w!==TALLV){TALLV=w;AUTO=null;layout();}if(TALLV){document.body.classList.toggle('pad',PADUSER||!PAD_MODES[mode]);document.body.classList.toggle('nw',mode!=='world');}updDbar();}
 const FOREST_SC={polku:1,sieni:1};
-const MAPS={piha:{W:YW,H:YH,grid:YARD,objs:YOBJ},kyla:buildVillage(),polku:buildPolku(),raimo:buildRaimo(),sieni:buildSieni(),laituri:buildLaituri(),ranta:buildRanta(),jaska:buildJaska(),rtupa:buildRtupa(null)};
+const MAPS={matti:buildMatti(),piha:{W:YW,H:YH,grid:YARD,objs:YOBJ},kyla:buildVillage(),polku:buildPolku(),raimo:buildRaimo(),sieni:buildSieni(),laituri:buildLaituri(),ranta:buildRanta(),jaska:buildJaska(),rtupa:buildRtupa(null)};
 function useMap(sc){if(sc==='piha'&&typeof S!=='undefined'&&S){syncTerrace();syncKeittio();syncPenkki();}if(sc==='rtupa'){const R=rantaR();MAPS.rtupa=buildRtupa(R&&R.veranta);syncRanta();}if(sc==='ranta')syncRantaExt();const m=MAPS[sc]||MAPS.piha;YARD=m.grid;YOBJ=m.objs;YW=m.W;YH=m.H;}
 
 function karaDay(){return S.time>=420&&S.time<1080;}
@@ -1179,6 +1198,26 @@ function makeGPenkki(){return outlined(62,42,g=>{const W=['#7a4a24','#a06a34','#
   /* tukevat etujalat ja poikkipuu */
   for(const lx of [5,52]){R(g,lx,30,5,10,W[1]);R(g,lx,30,1,10,W[3]);R(g,lx+4,30,1,10,W[0]);}
   R(g,10,35,42,2,W[1]);R(g,10,35,42,1,W[2]);});}
+function makeIrtolauta(){return outlined(26,30,g=>{R(g,3,2,20,26,'#8a6440');R(g,3,2,20,1,'#b08a5c');R(g,3,27,20,1,'#5a3e26');for(let y=7;y<26;y+=6)R(g,4,y,18,1,'#7a5636');
+  R(g,20,2,3,26,'#1e1610');P(g,6,5,'#c8c0b0');P(g,6,24,'#c8c0b0');R(g,7,10,8,1,'#6a4a30');});}
+function makeMattiHouse(){return outlined(128,116,g=>{const WL='#8a9c78',WD='#6e8060',WLL='#a4b490',TR='#f2eee2',RF='#56595f',RFD='#3e4046';
+  R(g,90,4,10,22,'#9a4a3a');R(g,90,4,10,2,'#b86a54');R(g,88,2,14,3,'#6a3a30');
+  poly(g,[[2,44],[126,44],[110,10],[18,10]],RF);for(let y=14;y<44;y+=5)R(g,10+Math.round((44-y)*.28),y,108-Math.round((44-y)*.56),1,RFD);R(g,18,9,92,2,'#6a6e74');R(g,2,43,124,3,RFD);
+  R(g,10,46,108,52,WL);for(let y=50;y<98;y+=4)R(g,10,y,108,1,WD);R(g,10,46,108,2,WLL);
+  R(g,8,46,4,52,TR);R(g,116,46,4,52,TR);R(g,8,96,112,3,'#8a8478');
+  for(const wx of [62,90]){R(g,wx-2,56,24,22,TR);R(g,wx,58,20,18,'#6a8ea8');R(g,wx,58,20,4,'#a8c8dc');R(g,wx+9,58,2,18,TR);R(g,wx,66,20,2,TR);R(g,wx,58,4,18,'#f0e2c0');R(g,wx+16,58,4,18,'#f0e2c0');R(g,wx-3,78,26,3,TR);
+    for(const [a,b] of [[3,76],[9,75],[15,76]]){ell(g,wx+a,b-2,3,2,'#4f8a40');ell(g,wx+a,b-4,2,2,'#d8423a');}}
+  R(g,32,56,18,40,'#8a3a30');R(g,32,56,18,2,'#a85044');R(g,30,54,22,2,TR);R(g,30,54,2,42,TR);R(g,50,54,2,42,TR);R(g,46,76,2,2,'#e8c050');R(g,35,60,12,12,'#a85044');
+  R(g,16,94,52,10,'#b48a5a');for(let x=16;x<68;x+=7)R(g,x,94,1,10,'#94704a');R(g,16,94,52,1,'#d0a878');R(g,16,103,52,2,'#7a5636');
+  for(const px of [16,66]){R(g,px,80,3,24,'#f2eee2');}R(g,16,80,53,3,TR);R(g,16,88,53,2,'#e2dccc');
+  R(g,32,104,20,5,'#a07850');R(g,32,104,20,1,'#c8a070');R(g,30,109,24,5,'#8a6440');R(g,30,109,24,1,'#b08a5c');
+  R(g,57,86,8,8,'#b85a3a');R(g,57,86,8,2,'#d07a50');ell(g,61,83,6,4,'#4f8a40');for(const [a,b] of [[-3,-2],[2,-4],[4,0]])ell(g,61+a,83+b,2,2,'#e04a40');
+  R(g,22,90,6,4,'#5a5e66');R(g,21,89,8,2,'#7a7e86');});}
+function makeKaisla(){return outlined(30,46,g=>{for(let i=0;i<9;i++){const x=3+i*3,h=24+Math.floor(hash(i,2,95)*16),lean=(i%3)-1;line(g,x,44,x+lean*3,44-h,i%2?'#6a8a3a':'#8aa848');
+    if(i%3===1){R(g,x+lean*3-1,44-h+2,3,8,'#6a4228');R(g,x+lean*3-1,44-h+2,1,8,'#8a5a34');}}ell(g,15,44,13,2,'rgba(40,80,100,.35)');});}
+function makeKahvipoyta(){return outlined(32,36,g=>{R(g,3,14,26,4,'#b48a5a');R(g,3,14,26,1,'#d0a878');R(g,3,17,26,1,'#7a5636');for(const lx of [5,25])R(g,lx,18,3,16,'#8a6440');
+  R(g,11,4,10,10,'#3a5a8a');R(g,11,4,10,2,'#5a7aaa');R(g,10,13,12,1,'#2a3a5a');R(g,21,7,4,2,'#3a5a8a');R(g,13,2,6,2,'#2a3a5a');R(g,11,4,1,10,'#f0ead8');
+  for(const cx of [4,24]){R(g,cx,10,5,4,'#f0ead8');R(g,cx,10,5,1,'#ffffff');R(g,cx+5,11,1,2,'#f0ead8');}});}
 function makePollkky(){return outlined(40,36,g=>{ell(g,20,30,17,5,'rgba(0,0,0,.2)');R(g,5,16,30,14,'#7a4f2c');R(g,5,16,4,14,'#94643a');R(g,30,16,5,14,'#5a3820');for(const x of [12,19,26])R(g,x,18,1,11,'#6a4426');
   ell(g,20,16,15,5,'#c89a62');ell(g,20,16,12,4,'#d8ae74');ell(g,20,16,8,2,'#c89a62');ell(g,20,16,3,1,'#b08050');
   R(g,14,4,12,12,'#8a5a32');R(g,14,4,3,12,'#a87444');ell(g,20,4,6,2,'#e0bc84');ell(g,20,4,3,1,'#c89a62');
@@ -1568,6 +1607,7 @@ function buildChar(look){const L=charL(look);
   const out={};for(const dir of ['down','up','left'])out[dir]=[0,1,2,3].map(f=>outlined(38,58,g=>drawCharRaw(g,dir,f===3?0:f,f===3,L),-.84));
   out.right=out.left.map(c=>mk(38,58,g=>{g.translate(38,0);g.scale(-1,1);g.drawImage(c,0,0);}));return out;}
 
+const MATTI_LOOK={style:0,hair:'#c8c8c2',skin:'#eab48c',eye:'#7d8b98',top:{c:'#7d7258'},pants:'#34363e',boots:'#5a4632',glasses:'#6a4a32',glassesT:1};
 const RAIMO_LOOK={style:1,hair:'#6b4226',skin:'#eab48c',eye:'#7d8b98',top:{c:'#2c2c33'},hood:true,pipo:true,pipoC:'#2e2e34',pants:'#3a4a6a',boots:'#3f6a3a',moustache:'#4e301c',beard:'#5a381e'};
 function buildNPC(L){const out={};for(const dir of ['down','up','left'])out[dir]=[0,1].map(f=>outlined(38,58,g=>drawCharRaw(g,dir,0,f===1,L),-.84));
   out.right=out.left.map(c=>mk(38,58,g=>{g.translate(38,0);g.scale(-1,1);g.drawImage(c,0,0);}));return out;}
@@ -1989,7 +2029,7 @@ function bottomRow(c){const d=c.getContext('2d').getImageData(0,0,c.width,c.heig
 function A(c){c.bot=bottomRow(c);return c;}
 function makeSprites(){
   SPR.kuusi=[makeSpruce(1),makeSpruce(2)].map(A);SPR.koivu=[makeBirch(1),makeBirch(2)].map(A);
-  SPR.gpenkki=A(makeGPenkki());SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());SPR.aita=A(makeAita());SPR.tyokalu=A(makeTyokalu());SPR.veranta=A(makeVeranta());SPR.verantaL=A(mk(SPR.veranta.width,SPR.veranta.height,g=>{g.translate(SPR.veranta.width,0);g.scale(-1,1);g.drawImage(SPR.veranta,0,0);}));SPR.ulkopoyta=A(makeUlkopoyta());SPR.grilli=A(makeGrilli());SPR.koju=A(makeKoju(false));SPR.koju2=A(makeKoju(true));SPR.pysakki=A(makePysakki());SPR.tiski2=A(makeTiski2());SPR.hylly=A(makeHylly());SPR.seinapenkki=A(makeSeinapenkki());SPR.pikkupoyta=A(makePikkupoyta());SPR.keitin=A(makeKeitin());SPR.jakkara=A(makeJakkara());SPR.ruokalista=A(makeRuokalista());SPR.telkkari=A(makeTelkkari());SPR.pajatso=A(makePajatso());SPR.jukeboksi=A(makeJukeboksi());SPR.pubpoyta=A(makePubpoyta(false));SPR.pubpoyta2=A(makePubpoyta(true));{const JN=buildNPC(JASKA_LOOK);for(const d in JN)JN[d].forEach(A);SPR.jaska=JN;const KN=buildNPC(KARA_LOOK);for(const d in KN)KN[d].forEach(A);SPR.kara=KN;}SPR.auto=A(makeAuto());SPR.autoKiinni=A(makeAutoKiinni());SPR.tuoppi=A(makeTuoppi());SPR.koira=[0,1].map(f=>A(makeKoira(f)));SPR.koiraNuk=A(makeKoiraNuk());SPR.kirppispoyta=A(makeKirppisPoyta());SPR.saappaat=A(makeSaappaat());SPR.soutuvene=A(makeSoutuvene(false));SPR.soutuveneK=A(makeSoutuvene(true));SPR.puomi=A(makePuomi());SPR.paalut=A(makePaalut());SPR.house3=A(makeRantaHouse());SPR.ilmoitustaulu=A(makeIlmoitustaulu());SPR.pollkky=A(makePollkky());SPR.pollipino=A(makePollipino());SPR.onkipaikka=A(makeOnkipaikka());SPR.verantaF=A(makeVerantaFront());SPR.kasvimaapaikka=A(makeKasvimaaPaikka());SPR.saunapaikka=A(makeSaunaPaikka());SPR.aitaV=A(makeAitaV());SPR.sammalkivi=A(makeMossRock());SPR.skanto=A(makeMossStump());
+  SPR.gpenkki=A(makeGPenkki());SPR.mpenkki=SPR.gpenkki;SPR.irtolauta=A(makeIrtolauta());SPR.mhouse=A(makeMattiHouse());SPR.kaisla=A(makeKaisla());SPR.kahvipoyta=A(makeKahvipoyta());{const MN=buildNPC(MATTI_LOOK);for(const d in MN)MN[d].forEach(A);SPR.mattiN=MN;}SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());SPR.aita=A(makeAita());SPR.tyokalu=A(makeTyokalu());SPR.veranta=A(makeVeranta());SPR.verantaL=A(mk(SPR.veranta.width,SPR.veranta.height,g=>{g.translate(SPR.veranta.width,0);g.scale(-1,1);g.drawImage(SPR.veranta,0,0);}));SPR.ulkopoyta=A(makeUlkopoyta());SPR.grilli=A(makeGrilli());SPR.koju=A(makeKoju(false));SPR.koju2=A(makeKoju(true));SPR.pysakki=A(makePysakki());SPR.tiski2=A(makeTiski2());SPR.hylly=A(makeHylly());SPR.seinapenkki=A(makeSeinapenkki());SPR.pikkupoyta=A(makePikkupoyta());SPR.keitin=A(makeKeitin());SPR.jakkara=A(makeJakkara());SPR.ruokalista=A(makeRuokalista());SPR.telkkari=A(makeTelkkari());SPR.pajatso=A(makePajatso());SPR.jukeboksi=A(makeJukeboksi());SPR.pubpoyta=A(makePubpoyta(false));SPR.pubpoyta2=A(makePubpoyta(true));{const JN=buildNPC(JASKA_LOOK);for(const d in JN)JN[d].forEach(A);SPR.jaska=JN;const KN=buildNPC(KARA_LOOK);for(const d in KN)KN[d].forEach(A);SPR.kara=KN;}SPR.auto=A(makeAuto());SPR.autoKiinni=A(makeAutoKiinni());SPR.tuoppi=A(makeTuoppi());SPR.koira=[0,1].map(f=>A(makeKoira(f)));SPR.koiraNuk=A(makeKoiraNuk());SPR.kirppispoyta=A(makeKirppisPoyta());SPR.saappaat=A(makeSaappaat());SPR.soutuvene=A(makeSoutuvene(false));SPR.soutuveneK=A(makeSoutuvene(true));SPR.puomi=A(makePuomi());SPR.paalut=A(makePaalut());SPR.house3=A(makeRantaHouse());SPR.ilmoitustaulu=A(makeIlmoitustaulu());SPR.pollkky=A(makePollkky());SPR.pollipino=A(makePollipino());SPR.onkipaikka=A(makeOnkipaikka());SPR.verantaF=A(makeVerantaFront());SPR.kasvimaapaikka=A(makeKasvimaaPaikka());SPR.saunapaikka=A(makeSaunaPaikka());SPR.aitaV=A(makeAitaV());SPR.sammalkivi=A(makeMossRock());SPR.skanto=A(makeMossStump());
   SPR.rock=A(makeRock());SPR.bush=A(makeBush(true));SPR.bushTyhja=A(makeBush(false));SPR.stump=A(makeStump());SPR.lippu=[0,1,2].map(makeLippu).map(A);SPR.pyykki=[0,1].map(makePyykki).map(A);
   SPR.halot=A(makeHalot());SPR.karry=A(makeKarry());SPR.tynnyri=A(makeTynnyri());SPR.mailbox=A(makeMailbox());SPR.mpyora=A(makeBike('#2f5a46','kukat'));
   SPR.shop=A(makeShop());SPR.bench=A(makeBench());SPR.lamp=A(makeLamp());SPR.maito=A(makeMaito());SPR.puhelin=A(makePuhelin());SPR.pyora=A(makeBike('#b8443a','pulla'));
@@ -2005,6 +2045,9 @@ function sprFor(o){switch(o.k){
   case 'tree':return SPR[o.v][hash(o.x,o.y,11)<.5?0:1];
   case 'bush':return raspFull(o)?SPR.bush:SPR.bushTyhja;
   case 'raimo':return SPR.raimo[raimoDir][(frame%230)<7?1:0];
+  case 'petrisaari':return BOAT?null:SPR.raimo.down[(frame%230)<7?1:0];
+  case 'matti':return COFFEE?null:SPR.mattiN.down[(frame%260)<7?1:0];
+  case 'mvene':return SPR.soutuvene;
   case 'jaska':return HDS.mandi[jaskaDir][(frame%260)<7?1:0];
   case 'kara':return SPR.kara.down[(frame%300)<7?1:0];
   case 'kara2':return HDS.kara.left[(frame%280)<7?1:0];
@@ -2446,7 +2489,7 @@ function updateToast(){const el=$('#toast');if(toastT>0){toastT--;if(toastT===0)
   if(toastQ.length){el.textContent=toastQ.shift();el.classList.remove('hide');el.classList.toggle('low',mode==='shop'||mode==='panel');toastT=150;}}
 function hud(){const el=$('#hud');if(mode==='title'||mode==='custom'){el.classList.add('hide');return;}
   const [L,f]=levelProgress();el.classList.remove('hide');
-  el.innerHTML='<div>Päivä '+S.day+' · klo '+clockStr()+' · '+({piha:'Piha',tupa:'Tupa',kyla:'Vattula',polku:'Metsäpolku',raimo:'Petrin piha',sieni:'Sienimetsä',laituri:'Venelaituri',jaska:'Mandin grilli',rtupa:rantaNimi(),ranta:rantaNimi()})[S.scene]+' · '+S.money+' mk</div><div class="lv">Mökkitaso '+L+'<span class="xb"><i style="width:'+Math.round(f*100)+'%"></i></span></div>';}
+  el.innerHTML='<div>Päivä '+S.day+' · klo '+clockStr()+' · '+({piha:'Piha',tupa:'Tupa',kyla:'Vattula',polku:'Metsäpolku',raimo:'Petrin piha',sieni:'Sienimetsä',laituri:'Venelaituri',jaska:'Mandin grilli',matti:'Matin saari',rtupa:rantaNimi(),ranta:rantaNimi()})[S.scene]+' · '+S.money+' mk</div><div class="lv">Mökkitaso '+L+'<span class="xb"><i style="width:'+Math.round(f*100)+'%"></i></span></div>';}
 function hint(t){const el=$('#hint');if(!t){el.classList.add('hide');return;}el.textContent=t;el.classList.remove('hide');}
 
 function say(pages,done){if(typeof pages==='string')pages=[pages];dlg={pages,i:0,shown:0,done,ret:mode==='dialog'?'world':mode};mode='dialog';renderDialog(true);}
@@ -2553,6 +2596,7 @@ function openNaming(){showPanel('<div class="ptitle">Anna rantamökille nimi</di
 function finishNaming(){const inp=$('#mnimi');let n=((inp&&inp.value)||'').replace(/[<>&"]/g,'').trim().slice(0,20)||'Rantamökki';
   if(inp)inp.blur();S.cabins.ranta.name=n;$('#panel').classList.add('hide');mode='world';panelKind='';addLog('Annoin rantamökille nimen '+n+'.');save();hud();blip(990,.06);toast(n+' · oma rantamökki');}
 function panelPress(b){
+  if(panelKind==='inv'&&b==='a'&&(S.inv.kirjeet||0)>0){$('#panel').classList.add('hide');panelKind='';mode='world';blip(660,.03);lueMatinKirjeet();return;}
   if(panelKind==='kuva'){if(b==='a'||b==='b'||b==='start'){$('#panel').classList.add('hide');panelKind='';mode='world';blip(660,.03);const cb=kuvaCb;kuvaCb=null;if(cb)cb();}return;}
   if(panelKind==='tarot'&&(b==='a'||b==='b'||b==='start')){TFX.on=false;$('#panel').classList.remove('tarotbox');}
   if(panelKind==='kirppis'){if(DIRS[b]){const st={left:-1,right:1,up:-3,down:3}[b];ksel=clamp(ksel+st,0,KIRPPIS.length-1);blip(660,.03);openKirppis();return;}
@@ -2566,7 +2610,7 @@ function panelPress(b){
   if(panelKind==='hinnasto'){if(b==='left'||b==='right'){hinPage=hinPage?0:1;blip(660,.03);renderHinnasto();return;}if(b==='a'){if(hinPage===0){hinPage=1;blip(660,.03);renderHinnasto();}else{blip(660,.03);showTasks(1);}return;}}
   if(panelKind==='vihko'){const n=vihkoPages();if(b==='left'||b==='right'||(b==='a'&&vihkoPage<n-1)){vihkoPage=(vihkoPage+(b==='left'?-1:1)+n)%n;blip(660,.03);renderVihko();return;}}
   if(b==='a'||b==='b'||b==='start'){$('#panel').classList.add('hide');mode='world';panelKind='';blip(330,.05);}}
-$('#panel').addEventListener('pointerdown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('pclose')){e.preventDefault();e.stopPropagation();press('b');return;}if(panelKind==='nimi'||panelKind==='varasto'||panelKind==='kirppis')return;e.preventDefault();if(mode==='panel')press('a');});
+$('#panel').addEventListener('pointerdown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('pclose')){e.preventDefault();e.stopPropagation();press('b');return;}if(panelKind==='inv'){e.preventDefault();press('b');return;}if(panelKind==='nimi'||panelKind==='varasto'||panelKind==='kirppis')return;e.preventDefault();if(mode==='panel')press('a');});
 let hinPage=0;
 function openHinnasto(pg){hinPage=pg||0;renderHinnasto();}
 function renderHinnasto(){let h;
@@ -2593,6 +2637,7 @@ function renderVihko(){if(vihkoPage>=vihkoPages())vihkoPage=0;
     {const K=kukkaQ();if(K.v>=1&&K.v<=3){const n=kukkiaKehakukkia();h+=vCard('Mummon vanha kukkapenkki','vaihe '+K.v+'/3',K.v===3?vBar(n,KUKKA_TAVOITE)+'Tavoite: kaksi kukkivaa kehäkukkaa kukkapenkissä · nyt '+n+' / '+KUKKA_TAVOITE:'',
       K.v===1?'Tutki vanhaa kukkapenkkiä. Se on kivireunuksen sisällä polun itäpuolella, ison kiven yläpuolella.':K.v===2?'Valitse kukkapenkiltä Kunnosta kukkapenkki.':'Kasvata kukkapenkkiin kaksi kukkivaa kehäkukkaa. Siemeniä saa kyläkaupasta ('+KUKKA.kehakukka.p+' mk).');}
      else if(K.v===0&&S.flags.kirje)h+=vCard('Mummon kirje','','','Kirjeen välissä taisi olla jotain muutakin. Lue se uudelleen: Valikko → Mummon kirje.');}
+    {const M=mattiQ();if(M.loydetty)h+=vCard('Myrskyluodon Matti',M.valmis?'valmis ✓':'vaihe '+mattiVaihe()+'/5','',mattiTavoite());}
     {const K=kortti();if(K.v>=1&&K.v<=5)h+=vCard('Mandin kadonnut tarot-kortti','vaihe '+K.v+'/5','',KORTTI_TAVOITE[K.v]);}
     for(const o of ORDERS){const st=orderSt(o.id);if(st==='hyv'){const have=Math.min(S.inv[o.item]||0,o.q);h+=vCard('Tilaus: '+o.n,have+' / '+o.q,vBar(have,o.q)+o.q+' '+o.u+' → '+o.paikka+' · palkkio '+o.mk+' mk + 10 XP',have>=o.q?'Vie toimitus: '+o.paikka+'.':'Kerää vielä '+(o.q-have)+'.');}}
     h+='<div class="ptitle sub">Seuraavaksi</div>'+(open.length?'<ul class="tasks">'+open.slice(0,4).map(t=>'<li><span class="ck">·</span><span>'+t[1]+'</span></li>').join('')+'</ul>':'<p class="dream">Kaikki aloitustehtävät on tehty. Hyvää työtä!</p>');
@@ -2605,15 +2650,17 @@ function renderVihko(){if(vihkoPage>=vihkoPages())vihkoPage=0;
     const pn=R.st===0?'Tapaa Petri. Hänen pihansa on metsäpolun kelon kohdalta länteen.':R.st===1?(R.vasara===1?'Palauta lainattu vasara Petrille.':'Petri lainaa vasaraa, jos tarvitset.'):R.st===2?'Vie Petrille litra mustikoita piirakkaa varten.':(S.flags.sienestys?'Kantarellit: yksi paikka sienimetsän polun varressa, toinen sammalkiven takana.':curLevel()<2?'Mökkitasolla 2 Petrillä on sienivinkki.':'Juttele Petrin kanssa, hänellä on sienivinkki.');
     h+=vCard('Petri',R.st>0?RAIMO_ST[R.st]:'ei vielä tavattu',R.st>0?'Oma piha metsäpolun varrella · pihalla klo 7–22 · koira Maukka':'',pn);
     if(S.flags.jaskaKaynti)h+=vCard('Mandi','Mandin grilli','Kylän grilli ja pubi · kahvi, makkaraperunat ja tarot','Päivän kortin saa kerran päivässä.');
+    if(mattiQ().tavattu)h+=vCard('Matti','Matin saari','Asuu pienellä saarella Vattulan edustalla · Petri vie veneellä venelaiturilta','');
     if(S.flags.kylaKaynti)h+=vCard('Kara','kirppis','Torilla klo 7–18, illalla Mandin grillillä','');
     h+='<p class="vdone">Taidot: rakennus '+buildSkill()+' · grillaus '+(S.grill>=3?2:1)+'</p>';}
   else{const logs=(S.log||[]).slice(-7).reverse();h+='<ul class="tasks log">'+(logs.length?logs.map(l=>'<li><span>'+l+'</span></li>').join(''):'<li><span>Ei vielä merkintöjä.</span></li>')+'</ul>';}
   h+='<div class="foot">◀ ▶ sivut · B sulje</div>';showPanel(h,'vihko');
   document.querySelectorAll('#panel .vtabs span').forEach(t=>t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();vihkoPage=+t.dataset.p;blip(660,.03);renderVihko();}));}
 function showInv(){const I=S.inv;const rows=[['Rahaa',S.money+' mk'],['Lautoja',I.lautoja],['Julkisivumaalia',I.maali],['Kehäkukan siemeniä',I.kehakukka],['Päivänkakkaran siemeniä',I.paivankakkara],['Ruiskaunokin siemeniä',I.ruiskaunokki],['Porkkanan siemeniä',I.porkkana_s],['Makkaroita',I.makkara],['Porkkanoita',I.porkkana],['Mustikat',I.mustikka?I.mustikka+' l':0],['Vadelmat',I.vadelma?I.vadelma+' l':0],['Kantarellit',I.kantarelli?I.kantarelli+' l':0],['Kiukaita',I.kiuas],['Ämpärillinen vettä',I.vesi],['Pöllejä',I.polli],['Klapeja',I.klapi],['Särkiä',I.sarki],['Ahvenia',I.ahven],['Nauloja',I.naulat],['Ikkunalaseja',I.lasi],['Öljykannu ja ruuvimeisseli',(rantaR()&&rantaR().tyokalut&&!rantaR().ovi)?'✓':0],['Petrin vasara (lainassa)',I.vasara]].filter(r=>r[1]&&r[1]!=='0 mk'||r[0]==='Rahaa');
-  if(S.unlocked.villapaita)rows.push(['Vaarin villapaita','✓']);if((S.recipes||{}).mustikkapiirakka)rows.push(['Resepti: mustikkapiirakka','✓']);if(S.flags.kirje)rows.push(['Mummon kirje','✓']);if(kukkaQ().v>=1)rows.push(['Vanha valokuva','✓']);if((S.inv.kuukortti||0)>0)rows.push(['Mandin Kuu-kortti','1']);if(I.kirves)rows.push(['Vaarin kirves','✓']);if(I.onki)rows.push(['Onki','✓']);
+  if(S.unlocked.villapaita)rows.push(['Vaarin villapaita','✓']);if((S.recipes||{}).mustikkapiirakka)rows.push(['Resepti: mustikkapiirakka','✓']);if(S.flags.kirje)rows.push(['Mummon kirje','✓']);if(kukkaQ().v>=1)rows.push(['Vanha valokuva','✓']);if((S.inv.kuukortti||0)>0)rows.push(['Mandin Kuu-kortti','1']);if(I.kirves)rows.push(['Vaarin kirves','✓']);if((I.kirjeet||0)>0)rows.push(['Kirjenippu: Matille ▸ lue','1']);if(I.onki)rows.push(['Onki','✓']);
   showPanel('<div class="ptitle">Reppu</div><ul class="tasks">'+rows.map(r=>'<li><span style="flex:1">'+r[0]+'</span><span>'+r[1]+'</span></li>').join('')+
-  '</ul><div class="foot">Mökkitaso '+curLevel()+' · '+(S.xp||0)+' XP · Grillaustaito '+(S.grill>=3?2:1)+'</div>','inv');}
+  '</ul><div class="foot">'+((I.kirjeet||0)>0?'A lue kirjeet · ':'')+'Mökkitaso '+curLevel()+' · '+(S.xp||0)+' XP · Grillaustaito '+(S.grill>=3?2:1)+'</div>','inv');
+  if((I.kirjeet||0)>0)document.querySelectorAll('#panel .tasks li').forEach(li=>{if(li.textContent.startsWith('Kirjenippu')){li.classList.add('lue');li.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();press('a');});}});}
 
 /* hahmon muokkaus */
 const CROWS=[{k:'hair',l:'Hiukset',o:()=>HAIR_STYLES},{k:'hairC',l:'Hiusväri',o:()=>HAIR_COLORS.map(a=>a[0])},{k:'skin',l:'Iho',o:()=>SKINS.map(a=>a[0])},
@@ -2679,6 +2726,7 @@ function raimoTalk(){const R=raimoState();
         return say(['Petri: "Kas, vasara palasi. Täällä päin sellainen on melkein ihme."','Petri: "Toisitko litran mustikoita? Piirakkataikina on jo henkisesti valmis."'],()=>toast('Petri · Hyvä naapuri'));}
       save();say('Petri: "Kiitos. Vasara pääsee lepäämään. Se ansaitsee sen."');});}
   else{opts.push('Lainaa vasara');acts.push(lend);}
+  {const M=mattiQ();if(M.loydetty){opts.push('Kysy Matista');acts.push(petriMatti);}if(M.vinkki){opts.push('Lähdetään Matin luo');acts.push(lahdeSaarelle);}}
   opts.push('Jutellaan');acts.push(()=>{const L=R.st>=3?['Petri: "Piirakka onnistui. Kardemumma teki kaiken työn, minä vain seisoin vieressä."','Petri: "Järvellä on tyyntä. Huomenna kalastetaan. Kalat tuskin ovat yhtä innoissaan."','Petri: "Hyvä naapuri on kullanarvoinen. Sinä olet ainakin hopeaa, ja nousussa."']:
       R.st===2?['Petri: "Piirakka odottaa yhä litraa mustikoita. Metsäpolun varrella niitä kasvaa. Minä odotan täällä nälkäisenä."']:['Petri: "Vaarin saunassa oli Vattulan parhaat löylyt. Kiuas oli niin kova, että hikoilin jo pihalla."'];{const L2=L.concat(['Petri: "Mandi pitää grilliä. Minä pidän täällä vahtia. Maukka hoitaa päiväunet."']);say(L2[S.day%L2.length]);}});
   if(S.flags.sienestys||curLevel()>=2){opts.push('Kysy sienistä');acts.push(()=>{if(!S.flags.sienestys){S.flags.sienestys=true;addLog('Petri kertoi, mistä sienimetsästä löytää kantarelleja.');save();
@@ -2839,7 +2887,7 @@ function drawPenkkiGhost(c){const sp=SPR.gpenkki,bl=penkkiBlocked(c),o={x:c.x,y:
   ctx.strokeStyle=bl.length?'#e8443a':'#f4d35e';ctx.lineWidth=1;ctx.setLineDash([3,2]);ctx.strokeRect(c.x*TS+.5,c.y*TS+.5,2*TS-1,TS-1);ctx.setLineDash([]);}
 function nousuRuutu(o,i,rx,ry){const ok=(x,y)=>x>=0&&y>=0&&x<YW&&y<YH&&!solid(x,y)&&!'DB'.includes((YARD[y]||[])[x]);if(ok(rx,ry))return [rx,ry,dirTo(o.x+i,o.y,rx,ry)];
   const sx=o.x+i,C=[[sx,o.y+1],[sx,o.y-1],[o.x+1-i,o.y+1],[o.x+1-i,o.y-1],[o.x-1,o.y],[o.x+2,o.y]];for(const [x,y] of C)if(ok(x,y))return [x,y,dirTo(sx,o.y,x,y)];return [rx,ry,PL.dir];}
-function istu(fx,fy){const o=objAt(fx,fy);if(!o||!o.pk)return;const i=clamp(fx-o.x,0,1),[rx,ry,rd]=nousuRuutu(o,i,PL.x,PL.y);SIT={o,i,rx,ry,rd};placePlayer(rx,ry,rd);AUTO=null;mode='sit';blip(520,.04);save();
+function istu(fx,fy){const o=objAt(fx,fy);if(!o||!(o.pk||o.k==='mpenkki'))return;const i=clamp(fx-o.x,0,1),[rx,ry,rd]=nousuRuutu(o,i,PL.x,PL.y);SIT={o,i,rx,ry,rd};placePlayer(rx,ry,rd);AUTO=null;mode='sit';blip(520,.04);save();
   hint(TALLV?'Istut penkillä. Pidä hetki taukoa.':'Istut penkillä. Pidä hetki taukoa. · A tai B: nouse');}
 function nouse(){if(SIT)placePlayer(SIT.rx,SIT.ry,SIT.rd);SIT=null;mode='world';hint(null);blip(440,.04);save();}
 const SITC={};
@@ -2850,6 +2898,93 @@ function makeSitChar(L){/* istuva hahmo edestä: yläkeho tavallisesta spritest�
     for(const kx of [9,17]){R(g,X(kx),Y+36,6,3,Pn);R(g,X(kx),Y+36,6,1,Pl);R(g,X(kx+5),Y+36,1,3,Pd);R(g,X(kx),Y+39,5,4,Pd);R(g,X(kx),Y+39,1,4,Pn);R(g,X(kx-1),Y+43,7,3,SH);R(g,X(kx-1),Y+43,7,1,SHl);}},-.84);}
 function drawSitter(L,o,i){const key=JSON.stringify(L);if(!SITC[key])SITC[key]=makeSitChar(L);const c=SITC[key];
   const cx=o.x*TS+18+i*28,top=o.y*TS-22;ctx.drawImage(c,cx-20,top);}
+
+/* ---------- v0.44: Myrskyluodon Matti ---------- */
+/* S.matti: loydetty (kirjeet löytyivät), vinkki (Petrin reittivinkki), saari (käynyt saarella), tavattu (Matin tuttavuus),
+   palautettu (kirjeet Matille), kesk 0–3 (keskustelun vaihe), paljastus, valmis, kahvi; XP: S.xpGot.matti */
+function mattiQ(){return S.matti||(S.matti={});}
+function mattiVaihe(){const M=mattiQ();return M.valmis?5:M.palautettu?4:M.saari?3:M.vinkki?2:1;}
+function mattiTavoite(){return ['','Selvitä, kuka Matti on.','Lähde Petrin kanssa Matin saarelle.','Palauta kirjeet Matille.','Jatka keskustelua Matin kanssa.','Tehtävä valmis. Matin luona voi käydä kahvilla Petrin kyydillä.'][mattiVaihe()]+
+  (mattiVaihe()===1?' Rantamökin entinen asukas? Petri tuntee kaikki.':mattiVaihe()===2?' Petri on kotipihallaan klo 7–22.':'');}
+const MATIN_KIRJEET=['Nauhalla sidottu kirjenippu. Päällimmäisessä lukee: Matille.',
+  '"Rakas Matti. Sunnuntain venematka jäi mieleeni. Seuraasi kaipaan enemmän kuin sopisi sanoa."',
+  '"Jos tulet torstaina rantaan, jätän veneen vanhalle paikalle. Toivon, ettei tarvitse puhua säästä."',
+  '"En voi luvata sinulle sitä elämää, jota pyydät. Ei se tee tunteistani vähäisempiä. I.M."'];
+function lueMatinKirjeet(done){say(MATIN_KIRJEET.concat(['Kirjeet kuuluvat Matille, kuka hän sitten onkin.']),done);}
+function irtolautaInteract(){const M=mattiQ();
+  if(M.loydetty)return say(M.palautettu?'Irtonainen seinälauta. Kolo sen takana on tyhjä. Kirjeet ovat nyt Matilla.':'Irtonainen seinälauta. Kolo sen takana on tyhjä. Kirjenippu on repussa.');
+  M.loydetty=true;S.inv.kirjeet=1;addLog('Löysin rantamökin seinälaudan takaa vanhan kirjenipun.');save();
+  say(['Oven vieressä yksi seinälauta heiluu. Se irtoaa helposti.','Laudan takana on vanha kirjenippu. Päällimmäisessä lukee: Matille.','Kirjeet ovat kellastuneet, ja ne on sidottu nauhalla.'],
+    ()=>ask('Luetaanko kirjeet?',['Lue kirjeet','Ei nyt'],i=>{const done=()=>questNote('Uusi tehtävä','Myrskyluodon Matti');if(i===0)lueMatinKirjeet(done);else done();}));}
+function petriMatti(){const M=mattiQ();
+  if(M.vinkki)return say(['Petri: "Matti on hyvä mies. Puhuu vähän, mutta keittää Vattulan parhaat kahvit."','Petri: "Sano, kun lähdetään. Vene on venelaiturilla."']);
+  M.vinkki=true;addLog('Petri kertoi, että rantamökin entinen asukas Matti asuu nyt saarella.');save();
+  say(['Sinä: "Kuka rantamökillä asui ennen? Löysin sieltä jotain, mikä kuuluu Matille."','Petri: "Mattihan siellä ennen asui. Nykyään pienellä saarella, Vattulan edustalla."','Petri: "Käyn välillä viemässä hänelle tavaraa. Voin ottaa sinut mukaan."'],
+    ()=>questNote('Tehtävä päivittyi','Lähde Petrin kanssa Matin saarelle'));}
+/* venekyyti: Petri soutaa venelaiturilta saarelle ja takaisin. Petri näkyy aina vain yhdessä paikassa. */
+let BOAT=null,COFFEE=false;
+function lahdeSaarelle(){say('Petri: "Mennään. Vene on venelaiturilla, ja Matin postit ovat jo repussa."',()=>fadeTo(()=>{S.scene='laituri';useMap('laituri');S.time=Math.min(1439,S.time+MATTI_MATKA_MIN);
+    BOAT={dir:'out',x:10*TS,y:9*TS,t:0,v:0};placePlayer(9,8,'down');groundDirty=true;AUTO=null;hud();save();},()=>{mode='cutscene';}));}
+function updateBoat(){const B=BOAT;if(!B||B.fading)return;B.t++;
+  if(frame%7===0)PARTS.push({x:B.x+6+Math.random()*24,y:B.y+(B.dir==='out'?4:96),vx:(Math.random()-.5)*.3,vy:0,life:0,max:40,c:'#e6f6fc',s:1});
+  if(B.dir==='out'){if(B.t>30){B.v=Math.min(B.v+.03,1.3);B.y+=B.v;if(B.t%40===0)blip(180,.04,'triangle',.02);}
+    if(B.y>YH*TS-70){B.fading=true;fadeTo(()=>{BOAT=null;goSaari();},saariPerilla);}}
+  else{B.v=Math.max(.35,Math.min(1.3,(B.y-9*TS)/60));B.y-=B.v;if(B.t%40===0)blip(180,.04,'triangle',.02);
+    if(B.y<=9*TS){BOAT=null;mode='world';placePlayer(9,8,'up');save();say('Petri: "Perillä. Minä käännän veneen. Maukka odottaa jo kotona."');}}}
+function drawBoat(){const B=BOAT;if(!B)return;const sp=SPR.soutuvene,x=Math.round(B.x+16-sp.width/2),y=Math.round(B.y)+(B.t%40<20?0:1);ctx.drawImage(sp,x,y);
+  const key=k=>{if(!SITC[k.key])SITC[k.key]=makeSitChar(k.L);return SITC[k.key];};
+  const pc=key({key:JSON.stringify(RAIMO_LOOK),L:RAIMO_LOOK}),me=key({key:JSON.stringify(charL(S.look)),L:charL(S.look)});
+  ctx.drawImage(pc,0,0,40,40,x+sp.width/2-20,y+8,40,40);ctx.drawImage(me,0,0,40,38,x+sp.width/2-20,y+46,40,38);
+  const ao=Math.sin(B.t/9)*4;R(ctx,x-6,y+40+ao,10,2,'#8a6440');R(ctx,x+sp.width-4,y+40-ao,10,2,'#8a6440');}
+function goSaari(){S.scene='matti';useMap('matti');placePlayer(8,10,'up');groundDirty=true;hud();save();}
+function saariPerilla(){const M=mattiQ();if(M.saari)return say('Petri: "Minä odotan veneellä. Sano, kun lähdetään."');
+  M.saari=true;addLog('Petri souti minut Matin saarelle.');save();
+  say(['Pieni saari: kallioita, muutama koivu ja siisti mökki kuisteineen. Kaislikossa kahisee.','Petri: "Tässä se on. Minä odotan veneellä. Sano, kun lähdetään."'],()=>questNote('Tehtävä päivittyi','Palauta kirjeet Matille'));}
+function paluuKysy(){ask('Petri: "Lähdetäänkö takaisin Vattulaan? Vene on valmiina."',['Palaa Vattulaan','Jäädään vielä'],i=>{if(i===0)palaaVattulaan();});}
+function palaaVattulaan(){fadeTo(()=>{S.scene='laituri';useMap('laituri');S.time=Math.min(1439,S.time+MATTI_MATKA_MIN);BOAT={dir:'in',x:10*TS,y:YH*TS-40,t:0,v:1.3};placePlayer(9,8,'up');groundDirty=true;AUTO=null;hud();save();},()=>{mode='cutscene';});}
+/* Matti */
+const MATTI_JUTUT=['Matti: "Järvi on tänään peilityyni. Sellaisina päivinä kuulee, kun kylässä kolahtaa ovi."',
+  'Matti: "Kaislikossa pesii kaakkuri. Huonompi naapuri kuin Petri, mutta laulaa paremmin."',
+  'Matti: "Olin nuorena laivoilla konemiehenä. Näin satamia, joiden nimiä en osaa vieläkään lausua."',
+  'Matti: "Talvella pääsee jäitse kylään. Kesällä odotan Petriä ja hänen venettään. Kumpikaan ei kiirehdi."',
+  'Matti: "Korjaan verkkoja, vaikka kalastan enää harvoin. Kädet tykkäävät tehdä jotain."',
+  'Matti: "Petri tuo postin ja kylän kuulumiset. Postista pidän enemmän, mutta älä kerro hänelle."',
+  'Matti: "Leivoin eilen ruisleipää. Ensimmäistä kertaa kuuteenkymmeneen vuoteen se onnistui."'];
+function mattiTalk(){const M=mattiQ();
+  if(!M.tavattu){M.tavattu=true;addLog('Tapasin Matin hänen saarellaan.');save();
+    return say(['Kuistin portailla seisoo iäkäs mies kahvikuppi kädessä. Neule on kulunut kyynärpäistä.','Matti: "Petri toi vieraan. Harvinaista. Minä olen Matti. Tervetuloa saarelle."'],mattiMenu);}
+  if(M.palautettu&&!M.valmis)return mattiJatka();
+  mattiMenu();}
+function mattiMenu(){const M=mattiQ(),o=[],a=[];
+  if(!M.palautettu&&(S.inv.kirjeet||0)>0){o.push('Palauta kirjeet');a.push(palautaKirjeet);}
+  o.push('Jutellaan');a.push(()=>say(M.valmis?nextLine('matti',MATTI_JUTUT):'Matti: "Täällä on hiljaista. Petri sanoo, että liian hiljaista. Minusta juuri sopivasti."'));
+  o.push('Hei hei');a.push(()=>{});
+  ask(M.valmis?'Matti istuu kuistilla. Kahvipannu on lämpimänä.':'Matti katsoo sinua kuistilta ystävällisesti.',o,i=>a[i]());}
+function palautaKirjeet(){const M=mattiQ();if(M.palautettu)return mattiJatka();
+  M.palautettu=true;M.kesk=0;S.inv.kirjeet=0;addLog('Palautin kirjeet Matille.');save();
+  say(['Sinä: "Löysin nämä rantamökiltä. Ajattelin, että ehkä haluaisit ne takaisin."','Matti ottaa nipun käsiinsä varovasti, kuin se voisi hajota.','Matti: "Minä luulin näiden jo kadonneen."'],mattiJatka);}
+function mattiJatka(){const M=mattiQ(),k=M.kesk||0;
+  if(k===0)return say(['Matti: "Ilmari kirjoitti kauniisti. Puhui yleensä paljon vähemmän."','Sinä: "Hauskaa! Minun vaarinkin nimi oli Ilmari!"'],()=>{M.kesk=1;save();mattiJatka();});
+  if(k===1)return say(['…','Matti hiljenee ja silittää kirjeen taitosta.','Matti: "Sinäkö olet sen mummon mökin perheen lapsenlapsi? Kuulin, että mökillä asuu nyt nuori."',
+      'Sinä: "Olen. Mummo muutti kaupunkiin, ja nyt minä asun mökillä."','Matti nyökkää hitaasti. Hän ottaa neuleensa taskusta vanhan valokuvan.'],()=>{M.kesk=2;save();mattiJatka();});
+  if(k===2)return showPhoto(ilmariKuvaHtml(),()=>say(['Sinä: "Tuo on vaari."'].concat(S.unlocked&&S.unlocked.villapaita?['Sinä: "Minä löysin tuon saman villapaidan mummon mökiltä."']:[]).concat(
+      ['Matti: "Minä rakastin häntä. Hän rakasti minua."','Matti: "Hän ei lähtenyt. Minä en enää osannut jäädä odottamaan."','Matti: "Tulin tänne. Ei elämä tähän loppunut, vaikka silloin siltä tuntui."',
+       'Matti: "Ehdin sen jälkeen seilata, rakentaa tämän mökin ja oppia leipomaan. Hyvä elämä tämäkin."']),()=>{M.kesk=3;M.paljastus=true;save();mattiJatka();}));
+  ask('Matti: "Kiitos, että toit ne kotiin. Keitänkö kahvit?"',['Jään mielelläni.','Tulen toiste.'],i=>{
+    M.valmis=true;M.kahvi=i===0;addLog('Vein kirjeet Matille. Opin vaarista jotain, mitä en ennen tiennyt.');save();
+    const palkinto=()=>{questNote('Tehtävä valmis','Myrskyluodon Matti',200,true);award('matti',MATTI_XP,'Myrskyluodon Matti');};
+    if(i===0)kahvihetki(palkinto);else say('Matti: "Tule silloin, kun siltä tuntuu. Pannu on täällä aina."',palkinto);});}
+function kahvihetki(done){fadeTo(()=>{COFFEE=true;},()=>say(['Istutte kuistin penkillä. Kahvi on vahvaa, ja kupin reunassa on pieni lohkeama.','Järvi lepää tyynenä. Kaislikon reunassa ui sorsa poikasineen.',
+    'Matti: "Ennen join kahvia yksin. Nykyään käy Petri, ja nyt sinä. Pitää kai ostaa kolmas kuppi."','Kumpikaan ei sano hetkeen mitään. Se tuntuu hyvältä.'],()=>fadeTo(()=>{COFFEE=false;},done)),.05);}
+let ILMARI_URL=null;
+function makeIlmariKuva(){const p=mk(40,40,g=>drawPortrait(g,{hair:0,hairC:0,skin:0,eye:3,top:5,glasses:0}));
+  return mk(100,108,g=>{R(g,0,0,100,108,'#f2ead6');g.imageSmoothingEnabled=false;g.drawImage(p,0,0,40,40,10,10,80,80);
+    g.globalAlpha=.18;R(g,10,10,80,80,'#e8a050');g.globalAlpha=.1;R(g,10,10,80,4,'#5a4a3a');R(g,10,86,80,4,'#5a4a3a');g.globalAlpha=1;
+    R(g,10,10,80,1,'#d8ccb0');R(g,10,89,80,1,'#d8ccb0');for(let i=0;i<22;i++)P(g,6+Math.floor(hash(i,7,97)*88),4+Math.floor(hash(i,8,97)*100),'#e2d6bc');
+    for(let i=0;i<26;i++)if(hash(i,9,97)<.8)P(g,37+i,98+Math.round(Math.sin(i*1.3)),'#4a5a8a');});}
+function ilmariKuvaHtml(){if(!ILMARI_URL)ILMARI_URL=makeIlmariKuva().toDataURL();
+  return '<div class="ptitle">Matin valokuva</div><div class="kuva"><img style="max-width:calc(var(--s)*110px)" alt="Vanha valokuva: nuori Ilmari villapaidassa" src="'+ILMARI_URL+'"></div><p class="kuvateksti">Nuori mies tummansinisessä villapaidassa. Kuvan alareunassa lukee lyijykynällä: Ilmari.</p><div class="foot">A jatka</div>';}
+function showPhoto(html,cb){kuvaCb=cb;showPanel(html,'kuva');}
 
 /* ---------- kylätilaukset (v0.40, testipalkinnot) ---------- */
 const ORDERS=[{id:'porkkana',n:'Porkkanoita Mandin grillille',item:'porkkana',q:3,u:'porkkanaa',to:'Mandi',paikka:'Mandin grilli',mk:20,xp:'tilausP'},
@@ -2952,6 +3087,14 @@ function interactYard(fx,fy){
       if(!S.flags.planks){S.flags.planks=true;S.inv.lautoja+=8;const k2=kv();save();return say(['Vajassa on siisti pino lautoja. Vaari on varannut ne johonkin.','Otit 8 lautaa. Niistä saisi kuistin!'].concat(k2?['Seinällä roikkuu vaarin kirves, ja nurkassa on '+POLLI_ALKU+' pölliä. Otit ne mukaan.']:[]),()=>{task('laudat');if(k2)toast('Vaarin kirves ja '+POLLI_ALKU+' pölliä reppuun');});}
       if(kv())return say(['Vajan seinällä roikkuu vaarin kirves. Terä on yhä terävä.','Nurkassa on '+POLLI_ALKU+' koivupölliä. Otit kirveen ja pöllit mukaan. Hakkuupölkky on vajan edessä.'],()=>toast('Vaarin kirves ja '+POLLI_ALKU+' pölliä reppuun'));
       return say('Vajassa tuoksuu pihka ja vanha öljy. Hyllyllä on purkki ruosteisia nauloja ja vaarin lippalakki.');}
+    case 'irtolauta':return irtolautaInteract();
+    case 'matti':return mattiTalk();
+    case 'petrisaari':return paluuKysy();
+    case 'mvene':return paluuKysy();
+    case 'mpenkki':return ask('Matin penkki kuistin vieressä. Kahdelle hyvä, kolmelle ahdas.',['Istu hetkeksi','Peru'],i=>{if(i===0)istu(fx,fy);});
+    case 'kahvipoyta':return say(mattiQ().valmis?'Kahvipannu ja kaksi kuppia. Toinen kupeista on nyt vähän kuin sinun.':'Pieni pöytä, sinireunainen kahvipannu ja kaksi kuppia.');
+    case 'kaisla':return say('Kaislikko kahisee. Jossain sen sisällä nokittelee sorsa.');
+    case 'mhouse':return say('Matin mökki. Pieni ja siisti. Ikkunalaudalla kukkii pelargoni, ja kuistin lankut on vastikään öljytty.');
     case 'gpenkki':return ask('Puutarhapenkki '+penkkiPaikka().n+'. Puu on vielä vaalea ja tuoksuu sahalle.',['Istu hetkeksi','Peru'],i=>{if(i===0)istu(fx,fy);});
     case 'grill':if(S.inv.makkara<=0)return say('Grilli on valmiina. Makkarat ovat tuvan kylmälaukussa.');
       return ask('Grillataanko makkara?',['Grillataan','Ei vielä'],i=>{if(i===0)startGrill();});
@@ -3033,6 +3176,7 @@ function interactYard(fx,fy){
   if(ch==='x')return say(S.scene==='laituri'?'Polku vie takaisin metsäpolulle.':S.scene==='polku'?(fx===0?'Sivupolku vie Petrin pihalle.':fx===13?'Polku vie venelaiturille.':'Polku jatkuu Vattulan kylään.'):S.scene==='raimo'?'Polku vie takaisin metsäpolulle.':'Tie vie metsäpolulle ja sieltä Vattulaan. Kävele etelään.');
   if(ch==='I')return say(['Mökkisaari keskellä Vattulanjärveä.','Sinne pääsee vain veneellä.']);
   if(ch==='o')return S.scene==='rtupa'?exitRtupa():exitJaska();
+  if(ch==='P'&&S.scene==='matti')return paluuKysy();
   if(ch==='P')return say('Laiturin lankut narisevat. Vesi läikehtii paalujen välissä.');
   if(ch==='w')return say(S.scene==='laituri'?['Vattulanjärven selkä aukeaa laiturin päästä.','Jossain tuolla on mökkisaari. Sinne pääsee vain veneellä.']:S.scene==='ranta'?'Vesi on kirkasta. Hiekkapohja jatkuu pitkälle, hyvä uimapaikka.':'Vattulanjärvi kimmeltää. Jossain tuolla on ranta, joka voi tulla myyntiin.');}
 function gameNow(){return S.day*1440+S.time;}
@@ -3113,7 +3257,7 @@ function dcAt(x,y){if(decor.ctx==='tupa')return S.furn.find(f=>isVase(f.t)&&f.x=
 function terraceReserved(){const po=S.porch||{},P2='Portaille pitää jättää kulkutilaa.';
   if(po.side==='etu')return {'10,7':'Oven eteen pitää jättää tilaa.','10,8':P2,'8,7':'Kukkaruukku on tiellä.','12,7':'Kuistin penkki on tiellä.'};
   if(po.side==='länsi')return {'5,5':P2,'5,6':P2};return {'15,5':P2,'15,6':P2};}
-function rtReserved(){const sd=rantaR().veranta,V='Verannan oviaukkoon pitää jättää kulkutilaa.',r={'8,7':'Oven eteen pitää jättää tilaa.'};
+function rtReserved(){const sd=rantaR().veranta,V='Verannan oviaukkoon pitää jättää kulkutilaa.',r={'8,7':'Oven eteen pitää jättää tilaa.','9,7':'Irtonaisen seinälaudan eteen pitää jättää tilaa.'};
   if(sd==='ita'){r['12,5']=V;r['13,5']=V;r['14,5']=V;}if(sd==='lansi'){r['4,5']=V;r['3,5']=V;r['2,5']=V;}return r;}
 function placeReason(f){const D=decor,[w,h]=dims(f),B=dcBounds();
   if(D.ctx==='ranta'){if(f.x<B.x0||f.y<B.y0||f.x+w-1>B.x1||f.y+h-1>B.y1)return 'Seinä tulee vastaan.';const res=rtReserved(),G=MAPS.rtupa.grid;
@@ -3321,7 +3465,7 @@ function titlePress(b){const o=titleOpts();
   if(b==='up'||b==='down'){titleSel=(titleSel+(b==='up'?-1:1)+o.length)%o.length;blip(660,.03);renderTitle();return;}
   if(b==='b'&&titleConfirm){titleConfirm=false;titleSel=0;renderTitle();return;}
   if(b!=='a'&&b!=='start')return;blip(990,.06);const ch=o[titleSel];
-  if(ch==='Jatka'){if(TITLE_REAL){S.scene=TITLE_REAL;TITLE_REAL=null;}if(XP_HYVITYS){const t=XP_HYVITYS;XP_HYVITYS=null;setTimeout(()=>{toast(t);hud();},600);}mode='world';renderTitle();useMap(S.scene);groundDirty=true;placePlayer(S.px,S.py,S.dir);if(S.scene!=='tupa'&&solid(S.px,S.py)){const sp={piha:[10,9],kyla:[18,15],polku:[7,1],raimo:[7,6],sieni:[8,14],laituri:[5,4],ranta:[3,23],jaska:[4,7],rtupa:[8,6]}[S.scene]||[10,9];placePlayer(sp[0],sp[1],'down');}CH=buildChar(S.look);hud();return;}
+  if(ch==='Jatka'){if(TITLE_REAL){S.scene=TITLE_REAL;TITLE_REAL=null;}if(XP_HYVITYS){const t=XP_HYVITYS;XP_HYVITYS=null;setTimeout(()=>{toast(t);hud();},600);}mode='world';renderTitle();useMap(S.scene);groundDirty=true;placePlayer(S.px,S.py,S.dir);if(S.scene!=='tupa'&&solid(S.px,S.py)){const sp={piha:[10,9],kyla:[18,15],polku:[7,1],raimo:[7,6],sieni:[8,14],laituri:[5,4],ranta:[3,23],jaska:[4,7],rtupa:[8,6],matti:[8,10]}[S.scene]||[10,9];placePlayer(sp[0],sp[1],'down');}CH=buildChar(S.look);hud();return;}
   if(ch==='Uusi peli'&&S.started){titleConfirm=true;titleSel=1;renderTitle();return;}
   if(ch==='Peru'){titleConfirm=false;titleSel=0;renderTitle();return;}
   // uusi peli
@@ -3427,7 +3571,7 @@ function drawHare(){const H=HARE;if(!H)return;const ph=H.t%26,hop=ph<16?Math.rou
   ell(ctx,X(5),y-3,3,3,body);P(ctx,X(7),y-3,'#1a1410');P(ctx,X(8),y-2,dark);
   R(ctx,X(3),y-11,1,8,dark);R(ctx,X(5),y-10,1,7,body);P(ctx,X(3),y-11,'#2a2018');P(ctx,X(5),y-10,'#2a2018');
   ell(ctx,X(-6),y-1,2,2,'#f2efe6');ctx.globalAlpha=1;}
-function update(){frame++;if(mode==='mg')mgUpdate();updateHare();updQbar();updTall();updateQuest();if(mode==='cutscene')updateBus();checkReitti();if(S&&S.scene==='raimo')updateDog();
+function update(){frame++;if(mode==='mg')mgUpdate();updateHare();updQbar();updTall();updateQuest();if(mode==='cutscene'){updateBus();updateBoat();}checkReitti();if(S&&S.scene==='raimo')updateDog();
   if(saunaSmoke>0){saunaSmoke--;if(S.scene==='piha'&&frame%9===0){const so=YOBJ.find(o=>o.k==='sauna');if(so&&SPR.saunaB){const [x0,y0]=sprPos(SPR.saunaB,so);PARTS.push({x:x0+76+Math.random()*4,y:y0+8,vx:.2+Math.random()*.1,vy:-.45,life:0,max:170,c:'#eeeeea',s:1,smoke:true});}}}
   if(frame%30===0){growPlants();updatePlantHint();if(S&&S.started&&mode==='world')kukkaCheck();}
   if((mode==='world'||mode==='sit')&&frame%60===0&&S.time<1439){S.time++;hud();}
@@ -3448,14 +3592,14 @@ function update(){frame++;if(mode==='mg')mgUpdate();updateHare();updQbar();updTa
 
 /* ---------- piirto (HD) ---------- */
 function drawSpr(c,o){const [x,y]=sprPos(c,o);dS(ctx,c,x,y);}
-function drawObj(o){if(o.tf&&decor&&decor.held&&decor.src===o.ref)return;if(o.k==='rf'){if(decor&&decor.held&&decor.src===o.ref)return;drawFurn(ctx,o.ref,o.ref.x*TS,o.ref.y*TS);return;}if(objHidden(o))return;if(o.k==='jänis')return;if(o.k==='maukka')return drawDog(o);if(o.k==='tuoppi'){const [x0,y0]=sprPos(SPR.tuoppi,o);dS(ctx,SPR.tuoppi,x0,y0-31);return;}const c=sprFor(o);if(!c)return;drawSpr(c,o);
+function drawObj(o){if(BOAT&&o.k==='soutuvene'&&S.scene==='laituri'&&o.x===10&&o.y===9)return;if(o.tf&&decor&&decor.held&&decor.src===o.ref)return;if(o.k==='rf'){if(decor&&decor.held&&decor.src===o.ref)return;drawFurn(ctx,o.ref,o.ref.x*TS,o.ref.y*TS);return;}if(objHidden(o))return;if(o.k==='jänis')return;if(o.k==='maukka')return drawDog(o);if(o.k==='tuoppi'){const [x0,y0]=sprPos(SPR.tuoppi,o);dS(ctx,SPR.tuoppi,x0,y0-31);return;}const c=sprFor(o);if(!c)return;drawSpr(c,o);
   if(o.tikka){const [x0,y0]=sprPos(c,o),bx=x0+35,by=y0+72;P(ctx,bx,by-9,'#8a8e98');
     ell(ctx,bx,by,7,7,'#2a2320');ell(ctx,bx,by,6,6,'#1f5a3a');ell(ctx,bx,by,5,5,'#e8dcc0');ell(ctx,bx,by,4,4,'#c0443a');ell(ctx,bx,by,3,3,'#e8dcc0');ell(ctx,bx,by,2,2,'#1f5a3a');P(ctx,bx,by,'#c0443a');
     for(let a=0;a<8;a++){const an=a/8*Math.PI*2;P(ctx,bx+Math.round(Math.cos(an)*5),by+Math.round(Math.sin(an)*5),'#2a2320');}
     for(const d of DARTS){const dx=bx+d[0],dy=by+d[1];R(ctx,dx,dy,1,1,'#3a3a40');R(ctx,dx+1,dy+1,2,1,'#6a6a72');R(ctx,dx+3,dy+2,2,2,d[2]);}}
   if(o.k==='grill'&&grilling>0){const [x,y]=sprPos(c,o);R(ctx,x+6,y+14,28,1,(frame>>2)%2?'#e8762c':'#f4a040');
     for(const sx of [10,21]){R(ctx,x+sx,y+10,10,4,'#7a2e1c');R(ctx,x+sx,y+10,10,1,'#c05a30');P(ctx,x+sx+3,y+11,'#e08a58');}}}
-function drawPlayer(){if(!CH)return;if(mode==='sit'&&SIT){drawSitter(charL(S.look),SIT.o,SIT.i);return;}const prog=Math.abs(PL.px-PL.x*TS)+Math.abs(PL.py-PL.y*TS);
+function drawPlayer(){if(!CH)return;if(BOAT)return;if(COFFEE){const b=YOBJ.find(o=>o.k==='mpenkki');if(b){drawSitter(charL(S.look),b,0);return;}}if(mode==='sit'&&SIT){drawSitter(charL(S.look),SIT.o,SIT.i);return;}const prog=Math.abs(PL.px-PL.x*TS)+Math.abs(PL.py-PL.y*TS);
   const fi=PL.moving&&prog<16?(PL.parity?1:2):0;const x=Math.round(PL.px),y=Math.round(PL.py);
   ell(ctx,x+17,y+29,10,2,'rgba(14,52,70,.35)');const blink=!PL.moving&&PL.dir!=='up'&&(frame%250)<7;if(HDV){const c=hdPlayer()[PL.dir][blink?3:fi];dS(ctx,c,x+16-c.width/4,y+30-c.bot-1);return;}ctx.drawImage(CH[PL.dir][blink?3:fi],x-3,y-24);}
 function draw(){
@@ -3466,6 +3610,7 @@ function draw(){
   if(mode==='build'&&build){const c=build.cands[build.i];fx=(c.x+c.w/2)*TS;fy=(c.y+c.h/2)*TS;}
   if(mode==='keittio'&&kk){const c=kk.cands[kk.i];fx=(c.x+c.w/2)*TS;fy=(c.y+c.h/2)*TS;}
   if(mode==='penkki'&&pk){const c=pk.cands[pk.i];fx=(c.x+1)*TS;fy=(c.y+.5)*TS;}
+  if(BOAT){fx=BOAT.x+16;fy=BOAT.y+50;}
   if(mode==='veranta'&&vrt){const c=vrt.cands[vrt.i];fx=(c.x+c.w/2)*TS;fy=(c.y+c.h/2)*TS;}
   if(mode==='terrace'&&terr){fx=(terr.rect.x+terr.rect.w/2)*TS;fy=(terr.rect.y+terr.rect.h/2)*TS;}
   if(mode==='paint'){fx=10*TS+16;fy=5*TS+16;}
@@ -3482,7 +3627,7 @@ function draw(){
     if(sc==='rtupa'&&rantaR()){const RL=rantaR().furn||[];for(const f of RL.filter(q=>isRug(q.t)))if(!(decor&&decor.held&&decor.src===f))drawFurn(ctx,f,f.x*TS,f.y*TS);for(const f of RL.filter(q=>isVase(q.t)))list.push({y:furnKey(f,RL),d:()=>{if(decor&&decor.held&&decor.src===f)return;drawFurn(ctx,f,f.x*TS,f.y*TS);}});}}
   else{for(const f of S.furn.filter(q=>isRug(q.t))){if(decor&&decor.held&&decor.src===f)continue;drawFurn(ctx,f,f.x*TS,f.y*TS);}for(const f of S.furn){if(decor&&decor.held&&decor.src===f)continue;if(isRug(f.t))continue;
     list.push({y:furnKey(f,S.furn),d:()=>drawFurn(ctx,f,f.x*TS,f.y*TS)});}}
-  if(!(mode==='title'&&sc==='piha'))list.push({y:mode==='sit'&&SIT?(SIT.o.y+1)*TS+.5:PL.py+TS+.5,d:drawPlayer});if(sc==='piha'&&mode==='penkki'&&pk){const c=pk.cands[pk.i];list.push({y:(c.y+1)*TS-.5,d:()=>drawPenkkiGhost(c)});}if(sc==='jaska'&&TFX.k>.05)list.push({y:4*TS+1,d:drawCandles});if(sc==='polku'&&HARE)list.push({y:(HARE.row+1)*TS-1,d:drawHare});if(BUS&&sc==='kyla')list.push({y:BUS.y+.5,d:drawBus});if(MG&&MG.kind==='fish')list.push({y:9999,d:drawFishFloat});if(sc==='piha'&&(S.kesakeittio||mode==='keittio')){const K=S.kesakeittio||kk.cands[kk.i];list.push({y:K.y*TS-1,d:()=>drawKeittio(false)},{y:(K.y+K.h)*TS+1,d:()=>drawKeittio(true)});}
+  if(!(mode==='title'&&sc==='piha'))list.push({y:mode==='sit'&&SIT?(SIT.o.y+1)*TS+.5:PL.py+TS+.5,d:drawPlayer});if(BOAT&&sc==='laituri')list.push({y:BOAT.y+102,d:drawBoat});if(COFFEE&&sc==='matti'){const b=YOBJ.find(o=>o.k==='mpenkki');if(b)list.push({y:(b.y+1)*TS+.6,d:()=>drawSitter(MATTI_LOOK,b,1)});}if(sc==='piha'&&mode==='penkki'&&pk){const c=pk.cands[pk.i];list.push({y:(c.y+1)*TS-.5,d:()=>drawPenkkiGhost(c)});}if(sc==='jaska'&&TFX.k>.05)list.push({y:4*TS+1,d:drawCandles});if(sc==='polku'&&HARE)list.push({y:(HARE.row+1)*TS-1,d:drawHare});if(BUS&&sc==='kyla')list.push({y:BUS.y+.5,d:drawBus});if(MG&&MG.kind==='fish')list.push({y:9999,d:drawFishFloat});if(sc==='piha'&&(S.kesakeittio||mode==='keittio')){const K=S.kesakeittio||kk.cands[kk.i];list.push({y:K.y*TS-1,d:()=>drawKeittio(false)},{y:(K.y+K.h)*TS+1,d:()=>drawKeittio(true)});}
   list.sort((a,b)=>a.y-b.y).forEach(o=>o.d());
   if(sc==='piha'){const w=(frame>>3)%2,bx=Math.round(BF.x),by=Math.round(BF.y);P(ctx,bx,by,'#2a1d24');P(ctx,bx,by+1,'#2a1d24');
     if(w){R(ctx,bx-3,by-2,3,3,'#fff6e8');R(ctx,bx+1,by-2,3,3,'#fff6e8');P(ctx,bx-3,by-2,'#f4c8d8');}else{R(ctx,bx-1,by-3,1,3,'#fff6e8');R(ctx,bx+1,by-3,1,3,'#fff6e8');}}
