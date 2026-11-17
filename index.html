@@ -78,7 +78,7 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
 #mg .mgbar{position:relative;height:calc(var(--s)*8px);background:#3a2a1e;border-radius:calc(var(--s)*2px);margin:calc(var(--s)*3px) 0;overflow:hidden}
 #mg .mgbar .zone{position:absolute;top:0;bottom:0;background:#4f8a4a}
 #mg .mgbar .mark{position:absolute;top:calc(var(--s)*-1px);bottom:calc(var(--s)*-1px);width:calc(var(--s)*2px);margin-left:calc(var(--s)*-1px);background:#f4d35e;box-shadow:0 0 calc(var(--s)*2px) #f4d35e}
-#mg .mgbtns{display:flex;gap:calc(var(--s)*3px)}
+#mg .mgcv{display:block;margin:calc(var(--s)*2px) auto;width:calc(var(--s)*66px);height:calc(var(--s)*66px);image-rendering:pixelated}#mg .mgsc{display:flex;justify-content:center;gap:calc(var(--s)*4px);font-size:calc(var(--s)*6px);color:#f4d35e}#mg .mgbtns{display:flex;gap:calc(var(--s)*3px)}
 #mg button{font:inherit;font-size:calc(var(--s)*7px);border:0;border-radius:calc(var(--s)*2px);padding:calc(var(--s)*3px) calc(var(--s)*4px);cursor:pointer}
 #mg .mgA{flex:2;background:#3f6b4a;color:#fff;font-weight:600}#mg .mgA.hot{background:#c8862e}
 #mg .mgB{flex:1;background:#e6d8b8;color:#3a2a1c}
@@ -266,7 +266,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.49</div>
+        <div class="sub">mummon mökki · versio 0.50</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -368,7 +368,10 @@ const PENKKI_NEED={lautoja:3,naulat:2};
 /* ---------- v0.44 testiarvot: Myrskyluodon Matti ---------- */
 /* v0.47: pelikello – yksi peliminuutti kuluu AIKA_FRAMET ruudun välein (60 = 1 s; 40 = 1,5 × nopeampi). Pelipäivä klo 7–24 ≈ 11 min. */
 const AIKA_FRAMET=40;
-const UINTI_MIN=20,UINTI_XP=5; /* v0.48 testiarvot: uimaranta */
+const UINTI_MIN=20,UINTI_XP=5;
+/* v0.50 testiarvot: tikkaminipeli */
+const TIKKA_HEILUNTA=.62,TIKKA_NOPEUS=1,TIKKA_HAJONTA=.045,TIKKA_TAVOITE=100,TIKKA_XP=10;
+const TIKKA_SEKTORIT=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5]; /* v0.48 testiarvot: uimaranta */
 const MATTI_XP=20,MATTI_MATKA_MIN=15;
 /* ---------- v0.45 testiarvot: saunojen sisätilat ja rantasauna ---------- */
 /* ---------- v0.46 testihinnat: uudet ostettavat tuotteet (yhteiset tuotetiedot) ---------- */
@@ -378,7 +381,7 @@ const TUOTE={sadetakki:{n:'Keltainen sadetakki',p:8,kind:'vaate',lock:'sadetakki
 const KAUPPA_TAVARAT=['sadetakki','sivupoyta','kansituoli'];
 const SAUNA_LAMPO_MIN=45,SAUNA_KUUMA_MIN=180,RSAUNA_NEED={lautoja:8,naulat:4,kiuas:1},RSAUNA_XP=15;
 const PENKKI_CANDS=[{n:'takapihan koivun luona',x:10,y:1,w:2,h:1},{n:'kukkapenkin vieressä',x:15,y:13,w:2,h:1},{n:'saunapolun varrella',x:7,y:13,w:2,h:1}];
-const XP_KEYS={uinti:5,rsauna:15,matti:20,kortti:15,halko:5,kala:5,sato:10,myynti:10,kuisti:10,maalaus:10,sauna:20,loylyt:5,maistaminen:5,raimo:10,sieni:5,terassi:15,keittio:20,tilausP:10,tilausK:10};
+const XP_KEYS={tikka:10,uinti:5,rsauna:15,matti:20,kortti:15,halko:5,kala:5,sato:10,myynti:10,kuisti:10,maalaus:10,sauna:20,loylyt:5,maistaminen:5,raimo:10,sieni:5,terassi:15,keittio:20,tilausP:10,tilausK:10};
 let XP_HYVITYS=null;
 const SAVE_KEY='mokki-v01';
 function migrate(s){s.inv=s.inv||{};s.inv.maali=s.inv.maali||0;s.money=s.money||0;s.log=s.log||[];s.flags=s.flags||{};s.tasks=s.tasks||{};if(s.look&&s.look.glasses==null)s.look.glasses=0;
@@ -676,11 +679,11 @@ function onkiInteract(o){if(curLevel()<KALA_TASO)return say('Laiturin päässä 
   ask('Saalismahdollisuuksia '+K.n+'/'+KALA_MAX+'. Vesi on tyyni.',['Ongi','Peru'],i=>{if(i===0)mgStart('fish',o);});}
 function mgStart(kind,o){MG={kind,o,st:kind==='chop'?'aim':'wait',pos:0,dir:1,t:kind==='fish'?KALA_ODOTUS[0]+Math.floor(Math.random()*(KALA_ODOTUS[1]-KALA_ODOTUS[0])):0,msg:''};mode='mg';mgRender();}
 function mgClose(){MG=null;$('#mg').classList.add('hide');mode='world';}
-function mgUpdate(){if(!MG)return;const M=MG;
+function mgUpdate(){if(!MG)return;const M=MG;if(M.kind==='darts')return tikkaUpdate();
   if(M.kind==='chop'&&M.st==='aim'){M.pos+=M.dir*HAKKUU_NOPEUS;if(M.pos>=1){M.pos=1;M.dir=-1;}if(M.pos<=0){M.pos=0;M.dir=1;}const mk=$('#mg .mark');if(mk)mk.style.left=(M.pos*100)+'%';}
   if(M.kind==='fish'){if(M.st==='wait'&&--M.t<=0){M.st='bite';M.t=KALA_REAKTIO;blip(520,.06);blip(780,.05);mgRender();}
     else if(M.st==='bite'&&--M.t<=0){M.st='res';M.msg='Koho nousi takaisin pintaan. Kala ehti karata.';mgRender();}}}
-function mgAction(){const M=MG;if(!M)return;
+function mgAction(){const M=MG;if(!M)return;if(M.kind==='darts')return tikkaAction();
   if(M.kind==='chop'){
     if(M.st==='aim'){if(M.pos>=HAKKUU_ZONE[0]&&M.pos<=HAKKUU_ZONE[1]){S.inv.polli--;S.inv.klapi=(S.inv.klapi||0)+KLAPI_PER_POLLI;const first=!S.xpGot||!S.xpGot.halko;
         if(first){S.xpGot=S.xpGot||{};S.xpGot.halko=true;addLog('Hakkasin ensimmäiset halot vaarin kirveellä.');addXP(HALKO_XP,'+'+HALKO_XP+' XP · Ensimmäiset halot');}else save();hud();
@@ -697,7 +700,7 @@ function mgAction(){const M=MG;if(!M)return;
       jingle();addXP(1+(first?EKA_KALA_XP:0),'1 '+sp.n+' · +1 XP'+(first?' · +'+EKA_KALA_XP+' XP ensimmäinen kala':''));
       M.st='res';M.msg=sp.N+'! Nostit kalan reppuun. Saalismahdollisuuksia '+K.n+'/'+KALA_MAX+'.';mgRender();return;}
     if(M.st==='res'){const K=kalaSync();if(K.n<=0){M.msg='Kalaparvi taisi siirtyä kauemmas. Kokeile uudelleen noin '+kalaMinLeft()+' minuutin päästä.';mgRender();return;}mgStart('fish',M.o);return;}}}
-function mgRender(){const el=$('#mg'),M=MG;if(!M){el.classList.add('hide');return;}el.classList.remove('hide');let h='';
+function mgRender(){const el=$('#mg'),M=MG;if(!M){el.classList.add('hide');return;}el.classList.remove('hide');let h='';if(M.kind==='darts')return tikkaRender();
   if(M.kind==='chop'){h='<div class="mgt">Halkominen · pöllejä '+(S.inv.polli||0)+'</div><div class="mgbar"><i class="zone" style="left:'+HAKKUU_ZONE[0]*100+'%;width:'+(HAKKUU_ZONE[1]-HAKKUU_ZONE[0])*100+'%"></i><i class="mark" style="left:'+M.pos*100+'%"></i></div>';
     h+='<div class="mgmsg">'+(M.msg||'Napauta Hakkaa, kun merkki on vihreällä alueella.')+'</div><div class="mgbtns"><button class="mgA">'+(M.st==='aim'?'Hakkaa':M.st==='fail'?'Yritä uudelleen':(S.inv.polli||0)>0?'Seuraava pölli':'Valmis')+'</button><button class="mgB">'+(M.st==='ok'?'Lopeta':'Peru')+'</button></div>';}
   else{const K=kalaSync();h='<div class="mgt">Onkiminen · saalismahdollisuuksia '+K.n+'/'+KALA_MAX+'</div>';
@@ -2885,6 +2888,39 @@ function throwDarts(){const sc=[];DARTS.length=0;const cols=['#e8443a','#f4d35e'
   if(tot>best){S.flags.tikkaEnnatys=tot;save();pg.push('Yhteensä '+tot+' pistettä. Uusi ennätys!');}else pg.push('Yhteensä '+tot+' pistettä. Ennätys on '+best+'.');
   say(pg);}
 
+/* ---------- tikkaminipeli (v0.50) ---------- */
+function tikkaInteract(){const best=S.flags.tikkaEnnatys||0;ask('Tikkataulu koivun rungossa. Kolme tikkaa odottaa naulassa.'+(best?' Ennätyksesi on '+best+' pistettä.':''),['Heitä tikkaa','Peru'],i=>{if(i===0)tikkaStart();});}
+function tikkaStart(){DARTS.length=0;MG={kind:'darts',st:'aim',t:Math.floor(Math.random()*400),darts:[],msg:''};mode='mg';mgRender();}
+function tikkaAim(M){const t=M.t*TIKKA_NOPEUS,A=TIKKA_HEILUNTA;return [A*Math.sin(t*.052)+.1*Math.sin(t*.17),A*Math.sin(t*.041+1.3)+.1*Math.cos(t*.13)];}
+function tikkaPisteet(x,y){const r=Math.hypot(x,y);if(r>1)return [0,'Ohi!'];if(r<.06)return [50,'Napakymppi · 50'];if(r<.14)return [25,'Bulli · 25'];
+  let a=Math.atan2(y,x)*180/Math.PI+90+9;a=((a%360)+360)%360;const n=TIKKA_SEKTORIT[Math.floor(a/18)%20];
+  if(r>=.54&&r<.62)return [n*3,'Tripla '+n+' · '+n*3];if(r>=.92)return [n*2,'Tupla '+n+' · '+n*2];return [n,''+n];}
+function tikkaUpdate(){const M=MG;if(M.st==='aim')M.t++;tikkaDraw();}
+function tikkaAction(){const M=MG;
+  if(M.st==='aim'){const [ax,ay]=tikkaAim(M),x=ax+(Math.random()-.5)*2*TIKKA_HAJONTA,y=ay+(Math.random()-.5)*2*TIKKA_HAJONTA,[p,txt]=tikkaPisteet(x,y);
+    const cols=['#e8443a','#f4d35e','#4a8ae0'];M.darts.push({x,y,p,c:cols[M.darts.length]});DARTS.push([Math.round(x*6.5),Math.round(y*6.5),cols[M.darts.length-1]]);
+    blip(p?500+Math.min(p,60)*8:180,.05,'square',.02);M.msg='Tikka '+M.darts.length+'/3: '+txt;
+    if(M.darts.length>=3){const tot=M.darts.reduce((a,d)=>a+d.p,0),best=S.flags.tikkaEnnatys||0;M.st='res';
+      if(tot>best){S.flags.tikkaEnnatys=tot;M.msg='Yhteensä '+tot+' pistettä. Uusi ennätys!';jingle();}else M.msg='Yhteensä '+tot+' pistettä. Ennätys on '+best+'.';
+      if(!S.flags.tikkaKierros){S.flags.tikkaKierros=true;addLog('Heitin ensimmäisen tikkakierroksen koivun taululle.');}
+      save();if(tot>=TIKKA_TAVOITE)award('tikka',TIKKA_XP,'Tikkamestari: '+TIKKA_TAVOITE+' pistettä kierroksella');}
+    mgRender();return;}
+  if(M.st==='res'){tikkaStart();}}
+function tikkaRender(){const M=MG,el=$('#mg'),tot=M.darts.reduce((a,d)=>a+d.p,0);
+  let h='<div class="mgt">Tikanheitto · ennätys '+(S.flags.tikkaEnnatys||0)+'</div><canvas class="mgcv" width="112" height="112"></canvas>';
+  h+='<div class="mgsc">'+[0,1,2].map(i=>'<span>'+(M.darts[i]?M.darts[i].p:'·')+'</span>').join('')+'<span>= '+tot+'</span></div>';
+  h+='<div class="mgmsg">'+(M.msg||'Tähtäin heiluu. Napauta Heitä, kun se osuu kohdalle.')+'</div><div class="mgbtns"><button class="mgA">'+(M.st==='res'?'Uusi kierros':'Heitä')+'</button><button class="mgB">Lopeta</button></div>';
+  el.innerHTML=h;el.querySelector('.mgA').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();press('a');});el.querySelector('.mgB').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();press('b');});tikkaDraw();}
+function tikkaDraw(){const M=MG,c=$('#mg .mgcv');if(!c||!M)return;const g=c.getContext('2d'),C=56,Rr=48;g.clearRect(0,0,112,112);
+  g.fillStyle='#2a2320';g.beginPath();g.arc(C,C,55,0,6.3);g.fill();g.fillStyle='#6a4a30';g.beginPath();g.arc(C,C,55,0,6.3);g.lineWidth=2;g.strokeStyle='#4a3420';g.stroke();
+  const ring=(r0,r1,cA,cB)=>{for(let i=0;i<20;i++){const a0=(-90-9+i*18)*Math.PI/180,a1=a0+18*Math.PI/180;g.fillStyle=i%2?cB:cA;g.beginPath();g.arc(C,C,r1*Rr,a0,a1);g.arc(C,C,r0*Rr,a1,a0,true);g.closePath();g.fill();}};
+  ring(.92,1,'#c0443a','#1f5a3a');ring(.62,.92,'#2a2320','#e8dcc0');ring(.54,.62,'#c0443a','#1f5a3a');ring(.14,.54,'#2a2320','#e8dcc0');
+  g.fillStyle='#1f5a3a';g.beginPath();g.arc(C,C,.14*Rr,0,6.3);g.fill();g.fillStyle='#c0443a';g.beginPath();g.arc(C,C,.06*Rr,0,6.3);g.fill();
+  g.fillStyle='#e8dcc0';g.font='bold 7px sans-serif';g.textAlign='center';g.textBaseline='middle';for(let i=0;i<20;i++){const a=(-90+i*18)*Math.PI/180;g.fillText(TIKKA_SEKTORIT[i],C+Math.cos(a)*52,C+Math.sin(a)*52);}
+  for(const d of M.darts){const x=C+d.x*Rr,y=C+d.y*Rr;g.fillStyle='#3a3a40';g.fillRect(x-1,y-1,3,3);g.fillStyle=d.c;g.fillRect(x+1,y+1,4,3);g.fillStyle='#ffffff';g.fillRect(x,y,1,1);}
+  if(M.st==='aim'){const [ax,ay]=tikkaAim(M),x=C+ax*Rr,y=C+ay*Rr;g.strokeStyle='#ffffff';g.lineWidth=1.5;g.beginPath();g.arc(x,y,5,0,6.3);g.stroke();g.beginPath();g.moveTo(x-8,y);g.lineTo(x-3,y);g.moveTo(x+3,y);g.lineTo(x+8,y);g.moveTo(x,y-8);g.lineTo(x,y-3);g.moveTo(x,y+3);g.lineTo(x,y+8);g.stroke();
+    g.strokeStyle='#f4d35e';g.lineWidth=1;g.beginPath();g.arc(x,y,5,0,6.3);g.stroke();}}
+
 /* ---------- mökkitaso ---------- */
 function curLevel(){return Math.max(S.taso||1,levelFor(S.xp||0));}
 function levelProgress(){const L=curLevel();if(L>=XP_LEVELS.length)return [L,1,null];const lo=XP_LEVELS[L-1],hi=XP_LEVELS[L];return [L,clamp(((S.xp||0)-lo)/(hi-lo),0,1),hi];}
@@ -3401,7 +3437,7 @@ function interactYard(fx,fy){
     case 'mustikka':return berryInteract(o);
     case 'kantarelli':return sieniInteract(o);
     case 'raimo':raimoDir={up:'down',down:'up',left:'right',right:'left'}[PL.dir];return raimoTalk();
-    case 'tree':if(o.saari)return say(['Mökkisaari keskellä Vattulanjärveä. Kuusia, kalliota ja pieni hiekkapoukama.','Sinne pääsee vain veneellä. Ehkä joskus.']);if(o.tikka)return throwDarts();return say(o.v==='koivu'?'Koivu. Tästä saa vihtoja, kunhan pihalla on sauna.':'Kuusi tuoksuu pihkalta. Juurella on muurahaispolku.');}}
+    case 'tree':if(o.saari)return say(['Mökkisaari keskellä Vattulanjärveä. Kuusia, kalliota ja pieni hiekkapoukama.','Sinne pääsee vain veneellä. Ehkä joskus.']);if(o.tikka)return tikkaInteract();return say(o.v==='koivu'?'Koivu. Tästä saa vihtoja, kunhan pihalla on sauna.':'Kuusi tuoksuu pihkalta. Juurella on muurahaispolku.');}}
   const ch=(YARD[fy]||[])[fx];
   if(ch==='B'&&kukkaTehtava(fx,fy))return;
   if(ch==='D'||ch==='B')return soilInteract(fx,fy);
