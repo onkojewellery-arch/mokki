@@ -266,7 +266,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.51</div>
+        <div class="sub">mummon mökki · versio 0.52</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -2127,7 +2127,7 @@ function bottomRow(c){const d=c.getContext('2d').getImageData(0,0,c.width,c.heig
 function A(c){c.bot=bottomRow(c);return c;}
 function makeSprites(){
   SPR.kuusi=[makeSpruce(1),makeSpruce(2)].map(A);SPR.koivu=[makeBirch(1),makeBirch(2)].map(A);
-  SPR.gpenkki=A(makeGPenkki());SPR.pukukopit=A(makePukukopit());SPR.uimakyltti=A(makeUimaKyltti());SPR.pelastusrengas=A(makePelastusrengas());SPR.aurinkovarjo=A(makeAurinkovarjo());SPR.tikkaat=A(makeTikkaat());SPR.emalivati=A(makeEmalivati());SPR.kansituoli=A(makeKansituoli(false));SPR.kansituoliL=A(makeKansituoli(true));SPR.lauteet=HDM.hd(makeLauteet());SPR.kiuasK=HDM.hd(makeKiuas(false));SPR.kiuasL=HDM.hd(makeKiuas(true));SPR.kiulu=HDM.hd(makeKiulu());SPR.pukupenkki=HDM.hd(makePukupenkki());SPR.klapilaatikko=HDM.hd(makeKlapilaatikko());SPR.mpenkki=SPR.gpenkki;SPR.irtolauta=A(makeIrtolauta());SPR.mhouse=A(makeMattiHouse());SPR.kaisla=A(makeKaisla());SPR.kahvipoyta=A(makeKahvipoyta());{const MN=buildNPC(MATTI_LOOK);for(const d in MN)MN[d].forEach(A);SPR.mattiN=MN;}SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());SPR.aita=A(makeAita());SPR.tyokalu=A(makeTyokalu());SPR.veranta=A(makeVeranta());SPR.verantaL=A(mk(SPR.veranta.width,SPR.veranta.height,g=>{g.translate(SPR.veranta.width,0);g.scale(-1,1);g.drawImage(SPR.veranta,0,0);}));SPR.ulkopoyta=A(makeUlkopoyta());SPR.grilli=A(makeGrilli());SPR.koju=A(makeKoju(false));SPR.koju2=A(makeKoju(true));SPR.pysakki=A(makePysakki());SPR.tiski2=A(makeTiski2());SPR.hylly=A(makeHylly());SPR.seinapenkki=A(makeSeinapenkki());SPR.pikkupoyta=A(makePikkupoyta());SPR.keitin=A(makeKeitin());SPR.jakkara=A(makeJakkara());SPR.ruokalista=A(makeRuokalista());SPR.telkkari=A(makeTelkkari());SPR.pajatso=A(makePajatso());SPR.jukeboksi=A(makeJukeboksi());SPR.pubpoyta=A(makePubpoyta(false));SPR.pubpoyta2=A(makePubpoyta(true));{const JN=buildNPC(JASKA_LOOK);for(const d in JN)JN[d].forEach(A);SPR.jaska=JN;const KN=buildNPC(KARA_LOOK);for(const d in KN)KN[d].forEach(A);SPR.kara=KN;}SPR.auto=A(makeAuto());SPR.autoKiinni=A(makeAutoKiinni());SPR.tuoppi=A(makeTuoppi());SPR.koira=[0,1].map(f=>A(makeKoira(f)));SPR.koiraNuk=A(makeKoiraNuk());SPR.kirppispoyta=A(makeKirppisPoyta());SPR.saappaat=A(makeSaappaat());SPR.soutuvene=A(makeSoutuvene(false));SPR.soutuveneK=A(makeSoutuvene(true));SPR.puomi=A(makePuomi());SPR.paalut=A(makePaalut());SPR.house3=A(makeRantaHouse());SPR.ilmoitustaulu=A(makeIlmoitustaulu());SPR.pollkky=A(makePollkky());SPR.pollipino=A(makePollipino());SPR.onkipaikka=A(makeOnkipaikka());SPR.verantaF=A(makeVerantaFront());SPR.kasvimaapaikka=A(makeKasvimaaPaikka());SPR.saunapaikka=A(makeSaunaPaikka());SPR.aitaV=A(makeAitaV());SPR.sammalkivi=A(makeMossRock());SPR.skanto=A(makeMossStump());
+  SPR.gpenkki=A(makeGPenkki());SPR.pukukopit=A(makePukukopit());SPR.uimakyltti=A(makeUimaKyltti());SPR.pelastusrengas=A(makePelastusrengas());SPR.aurinkovarjo=A(makeAurinkovarjo());SPR.tikkaat=A(makeTikkaat());SPR.emalivati=A(makeEmalivati());SPR.kansituoli=A(makeKansituoli(false));SPR.kansituoliL=A(makeKansituoli(true));SPR.lauteet=HDM.hd(makeLauteet());SPR.kiuasK=HDM.hd(makeKiuas(false));SPR.kiuasL=HDM.hd(makeKiuas(true));SPR.kiulu=HDM.hd(makeKiulu());SPR.pukupenkki=HDM.hd(makePukupenkki());for(let n=0;n<4;n++)SPR['klapilaatikko'+n]=HDM.hd(makeKlapilaatikko(n));SPR.mpenkki=SPR.gpenkki;SPR.irtolauta=A(makeIrtolauta());SPR.mhouse=A(makeMattiHouse());SPR.kaisla=A(makeKaisla());SPR.kahvipoyta=A(makeKahvipoyta());{const MN=buildNPC(MATTI_LOOK);for(const d in MN)MN[d].forEach(A);SPR.mattiN=MN;}SPR.well=A(makeWell());SPR.huussi=A(makeHuussi());SPR.shed=[makeShed(false),makeShed(true)].map(A);SPR.grill=A(makeGrill());SPR.sign=A(makeSign());SPR.aita=A(makeAita());SPR.tyokalu=A(makeTyokalu());SPR.veranta=A(makeVeranta());SPR.verantaL=A(mk(SPR.veranta.width,SPR.veranta.height,g=>{g.translate(SPR.veranta.width,0);g.scale(-1,1);g.drawImage(SPR.veranta,0,0);}));SPR.ulkopoyta=A(makeUlkopoyta());SPR.grilli=A(makeGrilli());SPR.koju=A(makeKoju(false));SPR.koju2=A(makeKoju(true));SPR.pysakki=A(makePysakki());SPR.tiski2=A(makeTiski2());SPR.hylly=A(makeHylly());SPR.seinapenkki=A(makeSeinapenkki());SPR.pikkupoyta=A(makePikkupoyta());SPR.keitin=A(makeKeitin());SPR.jakkara=A(makeJakkara());SPR.ruokalista=A(makeRuokalista());SPR.telkkari=A(makeTelkkari());SPR.pajatso=A(makePajatso());SPR.jukeboksi=A(makeJukeboksi());SPR.pubpoyta=A(makePubpoyta(false));SPR.pubpoyta2=A(makePubpoyta(true));{const JN=buildNPC(JASKA_LOOK);for(const d in JN)JN[d].forEach(A);SPR.jaska=JN;const KN=buildNPC(KARA_LOOK);for(const d in KN)KN[d].forEach(A);SPR.kara=KN;}SPR.auto=A(makeAuto());SPR.autoKiinni=A(makeAutoKiinni());SPR.tuoppi=A(makeTuoppi());SPR.koira=[0,1].map(f=>A(makeKoira(f)));SPR.koiraNuk=A(makeKoiraNuk());SPR.kirppispoyta=A(makeKirppisPoyta());SPR.saappaat=A(makeSaappaat());SPR.soutuvene=A(makeSoutuvene(false));SPR.soutuveneK=A(makeSoutuvene(true));SPR.puomi=A(makePuomi());SPR.paalut=A(makePaalut());SPR.house3=A(makeRantaHouse());SPR.ilmoitustaulu=A(makeIlmoitustaulu());SPR.pollkky=A(makePollkky());SPR.pollipino=A(makePollipino());SPR.onkipaikka=A(makeOnkipaikka());SPR.verantaF=A(makeVerantaFront());SPR.kasvimaapaikka=A(makeKasvimaaPaikka());SPR.saunapaikka=A(makeSaunaPaikka());SPR.aitaV=A(makeAitaV());SPR.sammalkivi=A(makeMossRock());SPR.skanto=A(makeMossStump());
   SPR.rock=A(makeRock());SPR.bush=A(makeBush(true));SPR.bushTyhja=A(makeBush(false));SPR.stump=A(makeStump());SPR.lippu=[0,1,2].map(makeLippu).map(A);SPR.pyykki=[0,1].map(makePyykki).map(A);
   SPR.halot=A(makeHalot());SPR.karry=A(makeKarry());SPR.tynnyri=A(makeTynnyri());SPR.mailbox=A(makeMailbox());SPR.mpyora=A(makeBike('#2f5a46','kukat'));
   SPR.shop=A(makeShop());SPR.bench=A(makeBench());SPR.lamp=A(makeLamp());SPR.maito=A(makeMaito());SPR.puhelin=A(makePuhelin());SPR.pyora=A(makeBike('#b8443a','pulla'));
@@ -2149,6 +2149,7 @@ function sprFor(o){switch(o.k){
   case 'kansituoli':return o.ref&&o.ref.r%2?SPR.kansituoliL:SPR.kansituoli;
   case 'kiuas':return saunaLammin()?SPR.kiuasL:SPR.kiuasK;
   case 'naulakko':return null;
+  case 'klapilaatikko':return SPR['klapilaatikko'+Math.min(3,S.inv.klapi||0)];
   case 'jaska':return HDS.mandi[jaskaDir][(frame%260)<7?1:0];
   case 'kara':return SPR.kara.down[(frame%300)<7?1:0];
   case 'kara2':return HDS.kara.left[(frame%280)<7?1:0];
@@ -3209,13 +3210,13 @@ function rsaunaPaikka(){const R=rantaR();if(!S.flags.rantaOstettu||!R)return say
       ()=>{jingle();for(let j=0;j<40;j++)PARTS.push({x:(20+Math.random()*3)*TS,y:(9+Math.random()*3)*TS,vx:(Math.random()-.5)*1.2,vy:-Math.random()*2,life:0,max:60,c:j%2?'#f4d35e':'#ffffff',s:1});
         say(['Rantasauna on valmis! Tervattu hirsi tuoksuu, ja ovi aukeaa järvelle päin.','Sisällä on pukuhuone ja löylyhuone. Kiuas lämmitetään klapilla, ja löylyvesi otetaan järvestä.'],()=>award('rsauna',RSAUNA_XP,'Rantasauna'));});});}
 /* HD-spritet (64 px ruutu, piirretään 2x tarkkuudella) */
-function makeLauteet(){return HDM.outlined(192,150,g=>{const L=['#8a5a30','#a8743e','#c48e52','#d8a86a','#e8c48a'];
-  R(g,0,0,192,14,L[1]);R(g,0,0,192,2,L[3]);R(g,0,12,192,2,L[0]);for(const x of [10,96,180])R(g,x-3,0,6,40,L[0]);
-  R(g,0,22,192,40,L[3]);for(let y=22;y<62;y+=10){R(g,0,y,192,1,L[4]);R(g,0,y+8,192,2,L[1]);}
-  R(g,0,62,192,22,L[1]);for(let x=0;x<192;x+=16)R(g,x,62,1,22,L[0]);R(g,0,62,192,2,L[0]);
-  R(g,0,84,192,34,L[2]);for(let y=84;y<118;y+=11){R(g,0,y,192,1,L[4]);R(g,0,y+9,192,2,L[0]);}
-  R(g,0,118,192,28,L[1]);for(let x=0;x<192;x+=16)R(g,x,118,1,28,L[0]);R(g,0,118,192,2,L[0]);R(g,0,144,192,4,'#3a2414');
-  for(let i=0;i<14;i++)R(g,6+Math.floor(HDM.hash(i,3,61)*176),26+Math.floor(HDM.hash(i,4,61)*80),6,1,L[1]);});}
+function makeLauteet(){return HDM.outlined(192,150,g=>{const L=['#7a5230','#a8784a','#cfa46e','#e2c08a','#f0d4a4'],gap='#5a3a22';
+  for(const [y] of [[2],[14]]){R(g,4,y,184,9,L[2]);R(g,4,y,184,1,L[4]);R(g,4,y+8,184,1,L[1]);}for(const x of [12,96,180])R(g,x-3,0,6,30,L[0]);
+  R(g,0,28,192,4,'#3a2414');
+  for(let k=0;k<4;k++){const y=32+k*8;R(g,0,y,192,6,L[3-(k%2)]);R(g,0,y,192,1,L[4]);R(g,0,y+6,192,2,gap);}
+  R(g,0,64,192,8,L[1]);R(g,0,64,192,1,L[3]);for(let x=0;x<192;x+=24)R(g,x,72,22,14,L[0]);R(g,0,72,192,14,'rgba(40,20,8,.35)');
+  for(let k=0;k<3;k++){const y=86+k*8;R(g,0,y,192,6,L[3-(k%2)]);R(g,0,y,192,1,L[4]);R(g,0,y+6,192,2,gap);}
+  R(g,0,110,192,8,L[1]);R(g,0,110,192,1,L[3]);for(const x of [6,92,178]){R(g,x,118,8,26,L[0]);R(g,x,118,2,26,L[1]);}R(g,0,118,192,26,'rgba(30,16,6,.25)');R(g,0,144,192,4,'#2a1a0e');});}
 function makeKiuas(hot){return HDM.outlined(56,112,g=>{R(g,22,0,12,30,'#2a2a2e');R(g,22,0,3,30,'#4a4a52');
   R(g,4,40,48,64,'#26262a');R(g,4,40,48,3,'#4a4a52');R(g,4,40,4,64,'#3a3a40');R(g,46,40,6,64,'#16161a');R(g,2,102,52,6,'#1a1a1e');
   for(let i=0;i<16;i++){const x=8+(i%5)*9+(i>>2)%2*3,y=22+Math.floor(i/5)*7;HDM.ell(g,x,y,6,5,i%3?'#7a7670':'#8e8a84');HDM.ell(g,x-1,y-2,3,2,'#b4b0a8');}
@@ -3227,8 +3228,9 @@ function makeKiulu(){return HDM.outlined(44,48,g=>{R(g,8,18,28,26,'#b07a44');for
 function makePukupenkki(){return HDM.outlined(128,64,g=>{const L=['#8a5a30','#a8743e','#c48e52','#d8a86a'];R(g,0,0,128,10,L[1]);R(g,0,0,128,2,L[3]);
   R(g,0,20,128,22,L[2]);R(g,0,20,128,2,L[3]);R(g,0,40,128,4,L[0]);for(const x of [8,112])R(g,x,44,8,18,L[0]);
   R(g,22,30,24,8,'#e8e2d4');R(g,22,30,24,2,'#c8402e');R(g,24,52,14,8,'#3a5a7a');R(g,40,52,14,8,'#3a5a7a');});}
-function makeKlapilaatikko(){return HDM.outlined(56,60,g=>{R(g,4,18,48,40,'#9a6a3a');R(g,4,18,48,3,'#c8945a');for(let x=8;x<52;x+=10)R(g,x,22,1,36,'#7a4e2a');
-  for(let i=0;i<6;i++){const x=8+(i%3)*14,y=8+Math.floor(i/3)*8;R(g,x,y,13,10,'#c8a070');HDM.ell(g,x+3,y+5,3,4,'#e8c890');HDM.ell(g,x+3,y+5,1,2,'#a07848');}});}
+function makeKlapilaatikko(n){return HDM.outlined(56,60,g=>{R(g,4,18,48,40,'#9a6a3a');R(g,4,18,48,3,'#c8945a');for(let x=8;x<52;x+=10)R(g,x,22,1,36,'#7a4e2a');R(g,6,20,44,4,'#3a2414');
+  if(!n){for(let i=0;i<5;i++)R(g,10+i*8,21,3,1,i%2?'#a07848':'#6a4a2a');return;}const pos=[[8,12],[22,12],[36,12],[14,4],[28,4],[21,-3]].slice(0,n===1?2:n===2?4:6);
+  for(const [x,y] of pos){R(g,x,y,13,10,'#c8a070');R(g,x,y,13,2,'#a07848');HDM.ell(g,x+3,y+5,3,4,'#e8c890');HDM.ell(g,x+3,y+5,1,2,'#a07848');}});}
 let SITHD={};
 function makeSitHD(look){const tp=TOPS[look.top]||TOPS[0];const L={skin:SKINS[look.skin][1],hair:HAIR_COLORS[look.hairC][1],style:['short','long','bun','short'][look.hair]||'short',pipo:look.hair===3,
     shirt:tp.c,stripe:tp.stripe,knit:tp.knit,coat:tp.coat,pants:PANTS[look.pants][1],shoes:look.shoes===1?'#d42a24':'#2a1a14',eye:EYES[look.eye][1],glasses:!!look.glasses,gc:GLASS_C[look.glasses||0],round:look.glasses===1,thick:look.glasses===2};
@@ -3237,29 +3239,53 @@ function makeSitHD(look){const tp=TOPS[look.top]||TOPS[0];const L={skin:SKINS[lo
     R(g,cx-12,62,24,6,pa);R(g,cx-12,62,24,2,paL);for(const kx of [cx-12,cx+1]){R(g,kx,66,11,8,pa);R(g,kx,66,11,2,paL);R(g,kx+1,74,9,10,paD);R(g,kx,84,12,6,so);R(g,kx+1,84,4,1,HDM.shade(so,.3));}}));}
 function drawSitterHD(o,i){const k=JSON.stringify(S.look);if(!SITHD[k])SITHD[k]=makeSitHD(S.look);const c=SITHD[k],[x0,y0]=sprPos(SPR.lauteet,o);
   dS(ctx,c,Math.round(x0+22+i*36),Math.round(y0+3));}
-function buildSaunaGround(){const ranta=S.saunaNyt==='ranta',W=9*64,H=7*64;ground=mk(W,H,g=>{
-  R(g,0,0,W,H,'#24170f');
-  const logs=(x0,x1,y0,y1,base)=>{for(let y=y0;y<y1;y+=16){const c=HDM.shade(base,((y>>4)%3-1)*.06);R(g,x0,y,x1-x0,16,c);R(g,x0,y,x1-x0,2,HDM.shade(c,.22));R(g,x0,y+13,x1-x0,3,HDM.shade(c,-.32));
-      for(let k=0;k<3;k++){const kx=x0+8+Math.floor(HDM.hash(y,k,71)*(x1-x0-16));HDM.ell(g,kx,y+8,3,2,HDM.shade(c,-.25));}}};
-  const tar=ranta?'#5e3e26':'#9a6a3e',smoke=ranta?'#4a301e':'#6e4628';
-  logs(64,256,0,128,tar);logs(256,512,0,128,smoke);R(g,252,0,8,128,'#3a2414');
-  /* naulakko ja pyyhkeet pukuhuoneen seinällä */
-  R(g,134,54,52,5,'#6a4424');for(const hx of [144,170])R(g,hx,58,3,6,'#2a2a2e');R(g,138,62,16,40,'#e8e2d4');for(let y=66;y<100;y+=8)R(g,138,y,16,3,'#c8402e');R(g,164,62,16,36,'#4a7aa8');R(g,164,62,16,3,'#6a9ac8');
+function buildSaunaGround(){const ranta=S.saunaNyt==='ranta',W=576,H=448,sh=HDM.shade,lc=HDM.lerpC,hh=HDM.hash;ground=mk(W,H,g=>{
+  R(g,0,0,W,H,'#1a120c');
+  /* pukuhuone: vaalea pystypaneeli */
+  const pan=ranta?['#c99a62','#bd8f58','#d0a26a']:['#d8ae74','#cea46a','#e0b880'];
+  for(let x=64;x<256;x+=16){const c=pan[(x>>4)%3];R(g,x,0,16,128,c);R(g,x,0,1,128,sh(c,.16));R(g,x+14,0,2,128,sh(c,-.38));for(let k=0;k<3;k++){const yy=6+Math.floor(hh(x,k,301)*96);R(g,x+3+k*4,yy,1,12+k*5,sh(c,-.09));}}
+  /* löylyhuone: tummempi vaakapaneeli */
+  const tl=ranta?['#8e5e36','#82562f','#9a6a3e']:['#ac7644','#a06c3c','#b8824e'];
+  for(let y=0;y<128;y+=12){const c=tl[(y/12|0)%3];R(g,264,y,248,12,c);R(g,264,y,248,1,sh(c,.2));R(g,264,y+10,248,2,sh(c,-.4));for(let k=0;k<4;k++){const xx=268+Math.floor(hh(y,k,303)*220);R(g,xx,y+4+(k%2)*3,16+k*6,1,sh(c,-.1));}}
+  for(let i=0;i<44;i++){g.fillStyle='rgba(24,12,4,'+(0.42*(1-i/44)).toFixed(3)+')';g.fillRect(264,i,248,1);}
+  for(let i=0;i<14;i++){g.fillStyle='rgba(24,12,4,'+(0.22*(1-i/14)).toFixed(3)+')';g.fillRect(64,i,192,1);}
+  R(g,64,118,192,10,'#8a6238');R(g,64,118,192,2,'#b08450');R(g,64,126,192,2,'#5a3e24');R(g,264,118,248,10,sh(tl[0],-.32));R(g,264,118,248,2,sh(tl[0],-.1));
+  /* naulakko, pyyhkeet ja vihta */
+  R(g,96,44,92,6,'#7a5232');R(g,96,44,92,2,'#a07048');for(const hx of [108,136,164])R(g,hx,50,3,6,'#3a3a40');
+  R(g,128,54,18,44,'#f2ece0');for(let y=58;y<96;y+=7)R(g,128,y,18,3,'#c8402e');R(g,128,96,18,2,'#d8d0c0');
+  R(g,156,54,18,40,'#4a7aa8');R(g,156,54,18,3,'#6a9ac8');R(g,156,90,18,2,'#3a5a88');
+  R(g,107,56,4,10,'#8a6a3a');for(let i=0;i<14;i++){const a=hh(i,1,307)*Math.PI*.9+.1*Math.PI,r=6+hh(i,2,307)*12;HDM.ell(g,109+Math.cos(a)*r*.6,72+Math.sin(a)*r,4,3,i%3?'#4f8a40':'#6aa84c');}
+  /* peili */
+  R(g,206,22,30,40,'#6a4a2c');R(g,209,25,24,34,'#a8c4cc');R(g,209,25,24,8,'#c8dce2');R(g,212,40,3,14,'#e4f0f2');
   /* löylyhuoneen ikkuna */
-  {const wx=6*64+8,wy=34,ww=48,wh=40;R(g,wx-4,wy-4,ww+8,wh+8,'#e8dcc0');
-    for(let r=0;r<wh;r++){const t=r/wh;R(g,wx,wy+r,ww,1,ranta?(t<.4?HDM.lerpC('#b8e0f0','#e4f2f2',t/.4):t<.46?'#3f6e4c':HDM.lerpC('#4a96bc','#2f7aa8',(t-.46)/.54)):(t<.5?HDM.lerpC('#b8e0f0','#e4f2f2',t*2):'#4f8a4a'));}
-    if(!ranta)for(let k=0;k<ww;k+=6){const th=8+Math.floor(HDM.hash(k,1,73)*12);for(let q=0;q<th;q++)R(g,wx+k+Math.floor(q/3)-1,wy+wh-8-q,Math.max(1,6-Math.floor(q/3)*2+2),1,'#2f5a40');}
-    else for(let k=0;k<4;k++)R(g,wx+4+Math.floor(HDM.hash(k,2,73)*(ww-12)),wy+26+k*3,8,1,'#bfe2f0');
-    R(g,wx+ww/2-2,wy,4,wh,'#e8dcc0');R(g,wx,wy+wh/2-2,ww,4,'#e8dcc0');R(g,wx-6,wy+wh+4,ww+12,5,'#d8ccb0');}
-  /* lattiat */
-  for(let x=64;x<256;x+=16){const c=['#c49a64','#b88e58','#caa06a'][(x>>4)%3];R(g,x,128,16,256,c);R(g,x,128,1,256,HDM.shade(c,.15));R(g,x+15,128,1,256,HDM.shade(c,-.3));}
-  for(let x=256;x<512;x+=12){const c=['#a87848','#9a6c40'][(x/12|0)%2];R(g,x,128,12,256,c);R(g,x+10,128,2,256,'#3a2414');}
-  R(g,256,256,64,128,'#b88e58');for(let y=256;y<384;y+=16)R(g,256,y,64,1,'#9a7448');
-  /* väliseinä ja reunat */
-  logs(256,320,128,256,smoke);R(g,256,128,64,4,'#3a2414');
-  for(const x of [0,512])R(g,x,0,64,H,'#3a2618');R(g,60,0,4,H,'#2a1a10');R(g,512,0,4,H,'#2a1a10');
-  R(g,64,384,448,64,'#3a2618');R(g,64,384,448,4,'#5a3e26');R(g,128,384,64,64,'#6a4a32');R(g,132,388,56,24,'#8a6a3a');R(g,128,444,64,4,'#ffe8b0');
-  for(let i=0;i<4;i++){g.fillStyle='rgba(0,0,0,'+(0.28-i*.06)+')';g.fillRect(64,128+i*2,448,2);}});ground.hd=1;}
+  {const wx=6*64+8,wy=30,ww=48,wh=40;R(g,wx-5,wy-5,ww+10,wh+10,'#e8dcc0');R(g,wx-5,wy-5,ww+10,2,'#fff6e2');
+    for(let r=0;r<wh;r++){const t=r/wh;R(g,wx,wy+r,ww,1,ranta?(t<.4?lc('#b8e0f0','#e4f2f2',t/.4):t<.46?'#3f6e4c':lc('#4a96bc','#2f7aa8',(t-.46)/.54)):(t<.5?lc('#b8e0f0','#e4f2f2',t*2):'#4f8a4a'));}
+    if(!ranta)for(let k=0;k<ww;k+=6){const th=8+Math.floor(hh(k,1,73)*12);for(let q=0;q<th;q++)R(g,wx+k+Math.floor(q/3)-1,wy+wh-8-q,Math.max(1,6-Math.floor(q/3)*2+2),1,'#2f5a40');}
+    else for(let k=0;k<4;k++)R(g,wx+4+Math.floor(hh(k,2,73)*(ww-12)),wy+26+k*3,8,1,'#bfe2f0');
+    R(g,wx+ww/2-2,wy,4,wh,'#e8dcc0');R(g,wx,wy+wh/2-2,ww,4,'#e8dcc0');R(g,wx-8,wy+wh+5,ww+16,6,'#d8ccb0');R(g,wx-8,wy+wh+10,ww+16,2,'#a89878');}
+  /* saunavalaisin ja lämpömittari */
+  {const lx=300,ly=34;g.fillStyle='rgba(255,210,150,.18)';g.beginPath();g.ellipse(lx,ly+6,30,22,0,0,6.3);g.fill();R(g,lx-14,ly-6,28,4,'#6a4424');for(let k=0;k<6;k++)R(g,lx-13+k*5,ly-2,3,16,'#c49a64');R(g,lx-10,ly+1,20,10,'#ffe2a8');R(g,lx-14,ly+14,28,3,'#6a4424');}
+  {const mx=486,my=52;HDM.ell(g,mx,my,13,13,'#6a4424');HDM.ell(g,mx,my,10,10,'#f2ead6');for(let a=0;a<12;a++){const an=a/12*Math.PI*2;P(g,mx+Math.round(Math.cos(an)*8),my+Math.round(Math.sin(an)*8),'#5a4a3a');}R(g,mx,my-1,7,2,'#c0302a');HDM.ell(g,mx,my,2,2,'#2a2320');}
+  /* pukuhuoneen lattia: lankut */
+  for(let y=128;y<384;y+=16){const c=['#c49a64','#b88e58','#caa06a','#bf945e'][(y>>4)%4];R(g,64,y,192,16,c);R(g,64,y,192,1,sh(c,.15));R(g,64,y+14,192,2,sh(c,-.35));const off=((y>>4)%3)*44;for(let x=64+30+off;x<256;x+=96)R(g,x,y+1,2,13,sh(c,-.3));}
+  for(let y=256;y<384;y+=16){const c=['#c49a64','#b88e58','#caa06a','#bf945e'][(y>>4)%4];R(g,256,y,64,16,c);R(g,256,y,64,1,sh(c,.15));R(g,256,y+14,64,2,sh(c,-.35));}
+  R(g,316,256,6,128,'#9a7044');R(g,316,256,2,128,'#c49a64');
+  /* räsymatto pukuhuoneeseen */
+  {const mx=88,my=300,mw=136,mh=56,C=['#c0443a','#f0ead8','#4a6fa5','#dfae35','#4f8a4a'];for(let i=0;i<mw;i+=8){const c=C[(i/8)%C.length];R(g,mx+i,my,Math.min(8,mw-i),mh,c);R(g,mx+i,my,2,mh,sh(c,.15));}for(let k=0;k<mh;k+=3){R(g,mx-6,my+k,6,1,'#f0ead8');R(g,mx+mw,my+k,6,1,'#f0ead8');}}
+  /* löylyhuoneen betonilattia, ritilä, kiuaslaatat ja lattiakaivo */
+  R(g,322,128,190,256,'#5e5a56');for(let i=0;i<300;i++)P(g,322+Math.floor(hh(i,1,309)*190),128+Math.floor(hh(i,2,309)*256),i%2?'#6a6662':'#53504c');
+  for(let y=258;y<382;y+=12){R(g,326,y,118,8,'#d0a86e');R(g,326,y,118,1,'#e8c890');R(g,326,y+7,118,1,'#9a7444');}
+  for(let y=264;y<382;y+=12)for(let x=330;x<444;x+=26)R(g,x,y-1,2,2,'#7a5434');
+  for(let y=256;y<320;y+=21)for(let x=448;x<512;x+=21){R(g,x+1,y+1,19,19,'#8e8a84');R(g,x+1,y+1,19,2,'#aaa6a0');}
+  HDM.ell(g,476,360,9,5,'#3a3836');HDM.ell(g,476,360,6,3,'#2a2826');for(let k=-4;k<=4;k+=2)R(g,476+k,357,1,6,'#6a6662');
+  /* väliseinä ovineen */
+  R(g,256,128,8,128,'#6a4628');R(g,256,128,64,10,'#2e1e12');for(let x=264;x<320;x+=14){const c=tl[(x/14|0)%3];R(g,x,138,14,104,sh(c,-.1));R(g,x+12,138,2,104,sh(c,-.42));}R(g,256,240,64,16,'#5a3c22');R(g,256,240,64,2,'#8a6238');
+  for(const px of [256,314])R(g,px,256,6,10,'#7a5232');
+  /* sivuseinät ja etuseinä */
+  for(const x of [0,512]){R(g,x,0,64,H,'#2e2016');R(g,x===0?58:512,0,6,H,'#4a3424');for(let y=0;y<H;y+=24)R(g,x+4,y,56,1,'#3a2a1c');}
+  R(g,64,384,448,64,'#3a2818');R(g,64,384,448,8,'#5a3e26');R(g,64,384,448,2,'#7a5638');for(let x=70;x<512;x+=18)R(g,x,394,1,54,'#2e2014');
+  R(g,128,384,64,64,'#6a4a32');R(g,132,388,56,40,lc('#ffe8b0','#c8a060',.4));R(g,132,388,56,4,'#fff2c8');R(g,128,384,4,64,'#8a6238');R(g,188,384,4,64,'#8a6238');R(g,128,444,64,4,'#ffe8b0');
+  for(let i=0;i<10;i++){g.fillStyle='rgba(0,0,0,'+(0.3-i*.03).toFixed(3)+')';g.fillRect(64,128+i,192,1);g.fillRect(322,128+i,190,1);}});ground.hd=1;}
 
 /* ---------- v0.48: Vattulan uimaranta ---------- */
 function uimaanKysy(){const yo=isNight();ask(yo?'Uimalaituri kuutamossa. Rannalla ei ole ketään, ja vesi on tyyni.':'Uimalaituri. Vesi on kirkasta, ja pohja näkyy laiturin päästä.',yo?['Käy uimassa','Kuutamouinti nakuna','Peru']:['Käy uimassa','Peru'],i=>{if(i===0)uimaan();else if(yo&&i===1)nakuUinti();});}
@@ -3390,7 +3416,7 @@ function interactYard(fx,fy){
     case 'lauteet':return lauteetInteract(fx,fy);
     case 'kiulu':return say(S.saunaNyt==='ranta'?['Kiulu ja puukauha. Rantasaunassa vesi haetaan suoraan järvestä, joten erillistä ämpäriä ei tarvita.']:['Kiulu ja puukauha. Löylyvesi kannetaan kaivolta ämpärillä.','Ämpärillisiä vettä repussa: '+(S.inv.vesi||0)+'.']);
     case 'pukupenkki':return say(S.saunaNyt==='ranta'?'Pukuhuoneen penkki. Ikkunasta näkyy laituri, ja vaatteet tuoksuvat järveltä.':'Pukuhuoneen penkki. Vaarin vanhat saunatossut odottavat penkin alla.');
-    case 'klapilaatikko':return say('Klapilaatikko. Klapeja repussa: '+(S.inv.klapi||0)+'. Lisää saa hakkuupölkyltä mummon mökin pihalta.');
+    case 'klapilaatikko':return say((S.inv.klapi||0)>0?'Klapilaatikossa on '+S.inv.klapi+' klapia. Yksi riittää kiukaan lämmitykseen.':['Klapilaatikko on tyhjä. Pohjalla on vain vähän tuohta ja purua.','Klapeja saa hakkaamalla pöllejä hakkuupölkyllä mummon mökin pihalla.']);
     case 'naulakko':return say('Naulakossa roikkuu kaksi pyyhettä, raidallinen ja sininen. Toinen on selvästi vaarin.');
     case 'matti':return mattiTalk();
     case 'petrisaari':return paluuKysy();
@@ -4034,6 +4060,7 @@ function darkness(rgb){return clamp(1-(rgb[0]*.3+rgb[1]*.55+rgb[2]*.15)/235,0,1)
 function lightSources(){const L=[];
   if(S.scene==='jaska'){const k=TFX.k;for(const [lx,ly] of JASKA_LAMPS)if(k<.95)L.push({x:lx<40?lx+12:lx,y:ly+8,r:(lx<40?60:52)*(1-k*.85),c:'255,190,110'});
     if(k>.05){const fl=Math.sin(frame*.31)*2+Math.sin(frame*.77),t=YOBJ.find(o=>o.k==='tiski2'),[x0,y0]=sprPos(SPR.tiski2,t);for(const cx of [102,120])L.push({x:x0+cx,y:y0+8,r:(34+fl)*k,c:'255,176,90'});L.push({x:112,y:62,r:42*k,c:'255,196,130'});}}
+  if(S.scene==='sauna')L.push({x:150,y:22,r:84,c:'255,206,150'});
   if(S.scene==='rtupa'&&rantaR())for(const f of rantaR().furn||[])if(f.t==='poytalamppu'&&f.on)L.push({x:f.x*TS+16,y:f.y*TS+4,r:64,c:'255,176,90'});
   if(S.scene!=='tupa'){for(const o of YOBJ){
       if(o.k==='house'||o.k==='house2'){const [x0,y0]=sprPos(sprFor(o),o);for(const wx of [22,108])L.push({x:x0+wx+18,y:y0+86,r:48,c:'255,200,120',win:[x0+wx+6,y0+75,24,22]});L.push({x:x0+102,y:y0+83,r:56,c:'255,214,140'});}
