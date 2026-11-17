@@ -68,7 +68,7 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
 #hud{position:absolute;left:calc(var(--s)*3px);top:calc(var(--s)*3px);background:rgba(20,30,24,.72);color:#f3ecd9;
   padding:calc(var(--s)*1px) calc(var(--s)*3px);border-radius:calc(var(--s)*2px);font-size:calc(var(--s)*6px)}
 #toast.low{top:auto;bottom:calc(var(--s)*4px)}
-#mg{position:absolute;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(var(--s)*6px + env(safe-area-inset-bottom,0px));width:min(92%,calc(var(--s)*150px));background:rgba(20,30,24,.92);color:#f3ecd9;border:calc(var(--s)*1px) solid #121a15;border-radius:calc(var(--s)*3px);padding:calc(var(--s)*3px) calc(var(--s)*4px);box-shadow:0 calc(var(--s)*1px) calc(var(--s)*4px) rgba(0,0,0,.35)}
+#mg{pointer-events:auto;position:absolute;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(var(--s)*6px + env(safe-area-inset-bottom,0px));width:min(92%,calc(var(--s)*150px));background:rgba(20,30,24,.92);color:#f3ecd9;border:calc(var(--s)*1px) solid #121a15;border-radius:calc(var(--s)*3px);padding:calc(var(--s)*3px) calc(var(--s)*4px);box-shadow:0 calc(var(--s)*1px) calc(var(--s)*4px) rgba(0,0,0,.35)}
 #panel .kuva{display:flex;justify-content:center;margin:calc(var(--s)*3px) 0}#panel .kuva img{width:100%;max-width:calc(var(--s)*150px);image-rendering:pixelated;transform:rotate(-1.5deg);box-shadow:0 calc(var(--s)*1px) calc(var(--s)*3px) rgba(0,0,0,.35)}#panel .vrepl{font-style:italic;color:#6a5a3a;margin:calc(var(--s)*1px) 0 calc(var(--s)*2px)}#panel .tasks li.lue{cursor:pointer;color:#2f6e42;font-weight:bold}#panel .kuvateksti{text-align:center;font-style:italic;color:#7a6f5a}
 #mg .mgt{font-size:calc(var(--s)*5px);color:#a6d873;letter-spacing:.05em;text-transform:uppercase}
 #mg .mgmsg{font-size:calc(var(--s)*6.2px);line-height:1.35;margin:calc(var(--s)*2px) 0;min-height:calc(var(--s)*14px)}
@@ -266,7 +266,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.46</div>
+        <div class="sub">mummon mökki · versio 0.47</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -366,6 +366,8 @@ const KUKKA={};for(const k of KUKAT){KUKKA[k.id]=k;GROW_MS[k.id]=k.ms;GROW[k.id]
 const KUKKAPENKKI=[[12,13],[13,13],[14,13]],KUKKA_TAVOITE=2;
 const PENKKI_NEED={lautoja:3,naulat:2};
 /* ---------- v0.44 testiarvot: Myrskyluodon Matti ---------- */
+/* v0.47: pelikello – yksi peliminuutti kuluu AIKA_FRAMET ruudun välein (60 = 1 s; 40 = 1,5 × nopeampi). Pelipäivä klo 7–24 ≈ 11 min. */
+const AIKA_FRAMET=40;
 const MATTI_XP=20,MATTI_MATKA_MIN=15;
 /* ---------- v0.45 testiarvot: saunojen sisätilat ja rantasauna ---------- */
 /* ---------- v0.46 testihinnat: uudet ostettavat tuotteet (yhteiset tuotetiedot) ---------- */
@@ -3796,7 +3798,7 @@ function update(){frame++;if(mode==='mg')mgUpdate();updateHare();updQbar();updTa
   if(saunaLammin('piha'))saunaSmoke=Math.max(saunaSmoke,2);
   if(saunaSmoke>0){saunaSmoke--;if(S.scene==='piha'&&frame%9===0){const so=YOBJ.find(o=>o.k==='sauna');if(so&&SPR.saunaB){const [x0,y0]=sprPos(SPR.saunaB,so);PARTS.push({x:x0+76+Math.random()*4,y:y0+8,vx:.2+Math.random()*.1,vy:-.45,life:0,max:170,c:'#eeeeea',s:1,smoke:true});}}}
   if(frame%30===0){growPlants();updatePlantHint();if(S&&S.started&&mode==='world')kukkaCheck();}
-  if((mode==='world'||mode==='sit')&&frame%60===0&&S.time<1439){S.time++;hud();}
+  if((mode==='world'||mode==='sit')&&frame%AIKA_FRAMET===0&&S.time<1439){S.time++;hud();}
   if(!INDOOR[S.scene]&&mode!=='title'&&frame%25===0&&darkness(ambientAt(S.time))>.45&&PARTS.filter(q=>q.fly).length<14)
     PARTS.push({fly:true,x:camX+Math.random()*VW,y:camY+40+Math.random()*240,life:0,max:500,c:'#eaff9a',sd:Math.random()*6});
   if(mode==='world'||mode==='busy'&&!fade)updatePlayer();
