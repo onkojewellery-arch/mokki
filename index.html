@@ -266,7 +266,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.48</div>
+        <div class="sub">mummon mökki · versio 0.49</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -654,15 +654,11 @@ function exitJaska(){fadeTo(()=>{S.scene='kyla';useMap('kyla');placePlayer(13,11
 function jaskaTalk(skipOrder){jaskaDir='down';
   if(!skipOrder&&S.flags.jaskaTuttu&&orderReady('porkkana'))return deliverOrder('porkkana',()=>jaskaTalk(true));
   if(!S.flags.jaskaTuttu){S.flags.jaskaTuttu=true;save();return say(['Mandi: "No moikka! Mandi tässä. Istu alas, täällä ei tarvitse esittäytyä kahdesti."','Mandi: "Sinä olet se mummon mökin uusi asukas. Koko kylä tietää jo, kylä on pieni."'],jaskaTalk);}
-  const buy=(p,t,log)=>{if(S.money<p){blip(180,.12);return say('Mandi: "Se tekee '+p+' markkaa. Tuu takaisin, kun kukkaro on lihonut."');}
-    S.money-=p;save();hud();blip(990,.06);toast('−'+p+' mk');if(log&&!S.flags[log]){S.flags[log]=true;addLog(t[t.length-1]);}say(t);};
   const ko=S.flags.jaskaTuttu?mandiKorttiOpt():null;
-  ask('Mandi nojaa tiskiin. "Kahvia, makkaraperunat vai kortti pöytään? Kaikki onnistuu."',['Kahvi ja munkki (2 mk)','Makkaraperunat (6 mk)','Tarot-luenta','Jutellaan'].concat(ko?[ko[0]]:[],['Hei hei']),i=>{
-    if(ko&&i===4)return ko[1]();
-    if(i===0)return buy(2,['Mandi kaataa kahvia ja nostaa munkin paperille.','Munkki on vielä lämmin. Sokeri rapisee sormissa.'],'');
-    if(i===1)return buy(6,['Mandi nostaa ranskalaiset altaasta ja pilkkoo makkaran päälle.','Makkaraperunat sinapilla ja ketsupilla. Juuri niin kuin pitääkin.'],'jaskaMp');
-    if(i===2)return tarotLuenta();
-    if(i===3)return say(nextLine('m',MANDI_JUORUT));});}
+  ask('Mandi nojaa tiskiin. "Kortti pöytään vai pelkkä jutteluhetki? Kumpikin onnistuu."',['Tarot-luenta','Jutellaan'].concat(ko?[ko[0]]:[],['Hei hei']),i=>{
+    if(ko&&i===2)return ko[1]();
+    if(i===0)return tarotLuenta();
+    if(i===1)return say(nextLine('m',MANDI_JUORUT));});}
 /* ---------- halkominen ja onkiminen (v0.42) ---------- */
 let MG=null;
 function hakkuuInteract(){ask('Hakkuupölkky. Pölkyn päällä odottaa pölli.',['Hakkaa halkoja','Peru'],i=>{if(i!==0)return;
@@ -767,7 +763,7 @@ const MANDI_JUORUT=[
   ['Mandi: "Maukka karkasi aamulla torille ja toi takaisin Karan villasukan.','Minulle se ei ole tuonut koskaan mitään. Paitsi kerran hiiren, ja silloin minä itkin.','Unikirjan mukaan hiiri tietää rahaa. Odotan sitä yhä."'],
   ['Mandi: "Kaupan myyjä tilasi taas kaksi laatikkoa lakritsia. Kukaan ei tiedä kenelle.','Minä tiedän. Puolet minulle. Syön niitä, kun en saa unta.','Ja unta en saa, kun kuu kasvaa. Silloin näen unia veneistä, joissa ei ole airoja."'],
   ['Mandi: "Kara osti torilta kolme samanlaista kynttilänjalkaa. Sanoi, että ne ovat eri sävyä.','Minä ostin kerran kolme samanlaista kenkäparia. Petri huomasi sen vasta jouluna.','Olen vaaka. Tasapaino on minulle tärkeää, myös kengissä."'],
-  ['Mandi: "Merkurius peruuttaa taas. Minä en. Otatko makkaraperunat?"'],
+  ['Mandi: "Merkurius peruuttaa taas. Minä en. Istu nyt, kun kerran tulit."'],
   ['Mandi: "Pajatso? Rikki jo vuodesta yhdeksänkymmentäneljä. Pidän sen sisustuksena."']];
 const KARA_TORI=[
   ['Kara: "Petri sanoi, ettei hän halua puuttua asiaan.','Sitten hän piirsi servettiin kartan siitä, kenen vattuja oli poimittu."'],
@@ -2754,7 +2750,7 @@ function renderVihko(){if(vihkoPage>=vihkoPages())vihkoPage=0;
   else if(vihkoPage===2){const R=raimoState();
     const pn=R.st===0?'Tapaa Petri. Hänen pihansa on metsäpolun kelon kohdalta länteen.':R.st===1?(R.vasara===1?'Palauta lainattu vasara Petrille.':'Petri lainaa vasaraa, jos tarvitset.'):R.st===2?'Vie Petrille litra mustikoita piirakkaa varten.':(S.flags.sienestys?'Kantarellit: yksi paikka sienimetsän polun varressa, toinen sammalkiven takana.':curLevel()<2?'Mökkitasolla 2 Petrillä on sienivinkki.':'Juttele Petrin kanssa, hänellä on sienivinkki.');
     h+=vCard('Petri',R.st>0?RAIMO_ST[R.st]:'ei vielä tavattu',R.st>0?'Oma piha metsäpolun varrella · pihalla klo 7–22 · koira Maukka':'',pn);
-    if(S.flags.jaskaKaynti)h+=vCard('Mandi','Mandin grilli','Kylän grilli ja pubi · kahvi, makkaraperunat ja tarot','Päivän kortin saa kerran päivässä.');
+    if(S.flags.jaskaKaynti)h+=vCard('Mandi','Mandin grilli','Kylän grilli ja pubi · juorut ja tarot','Päivän kortin saa kerran päivässä.');
     if(mattiQ().tavattu)h+=vCard('Matti','Matin saari','Asuu pienellä saarella Vattulan edustalla · Petri vie veneellä venelaiturilta','');
     if(S.flags.kylaKaynti)h+=vCard('Kara','kirppis','Torilla klo 7–18, illalla Mandin grillillä','');
     h+='<p class="vdone">Taidot: rakennus '+buildSkill()+' · grillaus '+(S.grill>=3?2:1)+'</p>';}
@@ -3186,7 +3182,17 @@ function buildSaunaGround(){const ranta=S.saunaNyt==='ranta',W=9*64,H=7*64;groun
   for(let i=0;i<4;i++){g.fillStyle='rgba(0,0,0,'+(0.28-i*.06)+')';g.fillRect(64,128+i*2,448,2);}});ground.hd=1;}
 
 /* ---------- v0.48: Vattulan uimaranta ---------- */
-function uimaanKysy(){ask('Uimalaituri. Vesi on kirkasta, ja pohja näkyy laiturin päästä.',['Käy uimassa','Peru'],i=>{if(i===0)uimaan();});}
+function uimaanKysy(){const yo=isNight();ask(yo?'Uimalaituri kuutamossa. Rannalla ei ole ketään, ja vesi on tyyni.':'Uimalaituri. Vesi on kirkasta, ja pohja näkyy laiturin päästä.',yo?['Käy uimassa','Kuutamouinti nakuna','Peru']:['Käy uimassa','Peru'],i=>{if(i===0)uimaan();else if(yo&&i===1)nakuUinti();});}
+/* kuutamouinti nakuna (v0.49): vain yöllä. Hahmo ei näy; laiturilla on vaatepino ja vedessä pelkkä pää. */
+let NAKU=null;
+function nakuUinti(){const px=PL.x,py=PL.y;fadeTo(()=>{S.time=Math.min(1439,S.time+UINTI_MIN);NAKU={x:px,y:py};hud();save();},()=>{const first=!S.flags.nakuUinti;
+  say(['Rannalla ei ole ketään. Jätät vaatteet laiturille siistiin pinoon.','Liu\'ut kuutamoon. Vesi tuntuu silkiltä koko iholla, ja kuu piirtää järveen hopeisen polun.','Kaislikossa narahtaa. Vain sorsa. Kukaan ei näe.'],()=>{
+    if(first){S.flags.nakuUinti=true;addLog('Kävin kuutamouinnilla nakuna. Kukaan ei nähnyt, paitsi kuu.');}if(!S.flags.uinti){S.flags.uinti=true;addLog('Kävin ensimmäistä kertaa uimassa Vattulan uimarannalla.');}save();
+    fadeTo(()=>{NAKU=null;},()=>say('Kuivattelet pyyhkeellä ja puet vaatteet takaisin. Olo on kevyt.',()=>award('uinti',UINTI_XP,'Ensimmäinen uinti')),.05);});},.05);}
+function drawNaku(){if(!NAKU)return;const L=S.look,top=TOPS[L.top].c,pa=PANTS[L.pants][1],X=NAKU.x*TS,Y=NAKU.y*TS;
+  R(ctx,X+8,Y+22,16,4,pa);R(ctx,X+8,Y+22,16,1,T(pa,.25));R(ctx,X+9,Y+18,14,4,top);R(ctx,X+9,Y+18,14,1,T(top,.3));R(ctx,X+5,Y+24,4,3,'#3a2a20');R(ctx,X+23,Y+24,4,3,'#3a2a20');
+  const hx=6*TS+16,hy=27*TS+12+Math.round(Math.sin(frame/18));for(let r=0;r<2;r++){const rr=7+((frame/4+r*8)%12);ctx.globalAlpha=Math.max(0,1-rr/19);ctx.strokeStyle='#e6f6fc';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(hx,hy+3,rr,rr/3,0,0,6.3);ctx.stroke();}ctx.globalAlpha=1;
+  ell(ctx,hx,hy,4,4,SKINS[L.skin][1]);ell(ctx,hx,hy-2,4,3,HAIR_COLORS[L.hairC][1]);P(ctx,hx-2,hy,'#2a2320');P(ctx,hx+1,hy,'#2a2320');}
 function uimaan(){fadeTo(()=>{S.time=Math.min(1439,S.time+UINTI_MIN);hud();save();},()=>{const t=S.time,first=!S.flags.uinti;
   const L=t<600?['Aamu-uinti. Vesi on viileää ja peilityyntä. Uit laiturilta kaislikon reunaan ja takaisin.']:t<1080?['Järvi on lämmin kuin kylpyamme. Joku huutaa rannalta, että vesi on ihanaa. Se on totta.']:
     t<1260?['Iltauinti. Aurinko laskee puiden taakse, ja vesi on lämpimämpää kuin ilma.']:['Yöuinti. Kuu piirtää veteen hopeisen polun. Rannalla ei ole ketään muita.'];
@@ -3862,7 +3868,7 @@ function drawObj(o){if(BOAT&&o.k==='soutuvene'&&S.scene==='laituri'&&o.x===10&&o
     for(const d of DARTS){const dx=bx+d[0],dy=by+d[1];R(ctx,dx,dy,1,1,'#3a3a40');R(ctx,dx+1,dy+1,2,1,'#6a6a72');R(ctx,dx+3,dy+2,2,2,d[2]);}}
   if(o.k==='grill'&&grilling>0){const [x,y]=sprPos(c,o);R(ctx,x+6,y+14,28,1,(frame>>2)%2?'#e8762c':'#f4a040');
     for(const sx of [10,21]){R(ctx,x+sx,y+10,10,4,'#7a2e1c');R(ctx,x+sx,y+10,10,1,'#c05a30');P(ctx,x+sx+3,y+11,'#e08a58');}}}
-function drawPlayer(){if(!CH)return;if(BOAT)return;if(COFFEE){const b=YOBJ.find(o=>o.k==='mpenkki');if(b){drawSitter(charL(S.look),b,0);return;}}if(mode==='sit'&&SIT){if(SIT.o.k==='lauteet')drawSitterHD(SIT.o,SIT.i);else if(SIT.o.k==='kansituoli')drawDeckSitter(SIT.o);else drawSitter(charL(S.look),SIT.o,SIT.i);return;}const prog=Math.abs(PL.px-PL.x*TS)+Math.abs(PL.py-PL.y*TS);
+function drawPlayer(){if(!CH)return;if(BOAT)return;if(NAKU){drawNaku();return;}if(COFFEE){const b=YOBJ.find(o=>o.k==='mpenkki');if(b){drawSitter(charL(S.look),b,0);return;}}if(mode==='sit'&&SIT){if(SIT.o.k==='lauteet')drawSitterHD(SIT.o,SIT.i);else if(SIT.o.k==='kansituoli')drawDeckSitter(SIT.o);else drawSitter(charL(S.look),SIT.o,SIT.i);return;}const prog=Math.abs(PL.px-PL.x*TS)+Math.abs(PL.py-PL.y*TS);
   const fi=PL.moving&&prog<16?(PL.parity?1:2):0;const x=Math.round(PL.px),y=Math.round(PL.py);
   ell(ctx,x+17,y+29,10,2,'rgba(14,52,70,.35)');const blink=!PL.moving&&PL.dir!=='up'&&(frame%250)<7;if(HDV){const c=hdPlayer()[PL.dir][blink?3:fi];dS(ctx,c,x+16-c.width/4,y+30-c.bot-1);return;}ctx.drawImage(CH[PL.dir][blink?3:fi],x-3,y-24);}
 function draw(){
