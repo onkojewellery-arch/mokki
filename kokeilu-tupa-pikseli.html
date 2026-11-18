@@ -16,11 +16,11 @@ button{pointer-events:auto;white-space:nowrap;font:inherit;font-size:14px;font-w
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="bar top"><button id="back">← Peliin</button><span class="title">VINO TUPA · PIKSELI</span><span style="display:flex;gap:6px"><button id="zo">−</button><button id="zi">+</button></span></div>
-<div class="bar bottom"><button id="kaanna">Käännä tuoli</button><button id="hahmo">Ilman hahmoa</button><button id="vekt">Vektori</button></div>
+<div class="bar top"><button id="back">← Peliin</button><span class="title">MUMMON TUPA · VINO</span><span style="display:flex;gap:6px"><button id="zo">−</button><button id="zi">+</button></span></div>
+<div class="bar bottom"><button id="koko">Koko tupa</button><button id="hahmo">Ilman hahmoa</button><button id="vekt">Vektori</button></div>
 <script>
 /* ===================================================================
-   MÖKKI – vino tupa, pikselikokeilu (v0.76: ilman rasterikohinaa; v0.75: hahmo ja tarkempi mittakaava)
+   MÖKKI – vino tupa, pikselikokeilu (v0.77: koko tupa pelaajan tallennuksesta; v0.76: ilman rasterikohinaa; v0.75: hahmo ja tarkempi mittakaava)
    Vain kuvakulma muuttuu: grafiikka on alkuperäisen pelin kaltaista pikseligrafiikkaa.
    Kaikki piirretään pikselipuskureihin ilman reunanpehmennystä: monikulmiot rivi kerrallaan,
    pinnat pikselikohtaisilla materiaalivarjostimilla (rasterointi Bayer 4×4), ja jokainen esine
@@ -28,7 +28,7 @@ button{pointer-events:auto;white-space:nowrap;font:inherit;font-size:14px;font-w
    Taidepikselit skaalataan näytölle kokonaislukukertoimella.
    =================================================================== */
 const TW=48,TH=24,ZH=54;          /* v0.75: ruutu 96 × 48 taidepikseliä, korkeusyksikkö 54 px: pelin tuvan HD-hahmo (48 × 100) sopii mittakaavaan sellaisenaan */
-const RW=3.2,RD=2.7,WALL_H=2.45;  /* kompakti huone */
+const RW=8,RD=6,WALL_H=2.45;      /* v0.77: koko tupa kuten pelissä (8 × 6 ruutua) */
 const AW=Math.ceil((RW+RD)*TW+40),AH=Math.ceil(WALL_H*ZH+(RW+RD)*TH+70),OX=AW/2-((RW-RD)*TW)/2,OY=WALL_H*ZH+22;  /* taidekankaan koko ja origo */
 const OUTLINE=[42,26,14];
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
@@ -154,13 +154,79 @@ function renderObj(o){const D=DEFS[o.t],[w,d]=o.r%2?[D.fd,D.fw]:[D.fw,D.fd],L={.
   const pts=[];for(const [x,y] of [[0,0],[w,0],[w,d],[0,d]])for(const z of [0,h])pts.push(P(x,y,z));const ox=Math.floor(Math.min(...pts.map(p=>p[0])))-4,oy=Math.floor(Math.min(...pts.map(p=>p[1])))-6;
   const B=Buf(Math.ceil(Math.max(...pts.map(p=>p[0])))-ox+6,Math.ceil(Math.max(...pts.map(p=>p[1])))-oy+6);
   if(D.rug)drawRugPx(B,L,ox,oy);
-  const ps=D.parts().slice();if(o.deco&&D.top)for(const dd of o.deco)for(const p of DECO[dd.t](dd.ox,dd.oy)){p.z+=D.top;p.k=10;ps.push(p);}
-  for(const p of sortParts(ps,L)){if(p.t==='box')drawBoxPx(B,p,L,ox,oy);else if(p.t==='cyl')drawCylPx(B,p,L,ox,oy);else if(p.t==='blob')drawBlobPx(B,p,L,ox,oy);else if(p.t==='dome')drawDomePx(B,p,L,ox,oy);else if(p.t==='fl')drawFlowersPx(B,p,L,ox,oy);}
+  const ps=D.parts(o).slice();if(o.deco&&D.top)for(const dd of o.deco)for(const p of DECO[dd.t](dd.ox,dd.oy)){p.z+=D.top;p.k=10;ps.push(p);}
+  for(const p of sortParts(ps,L)){if(p.t==='box')drawBoxPx(B,p,L,ox,oy);else if(p.t==='cyl')drawCylPx(B,p,L,ox,oy);else if(p.t==='blob')drawBlobPx(B,p,L,ox,oy);else if(p.t==='dome')drawDomePx(B,p,L,ox,oy);else if(p.t==='fl')drawFlowersPx(B,p,L,ox,oy);else if(p.t==='cards')drawCardsPx(B,p,L,ox,oy);}
   outline(B);return {B,ox,oy,w,d};}
 
+/* ---------- v0.77: koko tupa. Lisämateriaalit ---------- */
+function hexOf(c){return '#'+c.map(v=>Math.max(0,Math.min(255,v|0)).toString(16).padStart(2,'0')).join('');}
+const PALC_={};function palOf(h){return PALC_[h]||(PALC_[h]=[-.42,-.24,0,.16,.32].map(k=>hexOf(shc(C(h),k))));}
+function M_flat(h,o){const R=palOf(h);return (u,v,face,x,y,lf,pu,pv)=>{let t=FACE_L[face]+(face==='top'?0:(v-.5)*.12);
+    if(o&&o.band&&face!=='top'&&v>.55&&v<.68)return ramp(palOf(o.band),FACE_L[face],x,y);
+    if(face==='top'&&(u>1-pu*1.2||v<pv*1.2))t+=.12;if(face!=='top'&&v<pv*1.5)t-=.14;return ramp(R,t,x,y);};}
+const SAGE='#a3bcb0';
+function M_sage(o){const R=palOf(SAGE);return (u,v,face,x,y,lf,pu,pv)=>{let t=FACE_L[face]+(face==='top'?0:(v-.5)*.1);
+    if(o&&o.doors&&lf==='+y'){const n=o.doors,i=Math.min(n-1,Math.floor(u*n)),u0=i/n+.035,u1=(i+1)/n-.035,v0=o.tall?.06:.12,v1=o.tall?.95:.86;
+      if(u>u0&&u<u1&&v>v0&&v<v1){if(u<u0+pu*1.5||v>v1-pv*1.5)t+=.16;else if(u>u1-pu*1.5||v<v0+pv*1.5)t-=.2;else{t+=.06;
+        const kx=i%2?u0+.06:u1-.06;if(Math.abs(u-kx)<pu*1.3&&Math.abs(v-.5)<pv*1.3)return C('#e8c050');
+        if(o.flowers){const cu=(u0+u1)/2,cv=o.tall?.72:.6,du=(u-cu)/(u1-u0),dv=v-cv;for(const [a,b,c] of [[-.2,.04,'#c0443a'],[.2,.04,'#dfae35'],[0,.1,'#c0443a']])if(Math.abs(du-a)<.08&&Math.abs(dv-b)<.035)return C(c);if(Math.abs(du)<.03&&dv<.05&&dv>-.12)return C('#4f8a40');}}}
+      else if(u>u0-pu*1.5&&u<u1+pu*1.5&&v>v0-pv*1.5&&v<v1+pv*1.5)t-=.22;}
+    if(face==='top'&&(u>1-pu*1.2||v<pv*1.2))t+=.12;if(face!=='top'&&v<pv*2)t-=.18;return ramp(R,t,x,y);};}
+function M_tile(o){const R=palOf('#efe6d2');return (u,v,face,x,y,lf,pu,pv)=>{let t=FACE_L[face]+.08;
+    if(o&&o.fire&&lf==='+y'){if(u>.26&&u<.74&&v>.18&&v<.56){if(u<.3||u>.7||v<.22||v>.52)return C('#26262c');const f=(v-.22)/.3;return C(f<.35?'#ffd060':f<.7?'#e8762c':'#8a2a12');}if(v>.6&&v<.6+pv*2.2)return C('#d0a848');}
+    const gu=(u*4)%1,gv=(v*3)%1;if(gu<pu*4*1.2||gv<pv*3*1.2)t-=.18;else if(gu<pu*4*2.4&&gv>pv*3*1.2)t+=.06;
+    return ramp(R,t,x,y);};}
+function M_iron(o){const R=palOf('#45454e');return (u,v,face,x,y,lf,pu,pv)=>{let t=FACE_L[face];if(face==='top'&&o&&o.rings){for(const cu of [.3,.7]){const d=Math.hypot((u-cu)*1.1,(v-.5));if(d<.17&&d>.11)t-=.25;else if(d<.11)t+=.06;}}
+    if(face==='top'&&(u>1-pu*1.2||v<pv*1.2))t+=.2;return ramp(R,t,x,y);};}
+function M_counter(o){const W=M_wood({});return (u,v,face,x,y,lf,pu,pv)=>{if(face==='top'&&o&&o.sink){const [a,b]=o.sink;if(u>a&&u<b&&v>.18&&v<.78){if(u<a+pu*1.5||v>.78-pv*1.5)return C('#7a8a92');if(u>b-pu*1.5||v<.18+pv*1.5)return C('#dfe6e8');return C(v>.6?'#9aa8ae':'#b8c6cc');}}return W(u,v,face,x,y,lf,pu,pv);};}
+function M_quilt(){const L=M_flat('#f4efe4');const Q=['#c95a48','#e9c46a','#6f9ac0','#f2ead8','#7ea36a'];return (u,v,face,x,y,lf,pu,pv)=>{if(face!=='top'){const c=C(Q[(Math.floor(u*4)+2)%5]);return shc(c,face==='+x'?-.2:-.06);}
+    const i=Math.floor(u*4),j=Math.floor(v*6),fu=(u*4)%1,fv=(v*6)%1;const c=C(Q[(i+j*2)%5]);if(fu<pu*4*1.2||fv<pv*6*1.2)return shc(c,-.22);if(fu<pu*4*2.4||fv<pv*6*2.4)return shc(c,.1);return c;};}
+function M_cloth(o){const W=M_wood({});return (u,v,face,x,y,lf,pu,pv)=>{if(face==='top'&&u>.16&&u<.84&&v>.12&&v<.88){if(u<.16+pu*1.5||u>.84-pu*1.5||v<.12+pv*1.5||v>.88-pv*1.5)return C('#d6cdb8');if((x*3+y*5)%9===0)return C('#e4dccb');return C('#f6f1e4');}return W(u,v,face,x,y,lf,pu,pv);};}
+/* lisäosat: kortit, kirje ja pyöreä ruukku */
+function drawCardsPx(B,s,o,ox,oy){const [lx,ly]=rotP(s.x,s.y,o.fw,o.fd,o.r);const p=P(lx,ly,s.z);const bx=Math.round(p[0]-ox),by=Math.round(p[1]-oy);
+  if(s.kortit){for(let yy=0;yy<7;yy++)for(let xx=0;xx<10;xx++)setp(B,bx-14+xx+Math.floor(yy/2),by-4+yy,C(xx===0||yy===0||xx===9||yy===6?'#1c2c5a':(xx+yy)%2?'#3a5aa0':'#5a7ac0'));
+    for(const [dx,dy,c] of [[2,-2,'#c8302a'],[8,0,'#26262c'],[14,-1,'#c8302a']]){for(let yy=0;yy<7;yy++)for(let xx=0;xx<9;xx++)setp(B,bx+dx+xx+Math.floor(yy/2),by+dy+yy-2,C(xx===8||yy===6?'#c8c4b4':'#fbfaf4'));setp(B,bx+dx+5,by+dy+1,C(c));setp(B,bx+dx+4,by+dy+1,C(c));}}
+  else{for(let yy=0;yy<7;yy++)for(let xx=0;xx<14;xx++)setp(B,bx-4+xx+Math.floor(yy/2),by-3+yy,C(xx===13||yy===6?'#d8d4c4':'#ffffff'));for(let k=0;k<3;k++)for(let xx=0;xx<8-k*2;xx++)setp(B,bx-1+xx+k,by-1+k*2,C('#8a8aa0'));}}
+const legW=(x,y,h,r)=>({t:'cyl',x,y,z:0,r:r||.04,h,pal:PALW.slice(0,4)});
+Object.assign(DEFS,{
+  hella:{fw:1,fd:1,h:2.45,fixed:1,parts:()=>[{t:'box',x:.04,y:.08,z:0,w:.92,d:.84,h:.8,mat:M_tile({fire:1})},{t:'box',x:0,y:.04,z:.8,w:1,d:.92,h:.08,mat:M_iron({rings:1})},{t:'cyl',x:.5,y:.22,z:.88,r:.09,h:1.57,pal:['#2c2c34','#45454e','#5a5a64','#7a7a84']}]},
+  tiski:{fw:4,fd:1,h:1.05,fixed:1,parts:()=>[{t:'box',x:0,y:.1,z:0,w:4,d:.78,h:.84,mat:M_sage({doors:6})},{t:'box',x:0,y:.04,z:.84,w:4,d:.92,h:.07,mat:M_counter({sink:[.18,.4]})},
+    {t:'cyl',x:1.1,y:.18,z:.91,r:.03,h:.22,pal:['#7a8088','#a8aeb6','#c8ccd0','#e4e8ec']},{t:'blob',x:3.25,y:.45,z:1.0,r:.12,rz:.09,pal:['#1c2c4a','#2e4a7a','#4a6fa5','#7a9ad0']},{t:'cyl',x:2.4,y:.4,z:.91,r:.05,h:.09,pal:palOf('#f4efe4')},{t:'cyl',x:2.62,y:.5,z:.91,r:.05,h:.09,pal:palOf('#f4efe4')}]},
+  kylmalaukku:{fw:1,fd:1,h:.62,parts:()=>[{t:'box',x:.12,y:.16,z:0,w:.76,d:.68,h:.44,mat:M_flat('#3e6aa8',{band:'#6a94d0'})},{t:'box',x:.1,y:.14,z:.44,w:.8,d:.72,h:.1,mat:M_flat('#f0ead8')},
+    {t:'box',x:.22,y:.44,z:.54,w:.06,d:.06,h:.1,mat:M_flat('#2a2320')},{t:'box',x:.72,y:.44,z:.54,w:.06,d:.06,h:.1,mat:M_flat('#2a2320')},{t:'box',x:.22,y:.44,z:.62,w:.56,d:.06,h:.04,mat:M_flat('#2a2320')}]},
+  kaappi:{fw:1,fd:1,h:2.1,parts:()=>[{t:'box',x:.06,y:.12,z:0,w:.88,d:.78,h:1.92,mat:M_sage({doors:2,tall:1,flowers:1})},{t:'box',x:0,y:.06,z:1.92,w:1,d:.9,h:.12,mat:M_sage({})}]},
+  poyta:{fw:2,fd:1,h:.75,top:.71,parts:o=>{const P0=[legW(.14,.16,.64),legW(1.86,.16,.64),legW(.14,.84,.64),legW(1.86,.84,.64),{t:'box',x:.06,y:.08,z:.54,w:1.88,d:.84,h:.1,mat:M_wood({})},{t:'box',x:0,y:0,z:.64,w:2,d:1,h:.07,mat:M_cloth()}];
+    if(o&&o.mummo){P0.push({t:'blob',x:.95,y:.5,z:.8,r:.07,rz:.09,pal:PALC,glint:1,k:10},{t:'fl',x:.95,y:.5,z:.94,k:10},{t:'cards',x:1.42,y:.55,z:.71,kortit:o.kortit,k:10});}return P0;}},
+  tuoli:{fw:1,fd:1,h:1.0,parts:()=>[legW(.22,.24,.44),legW(.78,.24,.44),legW(.22,.8,.44),legW(.78,.8,.44),{t:'box',x:.16,y:.18,z:.42,w:.68,d:.68,h:.06,mat:M_wood({})},
+    legW(.22,.21,1.0,.035),legW(.78,.21,1.0,.035),{t:'box',x:.2,y:.17,z:.66,w:.6,d:.06,h:.08,mat:M_wood({})},{t:'box',x:.2,y:.17,z:.86,w:.6,d:.06,h:.12,mat:M_wood({})}]},
+  sanky:{fw:1,fd:2,h:1.0,parts:()=>[legW(.1,.1,.2,.05),legW(.9,.1,.2,.05),legW(.1,1.9,.2,.05),legW(.9,1.9,.2,.05),{t:'box',x:.04,y:.04,z:.16,w:.92,d:1.92,h:.18,mat:M_wood({})},
+    {t:'box',x:.02,y:0,z:.1,w:.96,d:.12,h:.9,mat:M_wood({drawer:0})},{t:'box',x:.08,y:.12,z:.34,w:.84,d:1.82,h:.14,mat:M_flat('#f6f1e4')},{t:'blob',x:.5,y:.38,z:.55,r:.26,rz:.09,pal:palOf('#f8f4ea')},
+    {t:'box',x:.07,y:.66,z:.44,w:.86,d:1.3,h:.08,mat:M_quilt()},{t:'box',x:.07,y:.62,z:.45,w:.86,d:.12,h:.09,mat:M_flat('#f6f1e4')}]},
+  isomatto:{fw:3,fd:2,rug:true,h:0,parts:()=>[]},
+  kasvi:{fw:1,fd:1,h:1.0,parts:()=>[{t:'cyl',x:.5,y:.5,z:0,r:.2,h:.32,pal:palOf('#c06a3a')},{t:'blob',x:.5,y:.5,z:.55,r:.3,rz:.26,pal:['#1f4a26','#2e6a32','#3d7a3a','#4f8a40','#6aa94c']},{t:'blob',x:.4,y:.6,z:.7,r:.18,rz:.16,pal:['#1f4a26','#2e6a32','#4f8a40','#6aa94c','#8ac860']},
+    {t:'blob',x:.62,y:.42,z:.78,r:.07,rz:.06,pal:['#8a1a14','#c0302a','#e2322e','#ff8a7a']},{t:'blob',x:.36,y:.44,z:.72,r:.06,rz:.05,pal:['#8a1a14','#c0302a','#e2322e','#ff8a7a']}]},
+  muu:{fw:1,fd:1,h:.8,parts:()=>[{t:'box',x:.12,y:.12,z:0,w:.76,d:.76,h:.7,mat:M_flat('#a88a64')}]}
+});
+DECO.lasimaljakko=(ox,oy)=>[{t:'blob',x:ox,y:oy,z:.09,r:.07,rz:.1,pal:['#6a9aaa','#8ab4c2','#b8dcec','#d8eef4','#ffffff'],glint:1},{t:'fl',x:ox,y:oy,z:.2}];
+DECO.poytalamppu=DECO.lamppu;
+/* pelin tallennuksen kalusteet → vino tupa: pelin x 1–8 → 0–8, y 2–7 → 0–6, mitat ja kääntö kuten pelissä */
+const GAME_DIMS={tiski:[4,1],kansituoli:[1,2],poyta:[2,1],sanky:[1,2],matto:[2,1],isomatto:[3,2]};
+const DEFAULT_FURN=[{id:'hella',t:'hella',x:1,y:2,r:0},{id:'tiski',t:'tiski',x:2,y:2,r:0},{id:'laukku',t:'kylmalaukku',x:7,y:2,r:0},{id:'kaappi',t:'kaappi',x:8,y:2,r:0},{id:'poyta',t:'poyta',x:3,y:4,r:0},
+  {id:'tuoli1',t:'tuoli',x:2,y:4,r:3},{id:'tuoli2',t:'tuoli',x:5,y:4,r:1},{id:'sanky',t:'sanky',x:8,y:5,r:0},{id:'matto',t:'matto',x:4,y:6,r:0},{id:'nojatuoli',t:'nojatuoli',x:1,y:6,r:3}];
+function invRot(wx,wy,fw,fd,r){switch(r){case 1:return [wy,fd-wx];case 2:return [fw-wx,fd-wy];case 3:return [fw-wy,wx];default:return [wx,wy];}}
+function loadTupa(){let S=null;try{S=JSON.parse(localStorage.getItem('mokki-v01')||'null');}catch(_){}
+  const F=(S&&Array.isArray(S.furn)&&S.furn.length)?S.furn:DEFAULT_FURN,kirje=!!(S&&S.flags&&S.flags.kirje);const isDeco=t=>t==='poytalamppu'||t==='maljakko'||t==='lasimaljakko';
+  const objs=F.filter(f=>!isDeco(f.t)).map(f=>({id:f.id,t:DEFS[f.t]?f.t:'muu',game:f.t,x:f.x-1,y:f.y-2,r:(f.r||0)%4,mummo:f.id==='poyta'&&f.t==='poyta',kortit:kirje,deco:[]}));
+  for(const v of F.filter(f=>isDeco(f.t))){const tb=objs.find(o=>(o.t==='poyta'||o.t==='sivupoyta')&&(()=>{const D=DEFS[o.t],[w,d]=o.r%2?[D.fd,D.fw]:[D.fw,D.fd];return v.x-1>=o.x&&v.x-1<o.x+w&&v.y-2>=o.y&&v.y-2<o.y+d;})());if(!tb)continue;
+    const same=F.filter(q=>isDeco(q.t)&&q.x===v.x&&q.y===v.y);let wx=v.x-1-tb.x+.5,wy=v.y-2-tb.y+.5;if(same.length>1){const first=same.sort((a,b)=>(a.t==='poytalamppu'?0:1)-(b.t==='poytalamppu'?0:1))[0]===v;wx+=first?-.2:.22;wy+=first?.2:-.2;}
+    const D=DEFS[tb.t],[lx,ly]=invRot(wx,wy,D.fw,D.fd,tb.r);tb.deco.push({t:v.t==='poytalamppu'?'lamppu':v.t,ox:lx,oy:ly});}
+  return {objs,fromSave:!!(S&&S.furn)};}
+
 /* ---------- huone: lattia, hirsiseinät, ikkuna ja varjot samaan puskuriin ---------- */
-const WIN={a:.35,b:1.45,z0:1.0,z1:1.95};            /* ikkuna vasemmassa takaseinässä (x=0), lukunurkan yllä */
-const WIN2={a:1.75,b:2.75,z0:1.05,z1:1.95};          /* toinen ikkuna oikeassa takaseinässä (y=0) */
+/* v0.77: seinien ikkunat ja koristeet kuten pelin tuvassa: kaksi ikkunaa tiskin yllä, käkikello ja taulu, ikkuna vasemmalla lukunurkan kohdalla */
+const WALLF=[{w:'y0',k:'win',a:1.2,b:2.4,z0:1.25,z1:2.15},{w:'y0',k:'clock',a:2.75,b:3.25,z0:1.45,z1:2.1},{w:'y0',k:'win',a:3.6,b:4.8,z0:1.25,z1:2.15},{w:'y0',k:'taulu',a:5.4,b:6.3,z0:1.4,z1:2.0},{w:'x0',k:'win',a:3.6,b:4.8,z0:1.0,z1:1.95},{w:'x0',k:'taulu',a:1.2,b:2.0,z0:1.35,z1:1.95}];
+const WIN={a:3.6,b:4.8};
+const DOOR={a:4.0,b:5.0};
 const PLANK=['#c9955e','#cf9b63','#c48f58','#cc985f'],LOGL=['#7a4c26','#9a6436','#b7834e','#c99a62','#dcb07a'],LOGR=['#8a5a30','#ab7442','#c69058','#d8a86c','#e8c08a'];
 function windowPx(u,v,x,y,wall){/* u vaakasuunta ikkunassa 0–1, v pystyssä 0–1 alhaalta */
   if(u<-.13||u>1.13||v<-.08||v>1.16)return null;
@@ -170,6 +236,9 @@ function windowPx(u,v,x,y,wall){/* u vaakasuunta ikkunassa 0–1, v pystyssä 0�
   if(u<.24||u>.76||v<.04||v>.96)return C('#f2ead8');if(Math.abs(u-.5)<.025||Math.abs(v-.5)<.035)return C('#f2ead8');
   const tree=Math.abs(((u-.24)*9)%1-.5)<(.5-v*1.1)*.9&&v<.45;if(tree)return C(Math.floor((u-.24)*9)%2?'#2f6a44':'#3a7a50');
   if(v<.12)return C('#8cc070');return C(v<.35?'#9cd2ec':v<.7?'#bfe3f2':'#e6f4f6');}
+function clockPx(u,v){if(u<0||u>1||v<-.35||v>1)return null;if(v<0)return (Math.abs(u-.5)<.05&&v>-.3)?C('#c9a040'):(Math.abs(u-.5)<.14&&v<-.24)?C('#d8b050'):null;
+  const d=Math.hypot((u-.5)*1.3,(v-.55)*1.6);if(v>.92||u<.08||u>.92)return C('#6e4426');if(d<.36){if(d>.32)return C('#3a2a1e');if((Math.abs(u-.5)<.03&&v>.55&&v<.8)||(Math.abs(v-.55)<.03&&u>.5&&u<.68))return C('#2a2320');return C('#f6f1e4');}return C(v>.85?'#9a6c44':'#8a5a32');}
+function tauluPx(u,v){if(u<-.06||u>1.06||v<-.06||v>1.06)return null;if(u<0||u>1||v<0||v>1)return C('#8a5a32');if(v>.5)return C(v>.8?'#cfe4ec':'#e8eee0');if(v>.42&&u<.6&&Math.abs(u-.3)<(v-.42)*-3+.3)return C('#3a6a48');if(v>.4&&u>.62&&u<.9&&v<.48)return C('#c0443a');return C(v>.2?'#6a9ab8':'#4a7a98');}
 function renderRoom(objs){const B=Buf(AW,AH);
   /* lattia: lankut x-suunnassa, saumat ja hillitty syy */
   const F=[P(0,0,0),P(RW,0,0),P(RW,RD,0),P(0,RD,0)];
@@ -178,12 +247,11 @@ function renderRoom(objs){const B=Buf(AW,AH);
     const fy=wy*2-row,fx=((wx+off)/1.6)%1;if(fy>1-1/8)k-=.16;if(fx<.012)k-=.14;if(Math.sin(wx*24+row*3+Math.sin(wx*3)*2)>.93)k-=.06;
     k-=wy<.12?.18:wy<.26?.1:wy<.4?.05:0;k-=wx<.12?.16:wx<.26?.09:wx<.4?.04:0;
     for(const [ox,oy,w,d] of foot){if(wx>ox-.04&&wx<ox+w+.1&&wy>oy-.04&&wy<oy+d+.12){const inner=wx>ox+.02&&wx<ox+w+.02&&wy>oy+.02&&wy<oy+d+.04;k-=inner?.2:.1;}}
-    const lx=wx-.1-(wy)*.0,inLight=wy>WIN.a+wx*.35&&wy<WIN.b+wx*.35&&wx<1.8&&wx>0;if(inLight&&wx<1.3)k+=.06;
+    const inLight=wy>WIN.a+wx*.35&&wy<WIN.b+wx*.35&&wx<1.8&&wx>0;if(inLight&&wx<1.3)k+=.06;if(wx>DOOR.a&&wx<DOOR.b&&wy>RD-.5)k-=.04;
     return shc(c,k);});
   /* seinät: hirret, tiiviste, syy ja oksat; ikkunat seinän suuntaisesti */
   const wall=(pts,len,R,fac,isLeft)=>{const A=pts[0],Bp=pts[1],D=pts[3],m=uvOf(A,Bp,D);fillPoly(B,pts,(x,y)=>{const [u,v]=m.f(x,y);const wu=u*len,z=v*WALL_H;
-      if(isLeft){const wv=(wu-WIN.a)/(WIN.b-WIN.a),zv=(z-WIN.z0)/(WIN.z1-WIN.z0);const c=windowPx(wv,zv,x,y,'x0');if(c)return c;}
-      else{const wv=(wu-WIN2.a)/(WIN2.b-WIN2.a),zv=(z-WIN2.z0)/(WIN2.z1-WIN2.z0);const c=windowPx(wv,zv,x,y,'y0');if(c)return c;}
+      for(const F of WALLF){if((F.w==='x0')!==isLeft)continue;const fa=isLeft?RD-F.b:F.a,fb=isLeft?RD-F.a:F.b,wv=(wu-fa)/(fb-fa),zv=(z-F.z0)/(F.z1-F.z0);const c=F.k==='win'?windowPx(wv,zv,x,y):F.k==='clock'?clockPx(wv,zv):tauluPx(wv,zv);if(c)return c;}
       const lg=Math.floor(z/.27),f=z/.27-lg;let t=fac+(f-.5)*.34+(rnd(lg,isLeft?1:2)-.5)*.1;if(f<.07)return C('#d6c496');if(f<.13)t-=.25;
       if(Math.sin(wu*20+lg*4+Math.sin(wu*2+lg)*2)>.9)t-=.1;if(rnd(lg,Math.floor(wu*3))>.9&&Math.abs((wu*3)%1-.5)<.05&&Math.abs(f-.5)<.2)t-=.3;
       if(z<.3)t-=(.3-z)*.8;if(wu<.35)t-=(.35-wu)*.5;
@@ -195,8 +263,9 @@ function renderRoom(objs){const B=Buf(AW,AH);
   fillPoly(B,[P(0,0,WALL_H),P(0,RD,WALL_H),P(-.16,RD,WALL_H),P(-.16,-.16,WALL_H)],(x,y)=>ramp(LOGL,.2,x,y));
   for(let i=0;i<9;i++){const c=P(0,0,(i+.5)*.27);for(let dy=-4;dy<=4;dy++)for(let dx=-3;dx<=3;dx++)if(dx*dx/9+dy*dy/16<=1)setp(B,c[0]+dx,c[1]+dy,ramp(['#8a5a32','#b8864e','#d8a670','#ecc290'],.6-dx*.08-dy*.06+(dx*dx+dy*dy<4?.2:0),c[0]+dx,c[1]+dy));}
   /* nukkekoti: kameran puoleiset seinät väistyvät, jäljelle jää matala hirsikynnys */
-  fillPoly(B,[P(0,RD,0),P(RW,RD,0),P(RW,RD,.16),P(0,RD,.16)],(x,y)=>ramp(LOGL,.4,x,y));
-  fillPoly(B,[P(0,RD,.16),P(RW,RD,.16),P(RW,RD+.13,.16),P(0,RD+.13,.16)],(x,y)=>ramp(LOGR,.65,x,y));
+  for(const [a,b] of [[0,DOOR.a],[DOOR.b,RW]]){fillPoly(B,[P(a,RD,0),P(b,RD,0),P(b,RD,.16),P(a,RD,.16)],(x,y)=>ramp(LOGL,.4,x,y));fillPoly(B,[P(a,RD,.16),P(b,RD,.16),P(b,RD+.13,.16),P(a,RD+.13,.16)],(x,y)=>ramp(LOGR,.65,x,y));}
+  fillPoly(B,[P(DOOR.a,RD,0),P(DOOR.b,RD,0),P(DOOR.b,RD+.13,0),P(DOOR.a,RD+.13,0)],(x,y)=>ramp(LOGR,.45,x,y));
+  fillPoly(B,[P(DOOR.a+.12,RD+.16,0),P(DOOR.b-.12,RD+.16,0),P(DOOR.b-.12,RD+.62,0),P(DOOR.a+.12,RD+.62,0)],(x,y)=>((x+y)%4<2?C('#8a6a3a'):C('#a8844e')));
   fillPoly(B,[P(RW,RD,0),P(RW,0,0),P(RW,0,.16),P(RW,RD,.16)],(x,y)=>ramp(LOGL,.25,x,y));
   fillPoly(B,[P(RW,0,.16),P(RW,RD+.13,.16),P(RW+.13,RD+.13,.16),P(RW+.13,0,.16)],(x,y)=>ramp(LOGR,.6,x,y));
   fillPoly(B,[P(0,RD+.13,0),P(RW+.13,RD+.13,0),P(RW+.13,RD+.13,-.45),P(0,RD+.13,-.45)],()=>C('#4a3020'));
@@ -204,7 +273,7 @@ function renderRoom(objs){const B=Buf(AW,AH);
   return B;}
 
 /* ---------- koostaminen (v0.75): tausta ja esineet välimuistiin, hahmo piirretään joka ruutuun ---------- */
-const ST={objs:[{t:'sivupoyta',x:.12,y:.12,r:0,deco:[{t:'lamppu',ox:.3,oy:.7},{t:'maljakko',ox:.72,oy:.3}]},{t:'nojatuoli',x:1.18,y:.14,r:0},{t:'matto',x:.9,y:1.05,r:0}]};
+const TUPA=loadTupa(),ST={objs:TUPA.objs};
 function behind(A,B){if(A.x+A.w<=B.x+1e-6)return true;if(B.x+B.w<=A.x+1e-6)return false;if(A.y+A.d<=B.y+1e-6)return true;if(B.y+B.d<=A.y+1e-6)return false;return (A.x+A.w/2+A.y+A.d/2)<(B.x+B.w/2+B.y+B.d/2);}
 function sortInst(L){const left=L.slice(),res=[];while(left.length){let pk=0;for(let i=0;i<left.length;i++)if(!left.some((B,j)=>j!==i&&behind(B,left[i]))){pk=i;break;}res.push(left.splice(pk,1)[0]);}return res;}
 function toCanvas(B){const c=document.createElement('canvas');c.width=B.w;c.height=B.h;c.getContext('2d').putImageData(new ImageData(B.d,B.w,B.h),0,0);return c;}
@@ -222,7 +291,7 @@ async function loadHahmo(){try{const src=await (await fetch('index.html',{cache:
   let look={hair:0,hairC:0,skin:0,eye:0,glasses:0,top:0,pants:0,shoes:0};try{const s=JSON.parse(localStorage.getItem('mokki-v01')||'null');if(s&&s.look)look=Object.assign(look,s.look);}catch(_){}
   HAHMO=M.HDM.player(look);const c=HAHMO.down[0],d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;for(let y=c.height-1;y>=0;y--){let f=false;for(let x=0;x<c.width;x++)if(d[(y*c.width+x)*4+3]>0){f=true;break;}if(f){FOOT=y;break;}}
   return true;}catch(e){console.warn('hahmo',e);return false;}}
-const PL={x:2.3,y:2.0,path:[],dir:'down',walk:0,frame:0};
+const PL={x:4.5,y:5.3,path:[],dir:'up',walk:0,frame:0};
 const SPEED=2.2;
 function plDirFrom(dx,dy){const sx=dx-dy,sy=(dx+dy)/2;if(Math.abs(sx)>Math.abs(sy)*1.2)return sx>0?'right':'left';return sy>0?'down':'up';}
 /* varjo hahmon alle: rasteroitu soikio, ei pehmeää hohtoa */
@@ -246,21 +315,25 @@ function paintArt(){const g=ACTX;g.imageSmoothingEnabled=false;g.clearRect(0,0,A
   const solids=OBJS.filter(i=>!i.rug),P0=HAHMO&&SHOW_PL?{pl:true,x:PL.x-.18,y:PL.y-.18,w:.36,d:.36}:null;
   for(const I of sortInst(P0?solids.concat([P0]):solids)){if(I.pl){const [fx,fy]=P(PL.x,PL.y,0),fi=PL.path.length?[1,0,2,0][Math.floor(PL.walk*7)%4]:0,c=HAHMO[PL.dir][fi];
       g.drawImage(PSH,Math.round(fx)-15,Math.round(fy)-6);g.drawImage(c,Math.round(fx-c.width/2),Math.round(fy-FOOT));continue;}g.drawImage(I.c,I.bx,I.by);}}
-function draw(){const W=cv.width,H=cv.height;ctx.imageSmoothingEnabled=false;ctx.fillStyle='#241a14';ctx.fillRect(0,0,W,H);paintArt();DX=Math.round(W/2-AW*K/2+panX);DY=Math.round(H/2-AH*K/2+panY-H*.04);ctx.drawImage(ART,DX,DY,AW*K,AH*K);}
+function draw(){const W=cv.width,H=cv.height;ctx.imageSmoothingEnabled=false;ctx.fillStyle='#241a14';ctx.fillRect(0,0,W,H);paintArt();
+  /* v0.77: kamera seuraa hahmoa (pehmeästi); ilman hahmoa huoneen keskelle */
+  const [fx,fy]=HAHMO&&SHOW_PL&&!KOKO?P(PL.x,PL.y,0):P(RW/2,RD/2,0),ty=KOKO||!SHOW_PL?fy-60:fy-40;if(CAMX==null){CAMX=fx;CAMY=ty;}CAMX+=(fx-CAMX)*.12;CAMY+=(ty-CAMY)*.12;
+  DX=Math.round(W/2-CAMX*K+panX);DY=Math.round(H*.5-CAMY*K+panY);ctx.drawImage(ART,DX,DY,AW*K,AH*K);}
+let CAMX=null,CAMY=null,KOKO=false;
 let DX=0,DY=0,SHOW_PL=true,lastT=0;
 function frame(t){const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;step(dt);if(ART)draw();requestAnimationFrame(frame);}
-function resize(){const dpr=window.devicePixelRatio||1;cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(innerHeight*dpr);K=Math.max(1,Math.floor(cv.width/((RW+RD)*TW+24)));}
+function resize(){const dpr=window.devicePixelRatio||1;cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(innerHeight*dpr);K=Math.max(1,Math.round(dpr));} /* v0.77: yksi taidepikseli ≈ yksi CSS-pikseli kuten pelin tuvassa */
 function draw2(){if(ART)draw();}
 addEventListener('resize',resize);
 document.getElementById('zi').onclick=()=>{K=Math.min(K+1,10);};document.getElementById('zo').onclick=()=>{K=Math.max(1,K-1);};
 document.getElementById('back').onclick=()=>{location.href='./';};document.getElementById('vekt').onclick=()=>{location.href='kokeilu-tupa.html';};
-document.getElementById('kaanna').onclick=()=>{const c=ST.objs.find(o=>o.t==='nojatuoli');c.r=(c.r+1)%4;compose();};
+document.getElementById('koko').onclick=()=>{const w=cv.width/((RW+RD)*TW+30);K=Math.max(1,Math.floor(w));if(K<2&&w<1.2)K=1;panX=panY=0;KOKO=true;};
 document.getElementById('hahmo').onclick=e=>{SHOW_PL=!SHOW_PL;e.target.textContent=SHOW_PL?'Ilman hahmoa':'Hahmon kanssa';};
 /* napautus kävelee, veto panoroi */
 let drag=null;cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,px:panX,py:panY,moved:false};cv.setPointerCapture(e.pointerId);});
 cv.addEventListener('pointermove',e=>{if(!drag)return;const dpr=window.devicePixelRatio||1;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>8)drag.moved=true;if(drag.moved){panX=drag.px+(e.clientX-drag.x)*dpr;panY=drag.py+(e.clientY-drag.y)*dpr;}});
 cv.addEventListener('pointerup',e=>{if(drag&&!drag.moved)tapAt(e.clientX,e.clientY);drag=null;});
-function tapAt(cx,cy){const dpr=window.devicePixelRatio||1,ax=(cx*dpr-DX)/K,ay=(cy*dpr-DY)/K,[wx,wy]=unP(ax,ay);if(!HAHMO||!SHOW_PL)return;const p=findPath(PL.x,PL.y,wx,wy);if(p)PL.path=p;}
+function tapAt(cx,cy){const dpr=window.devicePixelRatio||1,ax=(cx*dpr-DX)/K,ay=(cy*dpr-DY)/K,[wx,wy]=unP(ax,ay);if(!HAHMO||!SHOW_PL)return;const p=findPath(PL.x,PL.y,wx,wy);if(p){PL.path=p;panX=panY=0;if(KOKO){KOKO=false;K=Math.max(1,Math.round(window.devicePixelRatio||1));}}}
 resize();compose();requestAnimationFrame(frame);loadHahmo();
 window.PIKSELI={ST,compose,PL,step,draw,tapAt,findPath,get art(){return ART;},get K(){return K;},set K(v){K=v;},setPan:(x,y)=>{panX=x;panY=y;},get hahmo(){return HAHMO;},get foot(){return FOOT;},toScreen:(x,y)=>{const p=P(x,y,0),dpr=window.devicePixelRatio||1;return [(DX+p[0]*K)/dpr,(DY+p[1]*K)/dpr];}};
 </script>
