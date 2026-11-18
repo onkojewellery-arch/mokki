@@ -31,7 +31,7 @@ button[disabled]{opacity:.45}
 <div id="toast"></div>
 <script>
 /* ===================================================================
-   MÖKKI – vinon tuvan kokeilu (v0.72: uusi pehmeä hahmo; v0.71: pehmeät muodot, varjot, välimuisti)
+   MÖKKI – vinon tuvan kokeilu (v0.73: pintamateriaalit ja lähempi aloitus; v0.72: uusi pehmeä hahmo; v0.71: pehmeät muodot, varjot, välimuisti)
    Tekniikka: Canvas 2D, ei kuvatiedostoja. Jokainen kaluste on koottu
    3D-perusosista (laatikko, sylinteri, kupu, pallo, tasainen pinta) omassa
    koordinaatistossaan. Osat projisoidaan isometrisesti (2:1) ja niiden pinnat
@@ -49,6 +49,7 @@ const cam={x:0,y:150,z:1};
 let ilta=false,katsele=false,decorOn=false,sel=null,ghost=null,lastT=0,toastT=0;
 
 /* ---------- värit ---------- */
+function rnd(a,b){const t=Math.sin(a*12.9898+b*78.233)*43758.5453;return t-Math.floor(t);}
 function hx(c){c=c.replace('#','');return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
 function rgb(a){return '#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');}
 function sh(c,k){const a=hx(c);return rgb(a.map(v=>k>=0?v+(255-v)*k:v*(1+k)));}
@@ -90,6 +91,11 @@ function drawSoft(b,o,x0,x1,y0,y1,z0,z1,vis,faces){const c=b.c,r=b.soft;
   const tc=[(T0[0]+T2[0])/2,(T0[1]+T2[1])/2],tw=Math.hypot(T3[0]-T1[0],T3[1]-T1[1])/2;const tg=g.createRadialGradient(tc[0]-tw*.25,tc[1]-tw*.08,1,tc[0],tc[1],tw*1.1);tg.addColorStop(0,b.topC||sh(c,.26));tg.addColorStop(1,sh(c,.04));fillPts([T0,T1,T2,T3],tg);
   g.filter=bl(Math.max(1.4,r*.4));sline(T3,T2,sh(c,.3),Math.max(2,r*.8));sline(T2,T1,sh(c,.02),Math.max(2,r*.8));sline(T2,B2,sh(c,-.14),Math.max(1.5,r*.5));
   sline(B3,B2,'rgba(30,18,8,.32)',Math.max(3,r*.7));sline(B2,B1,'rgba(30,18,8,.38)',Math.max(3,r*.7));
+  if(b.sheen){const bx=Math.min(...sil.map(p=>p[0])),by2=Math.min(...sil.map(p=>p[1])),bw=Math.max(...sil.map(p=>p[0]))-bx,bh=Math.max(...sil.map(p=>p[1]))-by2,sd=b.x*31+b.y*17+b.z*7;
+    g.filter=bl(Math.max(2,r*.6));for(let k=0;k<5;k++){g.beginPath();g.ellipse(bx+bw*rnd(k,sd),by2+bh*rnd(k+3,sd),bw*.16,bh*.1,rnd(k,sd+1)*3,0,6.3);g.fillStyle=k%2?'rgba(255,255,255,.09)':'rgba(10,40,20,.08)';g.fill();}g.filter='none';
+    for(let k=0;k<70;k++){g.fillStyle=k%2?'rgba(255,255,255,.045)':'rgba(0,0,0,.045)';g.fillRect(bx+bw*rnd(k,sd+2),by2+bh*rnd(k,sd+3),.6,.6);}g.filter=bl(Math.max(1.4,r*.4));}
+  if(b.grain){const f0=g.filter;g.filter='none';const tq=topQuad(b,o,x0,x1,y0,y1,z1),gw=b.w>=b.d;for(let k=0;k<6;k++){const v=.1+k*.16;g.beginPath();for(let t=0;t<=10;t++){const u=t/10,w=v+Math.sin(t*.8+k*2)*.025,p=gw?tq(u,w):tq(w,u);t?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.strokeStyle='rgba(130,80,36,.22)';g.lineWidth=.8;g.stroke();}
+    if(vis['+y']){const fq=quadFn(B3,B2,T3);for(let k=0;k<3;k++)qline(fq,.04,.25+k*.25,.96,.27+k*.25,'rgba(120,72,30,.18)',.8);}g.filter=f0;}
   if(b.sheen){g.globalAlpha=.55;const m=[(T3[0]+T2[0])/2,(T3[1]+T2[1])/2+4];sline([m[0]-tw*.35,m[1]],[m[0]+tw*.1,m[1]+2],sh(c,.45),3);g.globalAlpha=1;}
   g.filter='none';
   if(vis['+y']&&faces[vis['+y']])faces[vis['+y']](quadFn(B3,B2,T3),'+y');if(vis['+x']&&faces[vis['+x']])faces[vis['+x']](quadFn(B2,B1,T2),'+x');
@@ -147,13 +153,13 @@ const DEFS={
     {t:'box',soft:9,x:.76,y:.2,z:.32,w:.2,d:.76,h:.34,c:M.velvet,sheen:1,faces:{'+y':scroll}}]},
   sivupoyta:{n:'Mäntyinen sivupöytä',fw:1,fd:1,move:true,h:.66,top:.66,parts:()=>[
     leg(.2,.2,.58,.04),leg(.8,.2,.58,.04),leg(.2,.8,.58,.04),leg(.8,.8,.58,.04),
-    {t:'box',soft:3,x:.14,y:.14,z:.46,w:.72,d:.72,h:.12,c:M.pine,faces:{'+y':q=>{qrect(q,.3,.2,.7,.8,sh(M.pine,.08),'rgba(120,70,30,.6)',1);qell(q,.5,.5,.03,.12,M.brass);}}},
-    {t:'box',soft:4,x:.08,y:.08,z:.58,w:.84,d:.84,h:.07,c:M.pine,topC:'#f0c890',faces:{top:q=>{for(const v of [.22,.47,.71])qline(q,.08,v,.92,v+.03,'rgba(176,118,58,.35)',1);qell(q,.3,.6,.05,.03,'rgba(150,96,44,.5)');}}}]},
+    {t:'box',soft:3,grain:1,x:.14,y:.14,z:.46,w:.72,d:.72,h:.12,c:M.pine,faces:{'+y':q=>{qrect(q,.3,.2,.7,.8,sh(M.pine,.08),'rgba(120,70,30,.6)',1);qell(q,.5,.5,.03,.12,M.brass);}}},
+    {t:'box',soft:4,grain:1,x:.08,y:.08,z:.58,w:.84,d:.84,h:.07,c:M.pine,topC:'#f0c890',faces:{top:q=>{qell(q,.3,.6,.045,.03,'rgba(150,96,44,.45)');qell(q,.3,.6,.02,.012,'rgba(110,64,28,.5)');}}}]},
   matto:{n:'Räsymatto',fw:2,fd:1,move:true,rug:true,h:0,parts:()=>[{t:'fn',x:1,y:.5,z:0,fn:o=>drawRug(o)}]},
   sanky:{n:'Sänky',fw:1,fd:2,move:true,h:1,parts:()=>[
     leg(.1,.1,.2,.05),leg(.9,.1,.2,.05),leg(.1,1.9,.2,.05),leg(.9,1.9,.2,.05),
-    {t:'box',soft:4,x:.04,y:.04,z:.16,w:.92,d:1.92,h:.18,c:M.woodD},
-    {t:'box',soft:6,x:.02,y:0,z:.1,w:.96,d:.12,h:.95,c:M.wood,faces:{'+y':q=>{qrect(q,.12,.3,.88,.82,sh(M.wood,.08),'rgba(120,70,30,.5)',1);}}},
+    {t:'box',soft:4,grain:1,x:.04,y:.04,z:.16,w:.92,d:1.92,h:.18,c:M.woodD},
+    {t:'box',soft:6,grain:1,x:.02,y:0,z:.1,w:.96,d:.12,h:.95,c:M.wood,faces:{'+y':q=>{qrect(q,.12,.3,.88,.82,sh(M.wood,.08),'rgba(120,70,30,.5)',1);}}},
     {t:'box',soft:7,x:.08,y:.12,z:.34,w:.84,d:1.82,h:.16,c:M.linen},
     {t:'blob',x:.5,y:.36,z:.58,r:.28,rz:.14,c:'#fbf8f0',hi:'#ffffff',k:-.05},
     {t:'box',soft:6,x:.07,y:.62,z:.42,w:.86,d:1.36,h:.1,c:'#c95a48',faces:{top:q=>{const C=['#c95a48','#e9c46a','#6f9ac0','#f2ead8','#7ea36a'];for(let i=0;i<4;i++)for(let j=0;j<6;j++)qrect(q,i/4+.01,j/6+.01,(i+1)/4-.01,(j+1)/6-.01,C[(i+j*2)%5]);for(let i=1;i<4;i++)qline(q,i/4,0,i/4,1,'rgba(255,255,255,.35)',1);},'+y':q=>qline(q,0,.5,1,.5,'rgba(255,255,255,.3)',1)}},
@@ -164,7 +170,7 @@ const DEFS={
     {t:'cyl',x:.5,y:.2,z:.9,r:.09,h:1.8,c:'#5a5a62',noTop:1}]},
   keittio:{n:'Keittiö',fw:3,fd:1,fixed:true,h:.95,parts:()=>[
     {t:'box',soft:4,x:0,y:.08,z:0,w:3,d:.78,h:.86,c:M.sage,faces:{'+y':doorFace(4)}},
-    {t:'box',soft:3,x:0,y:.02,z:.86,w:3,d:.9,h:.07,c:'#caa070',topC:'#e2bc8e',faces:{top:q=>{qrect(q,.36,.2,.64,.7,'#b9c4c8','rgba(80,90,96,.7)',1);qrect(q,.39,.28,.61,.64,'#8fa4ae');qell(q,.5,.15,.02,.04,'#c8ccd0');}}},
+    {t:'box',soft:3,grain:1,x:0,y:.02,z:.86,w:3,d:.9,h:.07,c:'#caa070',topC:'#e2bc8e',faces:{top:q=>{qrect(q,.36,.2,.64,.7,'#b9c4c8','rgba(80,90,96,.7)',1);qrect(q,.39,.28,.61,.64,'#8fa4ae');qell(q,.5,.15,.02,.04,'#c8ccd0');}}},
     {t:'cyl',x:1.5,y:.16,z:.93,r:.03,h:.22,c:'#b8bcc2'},
     {t:'fn',x:2.55,y:.35,z:.93,fn:o=>{const [x,y]=wp(o,2.5,.4),p=P(x,y,.93);mug(p[0]-10,p[1]);mug(p[0]+6,p[1]+3);}},
     {t:'fn',x:.5,y:.4,z:.93,fn:o=>{const [x,y]=wp(o,.45,.35),p=P(x,y,.93);breadBoard(p);}}]},
@@ -225,7 +231,10 @@ function wallQ(w,a,b,z0,z1){return w==='y0'?(u,v)=>P(a+(b-a)*u,0,z0+(z1-z0)*v):(
 function drawWalls(){
   /* vasen takaseinä (x=0): näkyvä pinta kääntyy oikealle → varjoisampi */
   for(const [w,len,base] of [['x0',RD,'#b7834e'],['y0',RW,'#c69058']]){const q=wallQ(w,0,len,0,WALL_H);const pts=[q(0,0),q(1,0),q(1,1),q(0,1)];poly(pts,base,null);
-    const logs=9;for(let i=0;i<logs;i++){const v0=i/logs,v1=(i+1)/logs;const a=q(0,v0),b=q(0,v1);const gr=g.createLinearGradient(0,b[1],0,a[1]);gr.addColorStop(0,sh(base,.12));gr.addColorStop(.55,base);gr.addColorStop(1,sh(base,-.2));qrect(q,0,v0,1,v1,gr);qline(q,0,v0,1,v0,'rgba(90,52,26,.55)',1.2);}
+    const logs=9;for(let i=0;i<logs;i++){const v0=i/logs,v1=(i+1)/logs,lb=sh(base,(rnd(i,len)-.5)*.1);const a=q(0,v0),b=q(0,v1);const gr=g.createLinearGradient(0,b[1],0,a[1]);gr.addColorStop(0,sh(lb,.14));gr.addColorStop(.5,lb);gr.addColorStop(.85,sh(lb,-.12));gr.addColorStop(1,sh(lb,-.24));qrect(q,0,v0,1,v1,gr);
+      /* puunsyy pitkin hirttä */for(let k=0;k<7;k++){const vv=v0+(v1-v0)*(.18+.64*rnd(k,i+len*3)),u0=rnd(k+9,i)*.7,u1=Math.min(1,u0+.15+rnd(k,i+5)*.4),wv=(v1-v0)*.08;g.beginPath();for(let t=0;t<=12;t++){const u=u0+(u1-u0)*t/12,p=q(u,vv+Math.sin(t*.9+k)*wv*.5);t?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.strokeStyle=k%3?'rgba(110,64,28,.2)':'rgba(255,232,190,.16)';g.lineWidth=.8;g.stroke();}
+      if(rnd(i,len+1)>.55){const ku=.1+rnd(i,len+2)*.8,kv=(v0+v1)/2;qell(q,ku,kv,.012,(v1-v0)*.18,'rgba(100,58,24,.45)');qell(q,ku,kv,.006,(v1-v0)*.08,'rgba(70,38,14,.55)');}
+      qline(q,0,v0+.004,1,v0+.004,'rgba(214,196,150,.75)',1.8);qline(q,0,v0,1,v0,'rgba(80,46,22,.45)',1);}
     for(let k=1;k<4;k++){const u=k/4+.03*Math.sin(k*3+len);qline(q,u,.0,u,.02,'rgba(90,52,26,.3)',1);}
     const top=w==='y0'?[P(0,0,WALL_H),P(RW,0,WALL_H),P(RW,-.18,WALL_H),P(-.18,-.18,WALL_H)]:[P(0,0,WALL_H),P(0,RD,WALL_H),P(-.18,RD,WALL_H),P(-.18,-.18,WALL_H)];poly(top,'#8a5a32','rgba(50,30,15,.6)');}
   /* nurkan lovetut hirsien päät */
@@ -249,9 +258,16 @@ function drawFloor(){const pts=[P(0,0,0),P(RW,0,0),P(RW,RD,0),P(0,RD,0)];poly(pt
   const PL2=['#c9955e','#cf9b63','#c48f58','#cc985f'];for(let j=0;j<RD*2;j++){const y0=j/2,y1=y0+.5;let x=-(j*1.37%2.2);while(x<RW){const L=1.8+((j*7+Math.floor(x*3))%5)*.35,xa=Math.max(0,x),xb=Math.min(RW,x+L);if(xb>xa){const c=PL2[(j+Math.floor(x))%PL2.length];const p=[P(xa,y0,0),P(xb,y0,0),P(xb,y1,0),P(xa,y1,0)];poly(p,c,null);
       const s=[P(xa,y1,0),P(xb,y1,0)];g.beginPath();g.moveTo(s[0][0],s[0][1]);g.lineTo(s[1][0],s[1][1]);g.strokeStyle='rgba(110,70,38,.28)';g.lineWidth=1;g.stroke();
       const e=[P(xb,y0,0),P(xb,y1,0)];g.beginPath();g.moveTo(e[0][0],e[0][1]);g.lineTo(e[1][0],e[1][1]);g.strokeStyle='rgba(110,70,38,.22)';g.stroke();
-      const gy=y0+.22,gx=xa+(xb-xa)*.3;const a=P(gx,gy,0),b=P(gx+.7,gy+.02,0);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.strokeStyle='rgba(150,100,56,.18)';g.stroke();}x+=L;}}
+      const sd=j*31+Math.floor(x*7);for(let k=0;k<3;k++){const gy=y0+.1+.3*rnd(k,sd),gx0=xa+(xb-xa)*rnd(k+4,sd)*.4,gx1=Math.min(xb,gx0+.6+rnd(k,sd+1)*1.2);g.beginPath();for(let t=0;t<=10;t++){const xx=gx0+(gx1-gx0)*t/10,p=P(xx,gy+Math.sin(t*.7+k)*.02,0);t?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.strokeStyle=k%2?'rgba(140,92,48,.17)':'rgba(255,236,200,.12)';g.lineWidth=.8;g.stroke();}
+      if(rnd(j,sd)>.6&&xb-xa>1){const cx=xa+(xb-xa)*(.3+.4*rnd(j,sd+2)),cy=y0+.25;for(let k=1;k<=3;k++){g.beginPath();for(let t=-8;t<=8;t++){const xx=cx+t*.05*k,yy=cy-(.06*k)+Math.pow(t/8,2)*.06*k,p=P(xx,yy,0);t>-8?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.strokeStyle='rgba(140,90,46,.13)';g.lineWidth=.8;g.stroke();}}}x+=L;}}
   if(!ilta)for(const W of WIN){const pts2=W.wall==='y0'?[P(W.a,0,0),P(W.b,0,0),P(W.b+1.1,2.2,0),P(W.a+1.1,2.2,0)]:[P(0,W.b,0),P(0,W.a,0),P(2.2,W.a+1.1,0),P(2.2,W.b+1.1,0)];
     const a=P(W.wall==='y0'?(W.a+W.b)/2:0,W.wall==='y0'?0:(W.a+W.b)/2,0),b=P(W.wall==='y0'?(W.a+W.b)/2+1.1:2.2,W.wall==='y0'?2.2:(W.a+W.b)/2+1.1,0);const gr=g.createLinearGradient(a[0],a[1],b[0],b[1]);gr.addColorStop(0,'rgba(255,248,215,.32)');gr.addColorStop(1,'rgba(255,248,215,0)');const H=HIT;HIT=null;poly(pts2,gr);HIT=H;}}
+/* v0.73: lattia, seinät ja nurkkavarjot piirretään kerran välimuistiin (avain: päivä/ilta ja tarkkuus) */
+let BGC=null;function drawBackground(){const S=Math.max(1,Math.min(5,Math.round(cam.z*DPR*2)/2)),key=(ilta?'i':'p')+S;
+  const minX=-RD*TWH-40,maxX=RW*TWH+40,minY=-WALL_H*ZH-30,maxY=(RW+RD)*THH+30;
+  if(!BGC||BGC.key!==key){const c=document.createElement('canvas');c.width=Math.ceil((maxX-minX)*S);c.height=Math.ceil((maxY-minY)*S);const cx=c.getContext('2d');cx.setTransform(S,0,0,S,-minX*S,-minY*S);
+    const g0=g,b0=BS,h0=HIT;g=cx;BS=S;HIT=null;drawFloor();drawWalls();drawWallAO();drawAO();g=g0;BS=b0;HIT=h0;BGC={key,c,S};}
+  g.drawImage(BGC.c,minX,minY,BGC.c.width/BGC.S,BGC.c.height/BGC.S);}
 function drawFrontEdge(){/* nukkekoti: kameran puoleiset seinät väistyvät, jäljelle jää matala hirsikynnys */
   const h=.16,t=.14;const A=[P(0,RD,0),P(RW,RD,0),P(RW,RD,h),P(0,RD,h)];poly(A,'#8a5a32','rgba(50,30,15,.55)');const T1=[P(0,RD,h),P(RW,RD,h),P(RW,RD+t,h),P(0,RD+t,h)];poly(T1,'#a8703c');
   const B=[P(RW,RD,0),P(RW,0,0),P(RW,0,h),P(RW,RD,h)];poly(B,'#744a28','rgba(50,30,15,.55)');const T2=[P(RW,0,h),P(RW,RD+t,h),P(RW+t,RD+t,h),P(RW+t,0,h)];poly(T2,'#a8703c');
@@ -402,7 +418,7 @@ let INST=[];
 function render(){BS=cam.z*DPR;g.setTransform(1,0,0,1,0,0);g.globalCompositeOperation='source-over';
   const bg=g.createLinearGradient(0,0,0,VH);bg.addColorStop(0,ilta?'#1c1a26':'#3a2c22');bg.addColorStop(1,ilta?'#121018':'#241a14');g.fillStyle=bg;g.fillRect(0,0,VW,VH);
   g.setTransform(cam.z*DPR,0,0,cam.z*DPR,VW/2-cam.x*cam.z*DPR,VH/2-cam.y*cam.z*DPR);
-  drawFloor();drawWalls();drawWallAO();drawAO();
+  drawBackground();
   INST=ST.objs.map(inst);if(ghost&&sel){const I=INST.find(i=>i.o===sel);if(I){Object.assign(I,{x:ghost.x,y:ghost.y,r:ghost.r});const [w,d]=ghost.r%2?[I.fd,I.fw]:[I.fw,I.fd];I.w=w;I.d=d;I.ghost=true;}}
   if(decorOn&&!katsele)drawGrid();
   for(const I of INST)if(I.D.rug)drawInst(I,I.ghost?.75:1);
@@ -463,7 +479,7 @@ function interact(o){const D=DEFS[o.t],p=nearFree(o);const act=()=>{const [w,d]=
   if(!p)return act();const far=Math.hypot(p[0]-PL.x,p[1]-PL.y)>.1;if(far)walkTo(p[0],p[1],act);else act();}
 
 /* ---------- käynnistys ---------- */
-function resize(){DPR=Math.min(2,window.devicePixelRatio||1);VW=Math.round(innerWidth*DPR);VH=Math.round(innerHeight*DPR);cv.width=VW;cv.height=VH;const fit=innerWidth/((RW+RD)*TWH+24);cam.z=Math.max(.6,Math.min(1.6,fit));cam.x=(RW-RD)*TWH/2;cam.y=(RW+RD)*THH/2-40;clampCam();}
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);VW=Math.round(innerWidth*DPR);VH=Math.round(innerHeight*DPR);cv.width=VW;cv.height=VH;const fit=innerWidth/((RW+RD)*TWH+24);cam.z=Math.max(.6,Math.min(2.2,fit*1.4));cam.x=-14;cam.y=(RW+RD)*THH/2-70;clampCam();}
 addEventListener('resize',resize);resize();setUI();requestAnimationFrame(frame);
 setTimeout(()=>toast('Napauta lattiaa kävelläksesi. Vedä panoroidaksesi, nipistä lähentääksesi.'),400);
 window.KOKEILU={ST,PL,cam,DEFS,tap,toWorld,walkTo,selectObj,placeOK,get ghost(){return ghost;},set ghost(v){ghost=v;},get sel(){return sel;},setIlta:v=>{ilta=v;setUI();},setLook:v=>{katsele=v;setUI();},render,step,INST:()=>INST};
