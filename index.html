@@ -294,7 +294,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.66</div>
+        <div class="sub">mummon mökki · versio 0.67</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -1112,7 +1112,9 @@ function makeRpoyta(v){v=v||0;return outlined(66,40,g=>{R(g,4,12,58,10,'#8a6a4a'
 function makeRepolaViitta(){return outlined(46,40,g=>{R(g,20,14,4,26,'#6a4a2e');R(g,1,4,44,13,'#a87a4a');R(g,1,4,44,2,'#c8986a');R(g,1,15,44,2,'#7a5434');poly(g,[[45,4],[48,10],[45,17]],'#a87a4a');text3x5(g,'REPOLA',8,8,'#2a1a10');});}
 /* --- asukkaat --- */
 const ILONA_LOOK={style:2,hair:'#ecd28a',skin:'#f6d3b3',eye:'#4a7ac8',top:{c:'#e8782a'},pants:'#3a5a8a'};
-const TIITUS_LOOK={style:0,hair:'#6a4428',skin:'#eec4a0',eye:'#4a8a4a',top:{c:'#26262c'},pants:'#1e1e24'};
+/* v0.67: Tiitus valokuvan kuvauksen mukaan: lyhyt sivuilta, tekstuuria päällä, epätasainen otsatukka, leveä hymy, rengaskorvakorut, musta poolo */
+const TIITUS_HIUS='#9a6c44',TIITUS_IHO='#f3d2b6';
+const TIITUS_LOOK={style:0,hair:TIITUS_HIUS,skin:TIITUS_IHO,eye:'#4a8a4a',top:{c:'#222228'},pants:'#1c1c20',tHair:true,kaulus:true,hymy:true,korvis:true};
 const SUSSU_LOOK={style:0,hair:'#5a3a24',skin:'#f0c8a4',eye:'#6a4428',top:{c:'#22222a'},pants:'#3a5a8a',glasses:'#2a2a2e',glassesT:1};
 const RNPC={ilona:{n:'Ilona',L:ILONA_LOOK},tiitus:{n:'Tiitus',L:TIITUS_LOOK},sussu:{n:'Sussu',L:SUSSU_LOOK}};
 const RNPC_IDS=['ilona','tiitus','sussu'],RNPC_TYO=[540,960],RNPC_UNI=[420,1380],RNPC_JAKSO=90; /* testiarvot: työ 9–16, valveilla 7–23, paikka vaihtuu 1,5 h välein */
@@ -1205,14 +1207,41 @@ function vaaliPiirrä(g,W,H,iso){const k=iso?2:1;R(g,0,0,W,H,'#efe6cf');R(g,0,0,
   const cx=Math.floor(W/2),hy=iso?13:6;
   if(iso){R(g,cx-9,hy+11,18,6,'#26262c');R(g,cx-2,hy+9,4,3,'#eec4a0');ell(g,cx,hy+1,7,8,'#eec4a0');R(g,cx-7,hy-7,14,5,'#6a4428');R(g,cx-8,hy-4,2,6,'#6a4428');R(g,cx+6,hy-4,2,6,'#6a4428');
     R(g,cx-4,hy,2,2,'#ffffff');R(g,cx+2,hy,2,2,'#ffffff');P(g,cx-3,hy+1,'#3a7a3a');P(g,cx+3,hy+1,'#3a7a3a');R(g,cx-2,hy+5,4,1,'#a85a4a');P(g,cx-3,hy+4,'#a85a4a');P(g,cx+2,hy+4,'#a85a4a');R(g,cx-6,hy-3,12,1,'#7a5434');}
-  else{R(g,cx-4,hy+4,8,2,'#26262c');ell(g,cx,hy,3,3,'#eec4a0');R(g,cx-3,hy-3,6,2,'#6a4428');P(g,cx-3,hy-1,'#6a4428');P(g,cx+3,hy-1,'#6a4428');P(g,cx-1,hy,'#3a7a3a');P(g,cx+1,hy,'#3a7a3a');P(g,cx,hy+2,'#a85a4a');}
+  else{R(g,cx-4,hy+4,8,2,'#222228');ell(g,cx,hy,3,3,TIITUS_IHO);R(g,cx-2,hy+3,4,1,'#222228');R(g,cx-3,hy-4,6,2,TIITUS_HIUS);P(g,cx-2,hy-2,TIITUS_HIUS);P(g,cx,hy-2,TIITUS_HIUS);P(g,cx-3,hy-2,T(TIITUS_HIUS,-.4));P(g,cx+3,hy-2,T(TIITUS_HIUS,-.4));P(g,cx-1,hy,'#3a7a3a');P(g,cx+1,hy,'#3a7a3a');R(g,cx-1,hy+2,3,1,'#7a3430');}
   const big=(ch,x,y,sc,c)=>{const gl=GLYPH[ch];for(let r=0;r<5;r++)for(let q=0;q<3;q++)if(gl[r][q]==='1')R(g,x+q*sc,y+r*sc,sc,sc,c);};
   if(iso){text3x5(g,'TIITUS',cx-12,33,'#26262c');big('6',cx-13,41,4,'#c8402e');big('6',cx+1,41,4,'#c8402e');R(g,4,H-5,W-8,1,'#3a6aa8');}
   else{big('6',cx-7,14,2,'#c8402e');big('6',cx+1,14,2,'#c8402e');}}
+/* v0.67: suurennos tarkemmilla pikseleillä (92 × 138) */
+function vaaliIso(g,W,H){const Hh=TIITUS_HIUS,Hd=T(Hh,-.38),Hdd=T(Hh,-.6),Hl=T(Hh,.35),Sk=TIITUS_IHO,Skd=T(Sk,-.16),Skdd=T(Sk,-.32),Bk='#1e1e24',Bkl='#34343e';
+  R(g,0,0,W,H,'#efe6cf');for(let i=0;i<W;i+=2){P(g,i,0,'#d8ccb0');P(g,i+1,H-1,'#c8b890');}for(let j=0;j<H;j+=3){P(g,0,j,'#d8ccb0');P(g,W-1,j+1,'#c8b890');}
+  R(g,3,3,W-6,78,'#3a6aa8');for(let y=3;y<81;y+=6)R(g,3,y,W-6,1,'#4272b0');R(g,3,3,W-6,2,'#5a8ac8');
+  const cx=46;
+  poly(g,[[4,81],[8,72],[16,67],[cx-12,64],[cx+12,64],[W-16,67],[W-8,72],[W-4,81]],Bk);R(g,4,80,W-8,1,'#141418');line(g,10,74,24,67,Bkl);line(g,cx-2,70,cx-2,80,'#141418');
+  R(g,cx-12,53,24,13,Bk);for(let y=55;y<66;y+=3)R(g,cx-12,y,24,1,Bkl);R(g,cx-12,53,2,13,Bkl);R(g,cx+10,53,2,13,'#141418');R(g,cx-12,65,24,1,'#141418');
+  ell(g,cx-15,38,3,5,Skd);ell(g,cx+15,38,3,5,Skdd);P(g,cx-15,38,Skdd);P(g,cx+15,38,T(Sk,-.42));
+  ell(g,cx,36,15,18,Skd);ell(g,cx-1,35,14,17,Sk);poly(g,[[cx-14,38],[cx-10,50],[cx-4,55],[cx+4,55],[cx+10,50],[cx+14,38]],Sk);
+  poly(g,[[cx+9,40],[cx+14,38],[cx+10,50],[cx+4,55],[cx+2,55],[cx+8,49]],Skd);R(g,cx-4,55,9,1,Skdd);
+  for(const [ex,c] of [[cx-15,'#d8d8e0'],[cx+15,'#b4b4be']]){R(g,ex-1,44,3,1,c);R(g,ex-1,47,3,1,c);P(g,ex-2,45,c);P(g,ex-2,46,c);P(g,ex+2,45,c);P(g,ex+2,46,c);P(g,ex-1,44,'#ffffff');}
+  ell(g,cx,19,16,9,Hh);R(g,cx-16,18,32,8,Hh);ell(g,cx-2,13,11,4,Hh);
+  for(let y=20;y<34;y++){if(y%2===0)P(g,cx-16,y,Hd);P(g,cx-15,y,y%3?Hd:Hdd);P(g,cx+15,y,y%3?Hdd:Hd);if(y%2)P(g,cx+16,y,Hdd);}
+  R(g,cx-15,20,2,6,Hd);R(g,cx+13,20,2,6,Hdd);
+  const tuft=[[-12,4,5],[-9,3,7],[-6,4,6],[-3,3,8],[0,4,6],[3,3,7],[6,4,5],[9,3,6],[12,3,4]];for(const [dx,w,h] of tuft){R(g,cx+dx-1,24,w,h,Hh);P(g,cx+dx-1+(dx%2?1:0),24+h,Hd);}
+  for(const [x,y] of [[-8,12],[-3,10],[2,11],[7,13],[11,16],[-12,16],[-5,15],[4,15],[0,18],[-9,19],[9,19]]){R(g,cx+x,y,3,1,Hl);P(g,cx+x+1,y+1,Hd);}
+  for(const [x,y] of [[-6,18],[3,17],[-1,14],[8,22],[-11,22],[5,21]])R(g,cx+x,y,2,1,Hdd);
+  R(g,cx-10,31,7,2,Hd);R(g,cx+3,31,7,2,Hd);P(g,cx-11,32,Hd);P(g,cx+10,32,Hd);
+  for(const ex of [cx-10,cx+3]){R(g,ex,35,7,3,'#ffffff');R(g,ex+2,35,3,3,'#4a8a4a');P(g,ex+3,36,'#1e3a1e');P(g,ex+2,35,'#ffffff');R(g,ex,34,7,1,'#5a3a2a');R(g,ex,38,7,1,Skd);P(g,ex-1,38,Skdd);P(g,ex+7,38,Skdd);}
+  R(g,cx,36,1,7,Skd);R(g,cx-2,43,5,1,Skdd);P(g,cx-3,42,Skd);P(g,cx+3,42,Skd);
+  ell(g,cx-10,43,3,1,'#f2bcae');ell(g,cx+10,43,3,1,'#eab0a2');
+  poly(g,[[cx-10,46],[cx+10,46],[cx+6,50],[cx-6,50]],'#6a2a28');R(g,cx-8,46,16,2,'#fbf6ee');R(g,cx-8,47,16,1,'#ece4d6');R(g,cx-4,49,8,1,'#b85a50');
+  P(g,cx-11,45,'#a85a4a');P(g,cx+10,45,'#a85a4a');P(g,cx-12,44,Skd);P(g,cx+11,44,Skd);
+  const big=(ch,x,y,sc,c)=>{const gl=GLYPH[ch];for(let r=0;r<5;r++)for(let q=0;q<3;q++)if(gl[r][q]==='1')R(g,x+q*sc,y+r*sc,sc,sc,c);};
+  let tx=cx-23;for(const ch of 'TIITUS'){big(ch,tx,86,2,'#1e1e24');tx+=8;}
+  big('6',cx-21,100,6,'#8a2a22');big('6',cx+3,100,6,'#8a2a22');big('6',cx-22,99,6,'#c8402e');big('6',cx+2,99,6,'#c8402e');
+  R(g,8,H-6,W-16,2,'#3a6aa8');}
 function makeVaali(){return outlined(18,26,g=>vaaliPiirrä(g,18,26,false));}
-let VAALI_ISO=null;function vaaliIsoUrl(){if(!VAALI_ISO)VAALI_ISO=mk(40,66,g=>vaaliPiirrä(g,40,66,true)).toDataURL();return VAALI_ISO;}
+let VAALI_ISO=null;function vaaliIsoUrl(){if(!VAALI_ISO)VAALI_ISO=mk(92,138,g=>vaaliIso(g,92,138)).toDataURL();return VAALI_ISO;}
 function vaaliPiirra(c,o){if(!vaaliTasta(o))return;const id=vaaliTasta(o),V=VAALI[id],[x0,y0]=sprPos(c,o);dS(ctx,SPR.vaali,x0+V.dx,y0+V.dy);}
-function vaaliKatso(cb){showPhoto('<div class="ptitle">Vanha vaalimainos</div><div class="kuva"><img alt="Vaalimainos: Tiituksen kuva, nimi TIITUS ja numero 66" src="'+vaaliIsoUrl()+'"></div><p class="kuvateksti">TIITUS · 66</p><div class="foot">A jatka</div>',cb);}
+function vaaliKatso(cb){showPhoto('<div class="ptitle">Vanha vaalimainos</div><div class="kuva"><img style="image-rendering:pixelated" alt="Vaalimainos: Tiituksen kuva, nimi TIITUS ja numero 66" src="'+vaaliIsoUrl()+'"></div><p class="kuvateksti">TIITUS · 66</p><div class="foot">A jatka</div>',cb);}
 let VAALI_OHI=null;
 function vaaliOhita(o){VAALI_OHI=o;interactYard(o.x,o.y);}
 function vaaliInteract(o){if(VAALI_OHI===o){VAALI_OHI=null;return false;}const id=vaaliTasta(o);if(!id)return false;const N=n66Q(),V=VAALI[id];
@@ -2033,19 +2062,24 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
     R(g,X(11),Y+20,11,13,C);R(g,X(12),Y+19,9,1,C);R(g,X(11),Y+20,2,13,Cl);R(g,X(19),Y+20,3,13,Cd);R(g,X(13),Y+29,6,1,Cd);if(L.hood){R(g,X(15),Y+16,8,6,Cd);R(g,X(15),Y+16,8,1,Cl);R(g,X(12),Y+21,1,5,'#d8d8d8');}
     const ax=fr===1?-3:fr===2?3:0;R(g,X(14+ax),Y+21,4,10,C);R(g,X(14+ax),Y+21,1,10,Cl);R(g,X(17+ax),Y+21,1,10,Cd);R(g,X(14+ax),Y+30,4,3,S);P(g,X(17+ax),Y+32,Sd);
     /* v0.53: sivuprofiili uusiksi – kasvot, korva ja hiukset pään muotoon */
-    R(g,X(13),Y+16,5,5,Sd);R(g,X(13),Y+16,2,5,S);
+    if(!L.kaulus){R(g,X(13),Y+16,5,5,Sd);R(g,X(13),Y+16,2,5,S);}
     ell(g,X(15),Y+11,8,9,Sd);ell(g,X(14),Y+11,8,8,S);R(g,X(8),Y+17,7,2,S);R(g,X(9),Y+19,5,1,S);R(g,X(10),Y+20,4,1,Sd);
     R(g,X(5),Y+12,2,3,S);P(g,X(5),Y+14,Sd);P(g,X(6),Y+15,Sd);
     if(!blink){R(g,X(8),Y+11,3,4,'#ffffff');R(g,X(8),Y+12,2,3,L.eye);P(g,X(8),Y+13,T(L.eye,-.55));P(g,X(8),Y+12,'#ffffff');}
     else R(g,X(8),Y+13,3,1,Sd);
-    R(g,X(10),Y+15,3,1,BL);R(g,X(6),Y+17,3,1,MO);P(g,X(7),Y+18,Sd);
+    R(g,X(10),Y+15,3,1,BL);if(L.hymy){R(g,X(6),Y+17,4,1,'#7a3430');P(g,X(7),Y+17,'#fbf4ea');P(g,X(10),Y+16,MO);P(g,X(8),Y+18,Sd);}else{R(g,X(6),Y+17,3,1,MO);P(g,X(7),Y+18,Sd);}
+    if(L.kaulus){R(g,X(11),Y+18,8,4,C);R(g,X(11),Y+18,8,1,Cl);R(g,X(11),Y+20,8,1,Cd);R(g,X(11),Y+18,1,4,Cl);R(g,X(18),Y+18,1,4,Cd);}
     const ear=()=>{R(g,X(16),Y+12,3,4,S);R(g,X(16),Y+12,1,4,Sd);P(g,X(17),Y+13,Sd);P(g,X(18),Y+15,Sd);};
-    ell(g,X(16),Y+7,9,6,H);R(g,X(8),Y+3,12,5,H);R(g,X(19),Y+6,5,11,H);ell(g,X(21),Y+12,3,6,H);R(g,X(18),Y+16,5,2,Hd);
-    R(g,X(7),Y+6,6,3,H);P(g,X(7),Y+9,H);P(g,X(10),Y+9,H);R(g,X(14),Y+9,2,4,H);P(g,X(15),Y+13,Hd);
+    if(L.tHair){ell(g,X(16),Y+6,9,6,H);R(g,X(9),Y+1,12,6,H);ell(g,X(15),Y+1,6,2,H);R(g,X(19),Y+6,5,7,H);R(g,X(19),Y+13,4,2,Hd);P(g,X(23),Y+12,Hd);R(g,X(15),Y+10,1,3,Hd);P(g,X(15),Y+13,Hdd);
+      R(g,X(7),Y+5,6,3,H);P(g,X(7),Y+8,H);P(g,X(9),Y+8,Hd);P(g,X(11),Y+8,H);P(g,X(6),Y+6,H);}
+    else{ell(g,X(16),Y+7,9,6,H);R(g,X(8),Y+3,12,5,H);R(g,X(19),Y+6,5,11,H);ell(g,X(21),Y+12,3,6,H);R(g,X(18),Y+16,5,2,Hd);
+    R(g,X(7),Y+6,6,3,H);P(g,X(7),Y+9,H);P(g,X(10),Y+9,H);R(g,X(14),Y+9,2,4,H);P(g,X(15),Y+13,Hd);}
     if(st===1){R(g,X(15),Y+9,8,12,H);R(g,X(15),Y+9,1,12,Hd);for(let y=11;y<21;y+=3)R(g,X(18+(y%2)),Y+y,1,2,Hd);}
     if(st!==1)ear();
+    if(L.korvis){P(g,X(17),Y+16,'#e4e4ea');P(g,X(18),Y+17,'#a4a4ae');P(g,X(16),Y+17,'#c4c4cc');}
     R(g,X(8),Y+10,3,1,Hdd);
-    ell(g,X(13),Y+2,4,1,Hl);R(g,X(10),Y+3,5,1,Hl);for(let y=5;y<16;y+=3)R(g,X(23),Y+y,1,2,Hd);R(g,X(9),Y+6,3,1,Hd);
+    if(L.tHair){for(const [x,y] of [[11,1],[16,0],[19,3]])R(g,X(x),Y+y,2,1,Hl);for(const [x,y] of [[14,2],[18,4],[12,5]])R(g,X(x),Y+y,1,2,Hd);R(g,X(22),Y+7,1,5,Hd);}
+    else{ell(g,X(13),Y+2,4,1,Hl);R(g,X(10),Y+3,5,1,Hl);for(let y=5;y<16;y+=3)R(g,X(23),Y+y,1,2,Hd);R(g,X(9),Y+6,3,1,Hd);}
     if(st===2){ell(g,X(23),Y+3,4,3,Hd);ell(g,X(22),Y+2,3,2,H);P(g,X(21),Y+1,Hl);}
     if((st===3||L.pipo)){ell(g,X(16),Y+3,10,6,KN);for(let x=8;x<26;x+=3)R(g,X(x),Y-1,1,7,KNd);ell(g,X(13),Y,4,2,KNl);R(g,X(6),Y+6,20,4,CU);R(g,X(6),Y+9,20,1,CUd);for(let x=7;x<26;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(18),Y-4,3,3,CU);P(g,X(17),Y-5,L.pipoC?KNl:'#ffffff');}
   }else{
@@ -2059,21 +2093,31 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
     const arm=(x,dy,dark)=>{R(g,X(x),Y+21+dy,3,10,dark?Cd:C);R(g,X(x),Y+21+dy,1,10,dark?C:Cl);R(g,X(x),Y+30+dy,3,3,S);P(g,X(x+2),Y+32+dy,Sd);};
     arm(6,aL,false);arm(23,aR,true);
     R(g,X(9),Y+20,14,13,C);R(g,X(10),Y+19,12,1,C);R(g,X(9),Y+20,2,13,Cl);R(g,X(20),Y+20,3,13,Cd);R(g,X(12),Y+28,1,4,Cd);R(g,X(18),Y+27,1,5,Cd);
-    if(!up){R(g,X(14),Y+19,4,3,S);P(g,X(15),Y+22,S);P(g,X(16),Y+22,S);R(g,X(13),Y+19,1,3,Cd);R(g,X(18),Y+19,1,3,Cd);for(let y=23;y<31;y+=3)P(g,X(16),Y+y,Cd);}
+    if(!up&&!L.kaulus){R(g,X(14),Y+19,4,3,S);P(g,X(15),Y+22,S);P(g,X(16),Y+22,S);R(g,X(13),Y+19,1,3,Cd);R(g,X(18),Y+19,1,3,Cd);for(let y=23;y<31;y+=3)P(g,X(16),Y+y,Cd);}
     if(L.hood){if(up){R(g,X(9),Y+16,14,7,Cd);R(g,X(10),Y+16,12,1,Cl);R(g,X(15),Y+18,2,4,T(C,-.55));}else{R(g,X(10),Y+18,12,3,Cd);R(g,X(10),Y+18,12,1,Cl);R(g,X(14),Y+20,4,2,S);R(g,X(14),Y+21,1,6,'#d8d8d8');R(g,X(17),Y+21,1,5,'#d8d8d8');R(g,X(11),Y+28,10,1,Cl);R(g,X(11),Y+28,1,4,Cl);R(g,X(20),Y+28,1,4,Cl);}}
     R(g,X(14),Y+17,4,3,Sd);
     ell(g,X(16),Y+11,9,9,Sd);ell(g,X(15),Y+10,8,8,S);R(g,X(6),Y+11,2,4,S);R(g,X(25),Y+11,2,4,Sd);
-    if(up){ell(g,X(16),Y+10,10,9,H);ell(g,X(16),Y+11,9,8,H);R(g,X(13),Y+18,6,2,Sd);
+    if(up&&L.tHair){ell(g,X(16),Y+7,9,8,H);R(g,X(8),Y+7,16,6,H);R(g,X(9),Y+13,14,2,Hd);R(g,X(11),Y+15,10,1,Hdd);R(g,X(13),Y+16,6,2,S);R(g,X(13),Y+17,6,1,Sd);
+      for(const [x,y] of [[11,1],[16,0],[19,3]])R(g,X(x),Y+y,2,1,Hl);for(const [x,y] of [[13,3],[18,5],[11,7],[21,8]])R(g,X(x),Y+y,1,2,Hd);R(g,X(7),Y+8,1,5,Hd);R(g,X(24),Y+8,1,5,Hdd);
+      if(L.korvis){P(g,X(6),Y+15,'#d4d4dc');P(g,X(26),Y+15,'#a4a4ae');}
+      if(L.kaulus){R(g,X(11),Y+18,10,4,C);R(g,X(11),Y+18,10,1,Cl);R(g,X(11),Y+20,10,1,Cd);}}
+    else if(up){ell(g,X(16),Y+10,10,9,H);ell(g,X(16),Y+11,9,8,H);R(g,X(13),Y+18,6,2,Sd);
       ell(g,X(13),Y+5,5,2,Hl);for(let x=9;x<24;x+=4)R(g,X(x),Y+8,1,9,Hd);R(g,X(22),Y+6,3,12,Hd);R(g,X(8),Y+16,16,2,Hd);
       if(st===1){R(g,X(7),Y+14,18,13,H);R(g,X(21),Y+14,4,13,Hd);for(let x=9;x<22;x+=4)R(g,X(x),Y+16,1,10,Hd);R(g,X(8),Y+26,16,1,Hd);R(g,X(7),Y+14,2,12,Hl);}
       if(st===2){ell(g,X(16),Y+3,5,4,Hd);ell(g,X(16),Y+2,4,3,H);P(g,X(15),Y,Hl);R(g,X(13),Y+6,7,1,Hd);}}
     else{
       if(!blink){for(const ex of [10,19]){R(g,X(ex),Y+12,3,4,'#ffffff');R(g,X(ex+(ex<16?1:0)),Y+12,2,4,L.eye);R(g,X(ex+(ex<16?1:0)),Y+14,2,2,T(L.eye,-.55));P(g,X(ex+(ex<16?1:0)),Y+12,'#ffffff');R(g,X(ex),Y+11,3,1,Hdd);}}
       else{R(g,X(10),Y+14,3,1,Sd);R(g,X(19),Y+14,3,1,Sd);}
-      R(g,X(10),Y+9,3,1,Hd);R(g,X(19),Y+9,3,1,Hd);P(g,X(16),Y+16,Sd);R(g,X(15),Y+18,3,1,MO);P(g,X(16),Y+19,BL);R(g,X(8),Y+16,2,1,BL);R(g,X(22),Y+16,2,1,BL);
-      ell(g,X(16),Y+6,10,5,H);R(g,X(6),Y+5,3,10,H);R(g,X(23),Y+5,3,10,Hd);
+      R(g,X(10),Y+9,3,1,Hd);R(g,X(19),Y+9,3,1,Hd);P(g,X(16),Y+16,Sd);R(g,X(8),Y+16,2,1,BL);R(g,X(22),Y+16,2,1,BL);
+      if(L.hymy){R(g,X(13),Y+17,7,2,'#7a3430');R(g,X(14),Y+17,5,1,'#fbf4ea');P(g,X(12),Y+16,MO);P(g,X(20),Y+16,MO);P(g,X(9),Y+17,Sd);P(g,X(23),Y+17,Sd);R(g,X(12),Y+20,9,1,Sd);}else{R(g,X(15),Y+18,3,1,MO);P(g,X(16),Y+19,BL);}
+      if(L.kaulus){R(g,X(11),Y+19,11,4,C);R(g,X(11),Y+19,11,1,Cl);R(g,X(11),Y+21,11,1,Cd);R(g,X(11),Y+19,1,4,Cl);R(g,X(21),Y+19,1,4,Cd);}
+      if(L.korvis){P(g,X(6),Y+15,'#e4e4ea');P(g,X(7),Y+16,'#9a9aa4');P(g,X(26),Y+15,'#c4c4cc');P(g,X(25),Y+16,'#8a8a94');}
+      if(L.tHair){ell(g,X(16),Y+4,10,5,H);ell(g,X(16),Y+1,7,2,H);R(g,X(6),Y+5,2,6,Hd);R(g,X(24),Y+5,2,6,Hdd);R(g,X(7),Y+4,2,3,H);R(g,X(23),Y+4,2,3,Hd);
+        for(const [x,w,h] of [[9,3,2],[12,2,3],[14,3,1],[17,2,2],[19,3,1],[22,2,2]])R(g,X(x),Y+7,w,h,x>=22?Hd:H);P(g,X(13),Y+9,Hd);P(g,X(18),Y+8,Hd);
+        for(const [x,y] of [[10,1],[15,-1],[19,1]])R(g,X(x),Y+y,2,1,Hl);for(const [x,y] of [[13,2],[17,2],[21,3],[11,4]])R(g,X(x),Y+y,1,2,Hd);}
+      else{ell(g,X(16),Y+6,10,5,H);R(g,X(6),Y+5,3,10,H);R(g,X(23),Y+5,3,10,Hd);
       for(let x=8;x<24;x+=3)R(g,X(x),Y+9,2,2+(x%3===1?1:0),H);
-      ell(g,X(13),Y+3,5,1,Hl);R(g,X(10),Y+4,4,1,Hl);for(let x=11;x<23;x+=4)R(g,X(x),Y+5,1,4,Hd);R(g,X(22),Y+4,3,6,Hd);
+      ell(g,X(13),Y+3,5,1,Hl);R(g,X(10),Y+4,4,1,Hl);for(let x=11;x<23;x+=4)R(g,X(x),Y+5,1,4,Hd);R(g,X(22),Y+4,3,6,Hd);}
       if(st===1){R(g,X(5),Y+8,4,18,H);R(g,X(5),Y+8,1,17,Hl);R(g,X(23),Y+8,4,18,Hd);R(g,X(24),Y+8,2,17,H);P(g,X(6),Y+26,H);P(g,X(25),Y+26,Hd);}
       if(st===2){ell(g,X(16),Y-1,5,3,Hd);ell(g,X(16),Y-2,4,2,H);P(g,X(14),Y-3,Hl);}}
     if((st===3||L.pipo)){ell(g,X(16),Y+3,11,6,KN);for(let x=7;x<26;x+=3)R(g,X(x),Y-2,1,8,KNd);ell(g,X(12),Y,4,2,KNl);R(g,X(5),Y+6,22,4,CU);R(g,X(5),Y+9,22,1,CUd);for(let x=6;x<27;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(16),Y-4,3,3,CU);P(g,X(15),Y-5,L.pipoC?KNl:'#ffffff');}
