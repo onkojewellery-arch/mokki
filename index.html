@@ -292,7 +292,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.61</div>
+        <div class="sub">mummon mökki · versio 0.62</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -1022,21 +1022,21 @@ const REPOLA_KANSI={x0:16,x1:21,y0:4,y1:8};
 function buildRepola(){const W=26,H=20,G=[],O=[];
   for(let y=0;y<H;y++){G.push([]);for(let x=0;x<W;x++)G[y].push(hash(x,y,401)<0.06?'f':'g');}
   const pp=(x,y)=>{G[y][x]='p';};
-  for(let y=0;y<H;y++){pp(22,y);pp(23,y);}pp(24,10);pp(25,10);
+  for(let y=0;y<H;y++){pp(23,y);pp(24,y);}pp(25,10);pp(22,10);pp(22,12);
   pp(3,5);for(let x=1;x<=12;x++)pp(x,6);pp(12,4);pp(12,5);
   for(const [x,y] of [[12,7],[13,7],[13,8],[14,8],[14,9],[15,9],[16,9],[17,9],[18,9],[19,9],[19,10],[20,10],[21,10]])pp(x,y);
   for(let y=7;y<=12;y++)pp(12,y);for(let x=12;x<=21;x++)pp(x,12);
   for(let y=REPOLA_KANSI.y0;y<=REPOLA_KANSI.y1;y++)for(let x=REPOLA_KANSI.x0;x<=REPOLA_KANSI.x1;x++)G[y][x]='g';
   O.push({k:'rhuone',x:1,y:2,w:5,h:3},{k:'aitta',x:11,y:1,w:4,h:3},{k:'repolatupa',x:16,y:1,w:6,h:3},{k:'rpoyta',x:18,y:6,w:2,h:1},
-    {k:'bergenia',x:13,y:10,w:3,h:1},{k:'tiiligrilli',x:8,y:9,w:1,h:1},{k:'keinu',x:4,y:9,w:2,h:1},{k:'rvarasto',x:17,y:15,w:5,h:3},{k:'puumaja',x:14,y:16,w:2,h:1},
+    {k:'bergenia',x:13,y:10,w:3,h:1},{k:'tiiligrilli',x:8,y:9,w:1,h:1},{k:'keinu',x:20,y:8,w:2,h:1},{k:'rvarasto',x:17,y:15,w:5,h:3},{k:'puumaja',x:7,y:3,w:2,h:1},
     {k:'risukasa',x:1,y:8,w:2,h:1},{k:'pressu',x:8,y:17,w:2,h:1},
     {k:'sammalkivi',x:2,y:12,w:1,h:1},{k:'sammalkivi',x:7,y:14,w:1,h:1},{k:'sammalkivi',x:10,y:9,w:1,h:1},{k:'sammalkivi',x:16,y:13,w:1,h:1},
     {k:'pagodavalo',x:10,y:7,w:1,h:1},{k:'pagodavalo',x:6,y:7,w:1,h:1},{k:'pagodavalo',x:16,y:10,w:1,h:1},{k:'pagodavalo',x:21,y:11,w:1,h:1},
-    {k:'tree',x:7,y:3,w:1,h:1,v:'manty'},{k:'tree',x:9,y:3,w:1,h:1,v:'manty'},{k:'tree',x:10,y:14,w:1,h:1,v:'manty'},{k:'tree',x:12,y:15,w:1,h:1,v:'manty'},
-    {k:'tree',x:8,y:1,w:1,h:1,v:'koivu'},{k:'tree',x:15,y:7,w:1,h:1,v:'koivu'});
+    {k:'tree',x:10,y:4,w:1,h:1,v:'manty'},{k:'tree',x:14,y:16,w:1,h:1,v:'manty'},{k:'tree',x:22,y:0,w:1,h:1,v:'kuusi'},{k:'tree',x:22,y:2,w:1,h:1,v:'manty'},{k:'tree',x:22,y:4,w:1,h:1,v:'koivu'},{k:'tree',x:22,y:6,w:1,h:1,v:'manty'},{k:'tree',x:22,y:8,w:1,h:1,v:'kuusi'},{k:'tree',x:10,y:14,w:1,h:1,v:'manty'},{k:'tree',x:12,y:15,w:1,h:1,v:'manty'},
+    {k:'tree',x:15,y:7,w:1,h:1,v:'koivu'});
   const vapaa=(x,y)=>G[y][x]!=='p'&&!O.some(o=>x>=o.x-1&&x<o.x+o.w+1&&y>=o.y&&y<o.y+o.h+2)&&!(x>=REPOLA_KANSI.x0-1&&x<=REPOLA_KANSI.x1+1&&y>=REPOLA_KANSI.y0&&y<=REPOLA_KANSI.y1+2);
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const reuna=x===0||x>=24||y>=18||(y===0&&x<16);if(!reuna||!vapaa(x,y))continue;if(x>=24&&(y>=9&&y<=11))continue;
-    if(hash(x,y,402)<(x>=24||y>=18?.7:.45))O.push({k:'tree',x,y,w:1,h:1,v:hash(x,y,403)<.5?'manty':hash(x,y,404)<.5?'koivu':'kuusi'});}
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const reuna=x===0||x>=25||y>=18||(y===0&&x<16);if(!reuna||!vapaa(x,y))continue;if(x>=25&&(y>=9&&y<=11))continue;
+    if(hash(x,y,402)<(x>=25||y>=18?.7:.45))O.push({k:'tree',x,y,w:1,h:1,v:hash(x,y,403)<.5?'manty':hash(x,y,404)<.5?'koivu':'kuusi'});}
   return {W,H,grid:G,objs:O};}
 function drawRepolaGround(g){const K=REPOLA_KANSI,X0=K.x0*32,Y0=K.y0*32,Wd=(K.x1-K.x0+1)*32,Hd=(K.y1-K.y0+1)*32;
   R(g,X0-2,Y0,Wd+4,Hd+4,'#3e2c20');R(g,X0,Y0,Wd,Hd,'#7a5a40');
@@ -1118,16 +1118,16 @@ const RSPOTS=[
   {sc:'laituri',x:4,y:5,d:'right',t:{ilona:'katselee järvelle termosmuki kädessä',tiitus:'laskee laiturin soutuveneitä',sussu:'kuvaa laituria puhelimella'}},
   {sc:'polku',x:5,y:9,d:'right',t:{ilona:'kävelee reippaasti podcast korvilla',tiitus:'tutkii kelopuun kaarnaa kuin museoesinettä',sussu:'poimii mustikoita suoraan suuhun'}},
   {sc:'lmetsa',x:8,y:4,d:'down',t:{ilona:'lenkkeilee metsätiellä',tiitus:'kuuntelee lintuja kädet selän takana',sussu:'puhuu puhelimessa asiakkaan kanssa'}},
-  {sc:'repola',x:8,y:10,d:'up',t:{ilona:'sytyttää tiiligrilliä',tiitus:'kääntää makkaroita tiiligrillillä',sussu:'kokoaa grillivartaita'}},
-  {sc:'repola',x:4,y:11,d:'up',t:{ilona:'keinuu ja selaa sisustuslehteä',tiitus:'keinuu ja lukee sanomalehteä',sussu:'keinuu ja luonnostelee vihkoon'}},
-  {sc:'repola',x:13,y:5,d:'up',t:{ilona:'järjestelee aitan tekstiilejä',tiitus:'korjaa aitan portaita',sussu:'tuulettaa aitan mattoja'}}];
+  {sc:'repola',x:8,y:10,d:'up',t:{ilona:'sytyttää tiiligrilliä',tiitus:'kitkee kukkapenkkiä grillin vieressä',sussu:'korjaa tiiligrillin irronnutta tiiltä'}},
+  {sc:'repola',x:21,y:7,d:'down',t:{ilona:'keinuu terassilla ja selaa sisustuslehteä',tiitus:'keinuu terassilla ja lukee sanomalehteä',sussu:'keinuu terassilla ja luonnostelee vihkoon'}},
+  {sc:'repola',x:13,y:5,d:'up',t:{ilona:'järjestelee aitan tekstiilejä ja Marimekon kahvikuppeja',tiitus:'istuttaa kukkia aitan portaiden viereen',sussu:'korjaa aitan portaita akkuporakone kädessä'}}];
 const RNPC_REPLIIKIT={
-  ilona:['Ilona: "Ostin taas kolme kahvikuppia. Ne eivät olleet tarpeellisia, mutta ne olivat välttämättömiä."','Ilona: "Viestinnän kultainen sääntö: jos et tiedä mitä sanoa, sano se lyhyesti. Ja hymyillen."',
-    'Ilona: "Lauantaina Repolassa saattaa olla pienet juhlat. Tai isot. Katsotaan, mihin ilta venyy."','Ilona: "Tämä paita on oranssi, koska elämä on liian lyhyt beigelle."','Ilona: "Löysin kirppikseltä pellavaliinan, jossa on käsin kirjottuja kanervia. Melkein itkin."'],
+  ilona:['Ilona: "Ostin taas kolme Marimekon kahvikuppia. Ne eivät olleet tarpeellisia, mutta ne olivat välttämättömiä."','Ilona: "Viestinnän kultainen sääntö: jos et tiedä mitä sanoa, sano se lyhyesti. Ja hymyillen."',
+    'Ilona: "Lauantaina Repolassa saattaa olla pienet juhlat. Tai isot. Katsotaan, mihin ilta venyy."','Ilona: "Tämä paita on oranssi, koska elämä on liian lyhyt beigelle."','Ilona: "Löysin kirppikseltä pellavaliinan, jossa on käsin kirjottuja kanervia. Melkein itkin."','Ilona: "Kahvi maistuu paremmalta Marimekon kupista. Tämä on tiedettä, älä kyseenalaista."'],
   tiitus:['Tiitus: "Eilen avajaiset kaupungissa, tänään halot. Kumpikin vaatii oikeat kengät."','Tiitus: "Kysy minulta mitä tahansa politiikasta. Vastaan pitkästi."','Tiitus: "Museossa on neljäkymmentätuhatta esinettä. Repolan varastossa melkein yhtä monta."',
-    'Tiitus: "Täällä hiljaisuus kuuluu. Kaupungissa sitä pitää varata etukäteen."','Tiitus: "Kunnanvaltuusto äänesti eilen laiturin korjauksesta. Seitsemän–kuusi. Draamaa."'],
+    'Tiitus: "Täällä hiljaisuus kuuluu. Kaupungissa sitä pitää varata etukäteen."','Tiitus: "Kunnanvaltuusto äänesti eilen laiturin korjauksesta. Seitsemän–kuusi. Draamaa."','Tiitus: "Istutin bergenioita. Ne ovat kuin hyvä valtiosääntö: sitkeitä ja vähän ylikasvaneita."'],
   sussu:['Sussu: "Uusi idea: mökkikorut. Sormus, jossa on hippunen Vattulanjärven hiekkaa. Mitä tykkäät?"','Sussu: "Tapahtumatuottajana opin, että kaikki menee aina vähän pieleen. Ja juuri siksi siitä tulee hyvä."',
-    'Sussu: "Toinen idea: saunakorut. Ei, odota. Metalli kuumenee. Unohda tuo."','Sussu vilkaisee järvelle saarten suuntaan ja hymyilee itsekseen. "Ei mitään. Ajattelin vain valoa veden päällä."','Sussu: "Kuulin, että saarella asuu joku Lumi. Ihan vain kysyn. Ihan muuten vain."']};
+    'Sussu: "Toinen idea: saunakorut. Ei, odota. Metalli kuumenee. Unohda tuo."','Sussu vilkaisee järvelle saarten suuntaan ja hymyilee itsekseen. "Ei mitään. Ajattelin vain valoa veden päällä."','Sussu: "Kuulin, että saarella asuu joku Lumi. Ihan vain kysyn. Ihan muuten vain."','Sussu: "Korjasin huussin oven saranan. Ja aitan portaan. Ja vähän sellaista, mikä ei ollut rikki."']};
 const RNPC_ESITTELY={ilona:'Ilona: "Moikka! Ilona. Me asutaan Repolassa, metsätien päässä kylän länsipuolella. Jos tarvitset joskus kauniita astioita tai hyvän syyn juhlia, tiedät mistä löytää."',
   tiitus:'Tiitus: "Tiitus, terve. Olen töissä kaupungin museossa, ja täällä pinoan puita. Kaksi maailmaa, yksi kumisaapaspari."',
   sussu:'Sussu: "Hei! Sussu, oikeastaan Susanne, mutta niin sanoo vain verottaja. Olin ennen tapahtumatuottaja, nykyään teen koruja. Ja noin kolme uutta yritysideaa päivässä."'};
@@ -1157,17 +1157,17 @@ function goKylaLansi(){fadeTo(()=>{S.scene='kyla';useMap('kyla');placePlayer(0,1
 function repolaInteract(o){const tyo=S.time>=RNPC_TYO[0]&&S.time<RNPC_TYO[1],yo=S.time<RNPC_UNI[0]||S.time>=RNPC_UNI[1];
   switch(o.k){
     case 'repolatupa':return say(yo?'Repolan tupa on hiljainen. Ikkunat ovat pimeinä, ja terassilla palavat vain pagodalamput.':tyo?'Repolan tupa. Terassilta kuuluu näppäimistöjen naputusta ja välillä naurua.':['Repolan tupa. Ikkunasta näkyy pitkä pöytä, täysi kirjahylly ja Ilonan astiakaappi.','Ovi on raollaan, mutta et mene kutsumatta.']);
-    case 'aitta':return say(['Aitta. Ovien takana on Ilonan tekstiilivarasto: pellavaa, villaa ja kolme laatikkoa kahvikuppeja.','Portaiden alimmassa askelmassa on uusi lauta. Tiitus on korjannut sen.']);
+    case 'aitta':return say(['Aitta. Ovien takana on Ilonan tekstiilivarasto: pellavaa, villaa ja kolme laatikkoa Marimekon kahvikuppeja.','Portaiden alimmassa askelmassa on uusi lauta. Sussu on korjannut sen.']);
     case 'rhuone':return say(['Pieni huone ja huussi samassa rakennuksessa.','Huoneen ikkunassa on pitsiverho. Ikkunalaudalla kimaltaa hopealankaa ja pieniä pihtejä: Sussun kesäpaja.','Huussin ovessa on sydän. Sisällä on lehtiteline ja vanha vaaliesite.']);
-    case 'rvarasto':return say(['Varasto ja liiteri. Halot ovat pinossa niin suorassa, että Tiitus on selvästi ollut asialla.','Seinää vasten nojaavat tikkaat, kottikärryt ja kasa lavoja.']);
-    case 'puumaja':return say(['Maja koivun latvassa. Ikkunasta näkee varmasti järvelle asti.','Tikkaita ei ole. Se lienee tarkoituksellista.']);
+    case 'rvarasto':return say(['Varasto ja liiteri. Seinällä roikkuvat Sussun työkalut tarkassa järjestyksessä, jokaiselle oma koukku.','Seinää vasten nojaavat tikkaat, kottikärryt ja kasa lavoja.']);
+    case 'puumaja':return say(['Maja koivun latvassa aitan ja huussin välissä. Ikkunasta näkee varmasti järvelle asti.','Tikkaita ei ole. Sussu on luvannut tehdä ne. Joskus.']);
     case 'tiiligrilli':return say('Tiilistä ladottu grilli. Ritilässä on vielä eilisen makkaranpaistajaisten jäljet.');
-    case 'keinu':return say('Puinen pihakeinu. Se narahtaa ystävällisesti, kun siihen koskee.');
+    case 'keinu':return say('Puinen pihakeinu terassin reunalla. Se narahtaa ystävällisesti, kun siihen koskee.');
     case 'pagodavalo':return say(valotPaalla()?'Pagodalamppu valaisee polkua lämpimästi.':'Pagodan mallinen polkuvalaisin. Illalla nämä syttyvät koko pihan polun varrelle.');
     case 'risukasa':return say('Risukasa. Siellä asuu ainakin yksi siili. Ehkä kaksi.');
     case 'pressu':return say('Sininen pressu jonkin päällä. Kukaan ei muista enää minkä.');
-    case 'bergenia':return say('Kukkapenkki täynnä bergenioita. Isot lehdet kiiltävät, ja varsien päässä on vaaleanpunaisia kukkia.');
-    case 'rpoyta':return say(tyo?'Pöydällä on kolme läppäriä, kahvikupit ja keksipaketti. Etätoimisto Repola.':'Terassipöytä. Pöydälle on unohtunut kolme kahvikuppia, kaikki erilaisia.');
+    case 'bergenia':return say(['Kukkapenkki täynnä bergenioita. Isot lehdet kiiltävät, ja varsien päässä on vaaleanpunaisia kukkia.','Tiitus on istuttanut ne. Penkin reunassa on pieni kyltti: ÄLÄ TALLO, KIITOS.']);
+    case 'rpoyta':return say(tyo?'Pöydällä on kolme läppäriä, kahvikupit ja keksipaketti. Etätoimisto Repola.':'Terassipöytä. Pöydälle on unohtunut kolme Marimekon kahvikuppia, kaikki eri kuosia.');
     case 'repolaviitta':return say('Käsin maalattu kyltti: REPOLA →');
     case 'rnpc':return rnpcTalk(o);}
   return null;}
@@ -4649,7 +4649,7 @@ function tryStep(d){const [dx,dy]=DIRS[d];const nx=PL.x+dx,ny=PL.y+dy;
   if(S.scene==='lmetsa'&&nx>=YW)return goKylaLansi();
   if(S.scene==='lmetsa'&&nx<0)return goRepola();
   if(S.scene==='repola'&&nx>=YW&&ny===10)return goLmetsa('repola');
-  if(S.scene==='repola'&&(ny<0||ny>=YH)&&(nx===22||nx===23))return say('Hiekkatie jatkuu naapurimökeille. Repolan väki tuntee jokaisen montun nimeltä.');
+  if(S.scene==='repola'&&(ny<0||ny>=YH)&&(nx===23||nx===24))return say('Hiekkatie jatkuu naapurimökeille. Repolan väki tuntee jokaisen montun nimeltä.');
   if(solid(nx,ny))return;
   PL.tx=nx;PL.ty=ny;PL.moving=true;PL.parity^=1;}
 function updatePlayer(){
