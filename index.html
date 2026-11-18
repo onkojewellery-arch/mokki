@@ -69,7 +69,18 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
   padding:calc(var(--s)*1px) calc(var(--s)*3px);border-radius:calc(var(--s)*2px);font-size:calc(var(--s)*6px)}
 #toast.low{top:auto;bottom:calc(var(--s)*4px)}
 #mg{pointer-events:auto;position:absolute;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(var(--s)*6px + env(safe-area-inset-bottom,0px));width:min(92%,calc(var(--s)*150px));background:rgba(20,30,24,.92);color:#f3ecd9;border:calc(var(--s)*1px) solid #121a15;border-radius:calc(var(--s)*3px);padding:calc(var(--s)*3px) calc(var(--s)*4px);box-shadow:0 calc(var(--s)*1px) calc(var(--s)*4px) rgba(0,0,0,.35)}
-#panel .kuva{display:flex;justify-content:center;margin:calc(var(--s)*3px) 0}#panel .kuva img{width:100%;max-width:calc(var(--s)*150px);image-rendering:pixelated;transform:rotate(-1.5deg);box-shadow:0 calc(var(--s)*1px) calc(var(--s)*3px) rgba(0,0,0,.35)}#panel .vrepl{font-style:italic;color:#6a5a3a;margin:calc(var(--s)*1px) 0 calc(var(--s)*2px)}#panel .tasks li.lue{cursor:pointer;color:#2f6e42;font-weight:bold}#panel .kuvateksti{text-align:center;font-style:italic;color:#7a6f5a}
+#panel .kuva{display:flex;justify-content:center;margin:calc(var(--s)*3px) 0}#panel .kuva img{width:100%;max-width:calc(var(--s)*150px);image-rendering:pixelated;transform:rotate(-1.5deg);box-shadow:0 calc(var(--s)*1px) calc(var(--s)*3px) rgba(0,0,0,.35)}#panel.pas{display:flex;flex-direction:column;overflow:hidden;background:#2f5a3e;color:#f4efe2}body.tall #panel.pas{height:calc(100% - 64px - env(safe-area-inset-top,0px))}
+#panel.pas .ptitle{color:#f4efe2;padding-right:calc(var(--s)*16px)}.pasbar{display:flex;justify-content:space-between;font-size:calc(var(--s)*5.5px);color:#d8e8c8;margin-bottom:calc(var(--s)*2px)}
+.pastop,.pastab{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:calc(var(--s)*1.5px)}.pastab{flex:1 1 auto;min-height:0;overflow-y:auto;touch-action:pan-y;margin-top:calc(var(--s)*3px);padding-bottom:calc(var(--s)*4px)}
+.pslot{position:relative;aspect-ratio:5/7;border-radius:calc(var(--s)*1.5px);border:calc(var(--s)*.6px) dashed rgba(255,255,255,.35)}.pcol{position:relative;min-height:calc(var(--pw)*1.4)}
+.pk{position:absolute;left:0;right:0;aspect-ratio:5/7;border-radius:calc(var(--s)*1.5px);background:#fbf6ea;border:calc(var(--s)*.6px) solid #2a2320;box-shadow:0 1px 0 rgba(0,0,0,.35);font-family:system-ui,sans-serif;font-weight:800;line-height:1;cursor:pointer;overflow:hidden}
+.pk .rv{position:absolute;left:8%;top:5%;font-size:calc(var(--pw)*.36)}.pk .ms{position:absolute;right:8%;top:5%;font-size:calc(var(--pw)*.32)}.pk .mb{position:absolute;left:0;right:0;bottom:6%;text-align:center;font-size:calc(var(--pw)*.5)}
+.pk.r{color:#c0302a}.pk.b{color:#1e1e22}.pk.dn{background:repeating-linear-gradient(45deg,#8a2a24 0 3px,#a8443a 3px 6px);border-color:#3a1a14}.pk.dn>*{display:none}
+.pk.sel{outline:calc(var(--s)*1px) solid #f4d35e;box-shadow:0 0 0 calc(var(--s)*1.2px) #f4d35e}.pk.cur,.pslot.cur{outline:calc(var(--s)*1px) dashed #ffffff;outline-offset:1px}
+.pslot.ok,.pcol.ok>.pk:last-child,.pcol.ok.tyhja{box-shadow:0 0 0 calc(var(--s)*1.2px) rgba(166,216,115,.9)}.pslot .tm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--pw)*.42);color:rgba(255,255,255,.4)}
+.pasbtn{display:flex;gap:calc(var(--s)*2px);margin-top:calc(var(--s)*2px)}.pasbtn button{flex:1;font:inherit;font-size:calc(var(--s)*6px);border:0;border-radius:calc(var(--s)*2px);padding:calc(var(--s)*2.5px) 0;background:#f2ead6;color:#2a2320}
+.pasmsg{min-height:calc(var(--s)*8px);font-size:calc(var(--s)*5.5px);color:#f4d35e;margin-top:calc(var(--s)*1px)}
+#panel .vrepl{font-style:italic;color:#6a5a3a;margin:calc(var(--s)*1px) 0 calc(var(--s)*2px)}#panel .tasks li.lue{cursor:pointer;color:#2f6e42;font-weight:bold}#panel .kuvateksti{text-align:center;font-style:italic;color:#7a6f5a}
 #mg .mgt{font-size:calc(var(--s)*5px);color:#a6d873;letter-spacing:.05em;text-transform:uppercase}
 #mg .mgmsg{font-size:calc(var(--s)*6.2px);line-height:1.35;margin:calc(var(--s)*2px) 0;min-height:calc(var(--s)*14px)}
 #mg .mgbig{font-size:calc(var(--s)*14px);font-weight:700;color:#f4d35e;text-align:center;margin:calc(var(--s)*2px) 0;animation:mgp .4s ease-in-out infinite alternate}
@@ -269,7 +280,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.54</div>
+        <div class="sub">mummon mökki · versio 0.55</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -390,7 +401,7 @@ const TUOTE={sadetakki:{n:'Keltainen sadetakki',p:8,kind:'vaate',lock:'sadetakki
 const KAUPPA_TAVARAT=['sadetakki','sivupoyta','kansituoli','lasimaljakko','pihalyhty','tolppavalo'];
 const SAUNA_LAMPO_MIN=45,SAUNA_KUUMA_MIN=180,SAUNA_KESTO_MS=30*60000,RSAUNA_NEED={lautoja:8,naulat:4,kiuas:1},RSAUNA_XP=15;
 const PENKKI_CANDS=[{n:'takapihan koivun luona',x:10,y:1,w:2,h:1},{n:'kukkapenkin vieressä',x:15,y:13,w:2,h:1},{n:'saunapolun varrella',x:7,y:13,w:2,h:1}];
-const XP_KEYS={pontto:5,tikka:10,uinti:5,rsauna:15,matti:20,kortti:15,halko:5,kala:5,sato:10,myynti:10,kuisti:10,maalaus:10,sauna:20,loylyt:5,maistaminen:5,raimo:10,sieni:5,terassi:15,keittio:20,tilausP:10,tilausK:10};
+const XP_KEYS={pasianssi:5,pontto:5,tikka:10,uinti:5,rsauna:15,matti:20,kortti:15,halko:5,kala:5,sato:10,myynti:10,kuisti:10,maalaus:10,sauna:20,loylyt:5,maistaminen:5,raimo:10,sieni:5,terassi:15,keittio:20,tilausP:10,tilausK:10};
 let XP_HYVITYS=null;
 const SAVE_KEY='mokki-v01';
 function migrate(s){s.inv=s.inv||{};s.inv.maali=s.inv.maali||0;s.money=s.money||0;s.log=s.log||[];s.flags=s.flags||{};s.tasks=s.tasks||{};if(s.look&&s.look.glasses==null)s.look.glasses=0;
@@ -2826,6 +2837,7 @@ function openNaming(){showPanel('<div class="ptitle">Anna rantamökille nimi</di
 function finishNaming(){const inp=$('#mnimi');let n=((inp&&inp.value)||'').replace(/[<>&"]/g,'').trim().slice(0,20)||'Rantamökki';
   if(inp)inp.blur();S.cabins.ranta.name=n;$('#panel').classList.add('hide');mode='world';panelKind='';addLog('Annoin rantamökille nimen '+n+'.');save();hud();blip(990,.06);toast(n+' · oma rantamökki');}
 function panelPress(b){
+  if(panelKind==='pasianssi')return pasPress(b);
   if(panelKind==='myynti'){const VV=myyntiVarastot()[myy.v],n=myyntiRyhmat(VV.L).length;if(DIRS[b]){const st={left:-1,right:1,up:-3,down:3}[b];myy.sel=clamp(myy.sel+st,0,Math.max(0,n-1));blip(660,.03);renderMyynti(true);return;}
     if(b==='start'){myy.v=(myy.v+1)%myyntiVarastot().length;myy.sel=0;blip(660,.03);renderMyynti();return;}if(b==='a'){if(n)myyntiMyy();return;}if(b==='b'){$('#panel').classList.add('hide');$('#panel').classList.remove('shopp');panelKind='';mode='world';blip(330,.05);}return;}
   if(panelKind==='inv'&&b==='a'&&(S.inv.kirjeet||0)>0){$('#panel').classList.add('hide');panelKind='';mode='world';blip(660,.03);lueMatinKirjeet();return;}
@@ -2842,7 +2854,7 @@ function panelPress(b){
   if(panelKind==='hinnasto'){if(b==='left'||b==='right'){hinPage=hinPage?0:1;blip(660,.03);renderHinnasto();return;}if(b==='a'){if(hinPage===0){hinPage=1;blip(660,.03);renderHinnasto();}else{blip(660,.03);showTasks(1);}return;}}
   if(panelKind==='vihko'){const n=vihkoPages();if(b==='left'||b==='right'||(b==='a'&&vihkoPage<n-1)){vihkoPage=(vihkoPage+(b==='left'?-1:1)+n)%n;blip(660,.03);renderVihko();return;}}
   if(b==='a'||b==='b'||b==='start'){$('#panel').classList.add('hide');mode='world';panelKind='';blip(330,.05);}}
-$('#panel').addEventListener('pointerdown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('pclose')){e.preventDefault();e.stopPropagation();press('b');return;}if(panelKind==='inv'){e.preventDefault();press('b');return;}if(panelKind==='nimi'||panelKind==='varasto'||panelKind==='kirppis'||panelKind==='myynti'||mode==='shop')return;e.preventDefault();if(mode==='panel')press('a');});
+$('#panel').addEventListener('pointerdown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('pclose')){e.preventDefault();e.stopPropagation();press('b');return;}if(panelKind==='inv'){e.preventDefault();press('b');return;}if(panelKind==='nimi'||panelKind==='varasto'||panelKind==='kirppis'||panelKind==='myynti'||panelKind==='pasianssi'||mode==='shop')return;e.preventDefault();if(mode==='panel')press('a');});
 let hinPage=0;
 function openHinnasto(pg){hinPage=pg||0;renderHinnasto();}
 function renderHinnasto(){let h;
@@ -3059,6 +3071,84 @@ function drawPontto(c,o,p,alpha){if(!PONTTO_SPR)PONTTO_SPR=outlined(14,18,g=>{po
   if(cyc<150)bird(hx-1,hy-3,false);else if(cyc<175){const k=cyc-150;bird(hx-1+k*1.2,hy-3-k*.9,(cyc>>2)%2);}
   else if(cyc>400&&cyc<425){const k=425-cyc;bird(hx-1+k*1.2,hy-3-k*.9,(cyc>>2)%2);}
   if(v>=2&&(frame%90)<40){const q=(frame%90)/40;ctx.globalAlpha=1-q;P(ctx,bx+3,by+6-q*6,'#fff6c0');P(ctx,bx+11,by+4-q*7,'#fff6c0');ctx.globalAlpha=1;}}
+
+/* ---------- pasianssi (v0.55): Klondike, yhden kortin nosto ----------
+   S.pasianssi = {stock:[id], waste:[id], found:[[id]×4], tab:[[{c:id,up:bool}]×7], moves, undo:[json]} ; S.flags.pasVoitot.
+   Kortti id 0–51: maa = id/13|0 (0 ♠, 1 ♥, 2 ♦, 3 ♣), arvo = id%13+1. */
+const PAS_MAAT=['♠','♥','♦','♣'],PAS_ARVO=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'],PAS_UNDO=40;
+let PS=null,pasSel=null,pasCur={z:'stock',c:0,i:0},pasMsg='';
+function pasMaa(c){return c/13|0;}function pasArvo(c){return c%13+1;}function pasPun(c){const m=pasMaa(c);return m===1||m===2;}
+function pasUusi(){const d=[];for(let i=0;i<52;i++)d.push(i);for(let i=51;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}
+  const tab=[];for(let c=0;c<7;c++){tab.push([]);for(let k=0;k<=c;k++)tab[c].push({c:d.pop(),up:k===c});}
+  return {stock:d,waste:[],found:[[],[],[],[]],tab,moves:0,undo:[]};}
+function pasSnap(){const {undo,...r}=PS;PS.undo.push(JSON.stringify(r));if(PS.undo.length>PAS_UNDO)PS.undo.shift();}
+function pasTallenna(){S.pasianssi=PS;save();}
+function openPasianssi(){PS=S.pasianssi||null;if(!PS){PS=pasUusi();pasTallenna();}pasSel=null;pasMsg='';
+  if(!S.flags.pasOhje){S.flags.pasOhje=true;save();return say(['Pasianssi: siirrä kaikki kortit neljään maapinoon ässästä kuninkaaseen.','Sarakkeisiin rakennetaan laskevasti vuorotellen punaisin ja mustin kortein. Tyhjään sarakkeeseen käy kuningas.',
+    'Napauta ensin korttia tai jonon ensimmäistä korttia ja sitten kohdetta. Nostopakan napautus kääntää kortin. Valittua korttia uudelleen napauttamalla se siirtyy maapinoon, jos voi.'],pasRender);}
+  pasRender();}
+function pasVoiko(cards,target){const top=cards[0];
+  if(target.z==='found'){if(cards.length!==1)return false;const F=PS.found[target.f];if(!F.length)return pasArvo(top)===1;const t=F[F.length-1];return pasMaa(t)===pasMaa(top)&&pasArvo(top)===pasArvo(t)+1;}
+  if(target.z==='tab'){const T=PS.tab[target.c];if(!T.length)return pasArvo(top)===13;const t=T[T.length-1];if(!t.up)return false;return pasPun(t.c)!==pasPun(top)&&pasArvo(top)===pasArvo(t.c)-1;}return false;}
+function pasLahde(sel){if(!sel)return null;if(sel.z==='waste')return PS.waste.length?[PS.waste[PS.waste.length-1]]:null;
+  if(sel.z==='found'){const F=PS.found[sel.f];return F.length?[F[F.length-1]]:null;}
+  if(sel.z==='tab'){const T=PS.tab[sel.c];if(!T[sel.i]||!T[sel.i].up)return null;const run=T.slice(sel.i).map(q=>q.c);
+    for(let k=1;k<run.length;k++)if(pasPun(run[k])===pasPun(run[k-1])||pasArvo(run[k])!==pasArvo(run[k-1])-1)return null;return run;}return null;}
+function pasSiirra(sel,target){const cards=pasLahde(sel);if(!cards||!pasVoiko(cards,target))return false;pasSnap();
+  if(sel.z==='waste')PS.waste.pop();else if(sel.z==='found')PS.found[sel.f].pop();else{PS.tab[sel.c].splice(sel.i);const T=PS.tab[sel.c];if(T.length&&!T[T.length-1].up)T[T.length-1].up=true;}
+  if(target.z==='found')PS.found[target.f].push(cards[0]);else PS.tab[target.c].push(...cards.map(c=>({c,up:true})));
+  PS.moves++;pasTallenna();return true;}
+function pasNosta(){pasSnap();if(PS.stock.length){PS.waste.push(PS.stock.pop());}else if(PS.waste.length){PS.stock=PS.waste.reverse();PS.waste=[];pasMsg='Nostopakka kierrätettiin.';}else{PS.undo.pop();pasMsg='Pakka on tyhjä.';return;}
+  PS.moves++;pasTallenna();}
+function pasVoitettu(){return PS.found.every(F=>F.length===13);}
+function pasKohteet(){const out={found:[],tab:[]};const c=pasLahde(pasSel);if(!c)return out;for(let f=0;f<4;f++)if(pasVoiko(c,{z:'found',f}))out.found.push(f);for(let k=0;k<7;k++)if(!(pasSel.z==='tab'&&pasSel.c===k)&&pasVoiko(c,{z:'tab',c:k}))out.tab.push(k);return out;}
+function pasMaapinoon(sel){const c=pasLahde(sel);if(!c||c.length!==1)return false;for(let f=0;f<4;f++)if(pasVoiko(c,{z:'found',f}))return pasSiirra(sel,{z:'found',f});return false;}
+function pasNapautus(z,a,b){pasMsg='';if(z==='tabtop'){z='tab';b=PS.tab[a].length-1;}if(z==='stock'){pasSel=null;pasNosta();return pasJalkeen();}
+  const src=z==='waste'?{z:'waste'}:z==='found'?{z:'found',f:a}:z==='tab'?{z:'tab',c:a,i:b}:null;
+  if(pasSel){const same=JSON.stringify(pasSel)===JSON.stringify(src);
+    if(same){const ok=pasMaapinoon(pasSel);pasSel=null;if(!ok)pasMsg='';return pasJalkeen();}
+    const tgt=z==='found'?{z:'found',f:a}:z==='tab'||z==='tabcol'?{z:'tab',c:a}:null;
+    if(tgt&&pasSiirra(pasSel,tgt)){pasSel=null;return pasJalkeen();}
+    if(src&&pasLahde(src)){pasSel=src;return pasRender();}pasSel=null;pasMsg='Siirto ei käy.';blip(200,.06);return pasRender();}
+  if(src&&pasLahde(src)){pasSel=src;blip(660,.03);}else if(z==='tab'&&PS.tab[a][b]&&!PS.tab[a][b].up)pasMsg='Peitetty kortti kääntyy, kun sen päältä siirretään kortit.';
+  pasRender();}
+function pasJalkeen(){blip(520,.03);if(pasVoitettu()){const v=(S.flags.pasVoitot||0)+1;S.flags.pasVoitot=v;const mv=PS.moves;S.pasianssi=null;PS=null;addLog('Pasianssi meni läpi ('+mv+' siirtoa).');save();
+    $('#panel').classList.add('hide');$('#panel').classList.remove('pas');panelKind='';mode='world';jingle();
+    return say(['Viimeinen kuningas asettuu paikalleen. Pasianssi meni läpi!',mv+' siirtoa. Voittoja yhteensä '+v+'.'],()=>award('pasianssi',5,'Ensimmäinen pasianssi'));}
+  pasRender();}
+function pasPeru(){if(!PS.undo.length){pasMsg='Ei peruttavaa siirtoa.';return pasRender();}const u=PS.undo.pop(),r=JSON.parse(u);Object.assign(PS,r);pasSel=null;pasMsg='Siirto peruttu.';pasTallenna();pasRender();}
+function pasUusiJako(){ask('Aloitetaanko uusi jako? Keskeneräinen peli hylätään.',['Uusi jako','Peru'],i=>{if(i===0){PS=pasUusi();pasTallenna();pasSel=null;pasMsg='Uusi jako.';}pasRender();});}
+function pasSulje(){pasTallenna();$('#panel').classList.add('hide');$('#panel').classList.remove('pas');panelKind='';mode='world';pasSel=null;blip(330,.05);}
+function pasKortti(c,up,cls,top){const p=pasPun(c)?'r':'b';return '<div class="pk '+p+(up?'':' dn')+(cls||'')+'" style="top:'+top+'px"><span class="rv">'+PAS_ARVO[pasArvo(c)]+'</span><span class="ms">'+PAS_MAAT[pasMaa(c)]+'</span><span class="mb">'+PAS_MAAT[pasMaa(c)]+'</span></div>';}
+function pasRender(){if(!PS)return;const el=$('#panel'),old=el.querySelector('.pastab'),keep=old&&panelKind==='pasianssi'?old.scrollTop:0;mode='panel';
+  const W=(el.getBoundingClientRect().width||300),pw=Math.floor((W-24-6*4)/7),ph=Math.round(pw*1.4),K=pasKohteet(),cur=pasCur;
+  const slotCur=(z,f)=>cur.z===z&&(z!=='found'||cur.f===f)?' cur':'';
+  let h='<div class="ptitle">Pasianssi</div><div class="pasbar"><span>Siirtoja '+PS.moves+'</span><span>Voittoja '+(S.flags.pasVoitot||0)+'</span></div><div class="pastop">';
+  h+='<div class="pslot'+slotCur('stock')+'" data-z="stock">'+(PS.stock.length?pasKortti(0,false,'',0):'<span class="tm">↺</span>')+'</div>';
+  const wt=PS.waste[PS.waste.length-1];h+='<div class="pslot'+slotCur('waste')+'" data-z="waste">'+(wt!=null?pasKortti(wt,true,pasSel&&pasSel.z==='waste'?' sel':'',0):'')+'</div><div></div>';
+  for(let f=0;f<4;f++){const F=PS.found[f],t=F[F.length-1];h+='<div class="pslot'+(K.found.includes(f)?' ok':'')+slotCur('found',f)+'" data-z="found" data-a="'+f+'">'+(t!=null?pasKortti(t,true,pasSel&&pasSel.z==='found'&&pasSel.f===f?' sel':'',0):'<span class="tm">A</span>')+'</div>';}
+  h+='</div><div class="pastab">';
+  for(let c=0;c<7;c++){const T=PS.tab[c],nDown=T.filter(q=>!q.up).length,dOff=Math.max(4,Math.round(ph*(T.length>12?.08:.14))),uOff=Math.round(ph*(T.length>14?.24:.3));let y=0;
+    h+='<div class="pcol'+(K.tab.includes(c)?' ok':'')+(T.length?'':' tyhja pslot')+(cur.z==='tab'&&cur.c===c&&!T.length?' cur':'')+'" data-z="tabcol" data-a="'+c+'" style="height:'+(ph+T.reduce((a,q,i)=>i<T.length-1?a+(q.up?uOff:dOff):a,0)+4)+'px">';
+    T.forEach((q,i)=>{const sl=pasSel&&pasSel.z==='tab'&&pasSel.c===c&&i>=pasSel.i,cu=cur.z==='tab'&&cur.c===c&&cur.i===i;h+=pasKortti(q.c,q.up,(sl?' sel':'')+(cu?' cur':''),y).replace('class="pk','data-i="'+i+'" data-c="'+c+'" class="pk');y+=q.up?uOff:dOff;});h+='</div>';}
+  h+='</div><div class="pasmsg">'+(pasMsg||(pasSel?'Valitse kohde. Vihreä reunus näyttää sopivat paikat.':'Napauta korttia, sitten kohdetta.'))+'</div>';
+  h+='<div class="pasbtn"><button data-b="peru">Peru siirto</button><button data-b="uusi">Uusi jako</button><button data-b="ohje">Ohje</button><button data-b="sulje">Sulje</button></div>';
+  showPanel(h,'pasianssi');el.classList.add('pas');el.style.setProperty('--pw',pw+'px');const tb=el.querySelector('.pastab');tb.scrollTop=keep;
+  if(pasCurKb){pasCurKb=false;const cc=el.querySelector('.cur');if(cc)try{cc.scrollIntoView({block:'nearest'});}catch(_){}}
+  el.querySelectorAll('.pk[data-c]').forEach(k=>k.addEventListener('click',e=>{e.stopPropagation();pasNapautus('tab',+k.dataset.c,+k.dataset.i);}));
+  el.querySelectorAll('[data-z]').forEach(d=>d.addEventListener('click',e=>{e.stopPropagation();const z=d.dataset.z,a=+d.dataset.a;if(z==='tabcol')return pasNapautus(PS.tab[a].length?'tabtop':'tabcol',a);pasNapautus(z,a);}));
+  el.querySelectorAll('.pasbtn button').forEach(bt=>bt.addEventListener('click',e=>{e.stopPropagation();const b=bt.dataset.b;if(b==='peru')pasPeru();else if(b==='uusi')pasUusiJako();else if(b==='sulje')pasSulje();
+    else{S.flags.pasOhje=false;openPasianssi();}}));}
+let pasCurKb=false;
+function pasCurLista(){const L=[{z:'stock'},{z:'waste'}];for(let f=0;f<4;f++)L.push({z:'found',f});return L;}
+function pasPress(b){if(!PS)return;const cur=pasCur;pasCurKb=true;
+  if(b==='b'||b==='start'){if(pasSel){pasSel=null;pasMsg='Valinta peruttu.';return pasRender();}return pasSulje();}
+  if(b==='left'||b==='right'){const d=b==='left'?-1:1;if(cur.z==='tab'){cur.c=clamp(cur.c+d,0,6);const T=PS.tab[cur.c];cur.i=Math.max(0,T.length-1);}
+    else{const L=pasCurLista();let k=L.findIndex(q=>q.z===cur.z&&(q.z!=='found'||q.f===cur.f));k=clamp(k+d,0,L.length-1);pasCur=Object.assign({c:0,i:0},L[k]);}blip(620,.02);return pasRender();}
+  if(b==='down'){if(cur.z!=='tab'){const col=cur.z==='stock'?0:cur.z==='waste'?1:cur.f+3;pasCur={z:'tab',c:col,i:Math.max(0,PS.tab[col].length-1)};}
+    else{const T=PS.tab[cur.c];if(cur.i<T.length-1)cur.i++;}blip(620,.02);return pasRender();}
+  if(b==='up'){if(cur.z==='tab'){const T=PS.tab[cur.c],first=T.findIndex(q=>q.up);if(T.length&&cur.i>Math.max(0,first))cur.i--;else{const c=cur.c;pasCur=c===0?{z:'stock'}:c===1||c===2?{z:'waste'}:{z:'found',f:c-3};}}blip(620,.02);return pasRender();}
+  if(b==='a'){if(cur.z==='tab'){const T=PS.tab[cur.c];return T.length?pasNapautus('tab',cur.c,cur.i):pasNapautus('tabcol',cur.c);}return pasNapautus(cur.z,cur.f);}}
 
 /* ---------- tikkaminipeli (v0.50) ---------- */
 function tikkaInteract(){const best=S.flags.tikkaEnnatys||0;ask('Tikkataulu koivun rungossa. Kolme tikkaa odottaa naulassa.'+(best?' Ennätyksesi on '+best+' pistettä.':''),['Heitä tikkaa','Peru'],i=>{if(i===0)tikkaStart();});}
@@ -3734,7 +3824,7 @@ function tupaFurnAct(f){
       return say('Kylmälaukku on tyhjä. Huomenna on taas makkaraa.');
     case 'poyta':if(!S.flags.kirje)return say(['Pöydällä on kirje. Käsiala on tuttu.'].concat(kirjeSivut()),()=>{
         S.flags.kirje=true;S.inv.kehakukka+=2;S.inv.porkkana_s+=2;toast('Sait siemeniä: kehäkukka ×2, porkkana ×2');task('kirje');setTimeout(kuvaLoyto,700);});
-      return ask('Mummon pitsiliina ja maljakko. Kirje on tallessa repussa.',['Lue kirje uudelleen','Peru'],i=>{if(i===0)lueKirje();});
+      return ask('Mummon pitsiliina ja maljakko. Kirje on tallessa repussa. Pöydän laatikossa on vanha korttipakka.',['Pelaa pasianssia','Lue kirje uudelleen','Peru'],i=>{if(i===0)openPasianssi();else if(i===1)lueKirje();});
     case 'tuoli':return ask('Puinen tuoli. Narisee vähän, kun siihen istuu.',['Istu','Peru'],i=>{if(i===0)istuFurn(f,'tuoli');});
     case 'nojatuoli':return ask('Vaarin nojatuoli. Siinä kuunneltiin radiosta sääennuste joka ilta.',['Istu','Peru'],i=>{if(i===0)istuFurn(f,'nojatuoli');});
     case 'sanky':return ask('Nukutaanko yön yli?',['Nukutaan','Ei vielä'],i=>{if(i===0)sleep();});
