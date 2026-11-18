@@ -286,7 +286,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.56</div>
+        <div class="sub">mummon mökki · versio 0.57</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -3222,7 +3222,7 @@ function pasSiirra(sel,target){const cards=pasLahde(sel);if(!cards||!pasVoiko(ca
   if(target.z==='found')PS.found[target.f].push(cards[0]);else PS.tab[target.c].push(...cards.map(c=>({c,up:true})));
   PS.moves++;pasTallenna();return true;}
 function pasNosta(){pasSnap();if(PS.stock.length){PS.waste.push(PS.stock.pop());}else if(PS.waste.length){PS.stock=PS.waste.reverse();PS.waste=[];pasMsg='Nostopakka kierrätettiin.';}else{PS.undo.pop();pasMsg='Pakka on tyhjä.';return;}
-  PS.moves++;pasTallenna();}
+  pasTallenna();} /* v0.57: nosto ja kierrätys eivät ole siirtoja */
 function pasVoitettu(){return PS.found.every(F=>F.length===13);}
 function pasKohteet(){const out={found:[],tab:[]};const c=pasLahde(pasSel);if(!c)return out;for(let f=0;f<4;f++)if(pasVoiko(c,{z:'found',f}))out.found.push(f);for(let k=0;k<7;k++)if(!(pasSel.z==='tab'&&pasSel.c===k)&&pasVoiko(c,{z:'tab',c:k}))out.tab.push(k);return out;}
 function pasMaapinoon(sel){const c=pasLahde(sel);if(!c||c.length!==1)return false;for(let f=0;f<4;f++)if(pasVoiko(c,{z:'found',f}))return pasSiirra(sel,{z:'found',f});return false;}
