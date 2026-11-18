@@ -10,26 +10,26 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;image-renderi
 .bar{position:fixed;left:0;right:0;display:flex;gap:8px;justify-content:space-between;align-items:center;padding:0 max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left));pointer-events:none}
 .top{top:calc(env(safe-area-inset-top) + 10px)}
 .bottom{bottom:calc(env(safe-area-inset-bottom) + 12px);justify-content:center}
-button{pointer-events:auto;font:inherit;font-size:14px;font-weight:600;color:#3a2a1e;background:#fbf4e2;border:0;border-radius:12px;padding:10px 13px;box-shadow:0 3px 0 #cdb994;min-height:44px}
+button{pointer-events:auto;white-space:nowrap;font:inherit;font-size:14px;font-weight:600;color:#3a2a1e;background:#fbf4e2;border:0;border-radius:12px;padding:10px 13px;box-shadow:0 3px 0 #cdb994;min-height:44px}
 .title{color:#f6efdc;font-size:12px;font-weight:700;letter-spacing:.06em;background:rgba(40,28,20,.6);padding:8px 10px;border-radius:10px}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div class="bar top"><button id="back">← Peliin</button><span class="title">VINO TUPA · PIKSELI</span><span style="display:flex;gap:6px"><button id="zo">−</button><button id="zi">+</button></span></div>
-<div class="bar bottom"><button id="kaanna">Käännä tuoli</button><button id="vekt">Vektoriversio</button></div>
+<div class="bar bottom"><button id="kaanna">Käännä tuoli</button><button id="hahmo">Ilman hahmoa</button><button id="vekt">Vektori</button></div>
 <script>
 /* ===================================================================
-   MÖKKI – vino tupa, pikselikokeilu (v0.74)
+   MÖKKI – vino tupa, pikselikokeilu (v0.75: hahmo ja tarkempi mittakaava)
    Vain kuvakulma muuttuu: grafiikka on alkuperäisen pelin kaltaista pikseligrafiikkaa.
    Kaikki piirretään pikselipuskureihin ilman reunanpehmennystä: monikulmiot rivi kerrallaan,
    pinnat pikselikohtaisilla materiaalivarjostimilla (rasterointi Bayer 4×4), ja jokainen esine
    saa yhden pikselin tumman ääriviivan vain ulkoreunaansa kuten pelissä (outlined).
    Taidepikselit skaalataan näytölle kokonaislukukertoimella.
    =================================================================== */
-const TW=32,TH=16,ZH=36;          /* ruutu 64 × 32 taidepikseliä, korkeusyksikkö 36 px (sama tarkkuus kuin tuvan HD-grafiikassa) */
+const TW=48,TH=24,ZH=54;          /* v0.75: ruutu 96 × 48 taidepikseliä, korkeusyksikkö 54 px: pelin tuvan HD-hahmo (48 × 100) sopii mittakaavaan sellaisenaan */
 const RW=3.2,RD=2.7,WALL_H=2.45;  /* kompakti huone */
-const AW=268,AH=250,OX=AW/2-((RW-RD)*TW)/2,OY=WALL_H*ZH+18;  /* taidekankaan koko ja origo */
+const AW=Math.ceil((RW+RD)*TW+40),AH=Math.ceil(WALL_H*ZH+(RW+RD)*TH+70),OX=AW/2-((RW-RD)*TW)/2,OY=WALL_H*ZH+22;  /* taidekankaan koko ja origo */
 const OUTLINE=[42,26,14];
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let K=3,panX=0,panY=0;
@@ -115,7 +115,7 @@ function drawDomePx(B,s,o,ox,oy){const [lx,ly]=rotP(s.x,s.y,o.fw,o.fd,o.r);const
   for(let y=Math.floor(c[1]-hh-1);y<=Math.ceil(c[1]+ry);y++)for(let x=Math.floor(c[0]-rx);x<=Math.ceil(c[0]+rx);x++){const nx=(x+.5-c[0])/rx;if(Math.abs(nx)>1)continue;const top=c[1]-Math.sqrt(1-nx*nx)*hh,bot=c[1]+Math.sqrt(1-nx*nx)*ry,yy=y+.5;if(yy<top||yy>bot)continue;
     const ny=(yy-c[1])/hh;let t=.42-nx*.22-ny*.1;if(yy>c[1]+Math.sqrt(1-nx*nx)*ry-1.5)t=.7;if(Math.abs(nx+.45)<.08&&ny<-.25&&ny>-.8)t=.95;setp(B,x-ox,y-oy,ramp(R,t,x,y));}}
 function drawFlowersPx(B,s,o,ox,oy){const [lx,ly]=rotP(s.x,s.y,o.fw,o.fd,o.r);const b=P(lx,ly,s.z);const bx=b[0]-ox,by=b[1]-oy;const G=C('#4f8a40'),Gl=C('#6aa055');
-  const F=[[-8,-17,'w'],[-1,-22,'b'],[6,-19,'w'],[10,-12,'b'],[1,-13,'w'],[-10,-8,'l'],[7,-6,'l']];
+  const F=[[-12,-26,'w'],[-2,-33,'b'],[9,-28,'w'],[15,-18,'b'],[1,-19,'w'],[-14,-12,'l'],[10,-9,'l'],[-6,-24,'b'],[5,-37,'w']];
   for(const [dx,dy] of F)line(B,bx,by,bx+dx,by+dy+2,G);
   for(const [dx,dy,k] of F){const X=bx+dx,Y=by+dy;if(k==='w'){for(const [a,c2] of [[-2,0],[2,0],[0,-2],[0,2],[-1,-1],[1,-1],[-1,1],[1,1]])setp(B,X+a,Y+c2,C(a+c2<0?'#fffdf6':'#e8e2d2'));setp(B,X,Y,C('#f0b828'));setp(B,X-1,Y,C('#f8d050'));}
     else if(k==='b'){for(const [a,c2] of [[0,-1],[-1,0],[0,0],[1,0],[-1,1],[0,1],[1,1]])setp(B,X+a,Y+c2,C(c2<0?'#a89af0':'#7d6cd0'));setp(B,X,Y+2,C('#4a3a90'));}
@@ -131,10 +131,10 @@ const leg=(x,y,h)=>({t:'cyl',x,y,z:0,r:.045,h,pal:PALW.slice(1,5)});
 const DEFS={
   nojatuoli:{fw:1,fd:1,h:1.08,parts:()=>[leg(.18,.2,.16),leg(.82,.2,.16),leg(.18,.82,.16),leg(.82,.82,.16),
     {t:'box',x:.1,y:.12,z:.14,w:.8,d:.8,h:.22,mat:M_velvet({braid:1})},
-    {t:'box',x:.12,y:.08,z:.34,w:.76,d:.24,h:.72,mat:M_velvet({channels:1}),cut:(u,v,f)=>f==='top'?((u<.1||u>.9)&&(v<.25||v>.75)):(v>.94&&(u<.2||u>.8))||(v>.86&&(u<.08||u>.92))},
+    {t:'box',x:.12,y:.08,z:.34,w:.76,d:.24,h:.72,mat:M_velvet({channels:1})},
     {t:'box',x:.22,y:.3,z:.34,w:.56,d:.62,h:.14,mat:M_velvet({cushion:1})},
-    {t:'box',x:.04,y:.2,z:.34,w:.21,d:.76,h:.3,mat:M_velvet({scroll:1}),cut:(u,v,f)=>f!=='top'&&v>.82&&(u<.18||u>.82)},
-    {t:'box',x:.75,y:.2,z:.34,w:.21,d:.76,h:.3,mat:M_velvet({scroll:1}),cut:(u,v,f)=>f!=='top'&&v>.82&&(u<.18||u>.82)},
+    {t:'box',x:.04,y:.2,z:.34,w:.21,d:.76,h:.3,mat:M_velvet({scroll:1})},
+    {t:'box',x:.75,y:.2,z:.34,w:.21,d:.76,h:.3,mat:M_velvet({scroll:1})},
     {t:'box',x:.34,y:.08,z:1.06,w:.32,d:.26,h:.025,mat:M_lace()},
     {t:'box',x:.34,y:.32,z:.84,w:.32,d:.025,h:.24,mat:M_lace()}]},
   sivupoyta:{fw:1,fd:1,h:.66,top:.66,parts:()=>[leg(.2,.2,.58),leg(.8,.2,.58),leg(.2,.8,.58),leg(.8,.8,.58),
@@ -203,27 +203,66 @@ function renderRoom(objs){const B=Buf(AW,AH);
   fillPoly(B,[P(RW+.13,RD+.13,0),P(RW+.13,0,0),P(RW+.13,0,-.45),P(RW+.13,RD+.13,-.45)],()=>C('#3a2418'));
   return B;}
 
-/* ---------- koostaminen ---------- */
-const ST={objs:[{t:'sivupoyta',x:.12,y:.12,r:0,deco:[{t:'lamppu',ox:.34,oy:.36},{t:'maljakko',ox:.67,oy:.66}]},{t:'nojatuoli',x:1.18,y:.14,r:0},{t:'matto',x:.9,y:1.05,r:0}]};
+/* ---------- koostaminen (v0.75): tausta ja esineet välimuistiin, hahmo piirretään joka ruutuun ---------- */
+const ST={objs:[{t:'sivupoyta',x:.12,y:.12,r:0,deco:[{t:'lamppu',ox:.3,oy:.7},{t:'maljakko',ox:.72,oy:.3}]},{t:'nojatuoli',x:1.18,y:.14,r:0},{t:'matto',x:.9,y:1.05,r:0}]};
 function behind(A,B){if(A.x+A.w<=B.x+1e-6)return true;if(B.x+B.w<=A.x+1e-6)return false;if(A.y+A.d<=B.y+1e-6)return true;if(B.y+B.d<=A.y+1e-6)return false;return (A.x+A.w/2+A.y+A.d/2)<(B.x+B.w/2+B.y+B.d/2);}
-let ART=null;
-function compose(){const room=renderRoom(ST.objs),out=room;const L=ST.objs.map(o=>{const R=renderObj(o);return {o,R,x:o.x,y:o.y,w:R.w,d:R.d,rug:DEFS[o.t].rug};});
-  const order=L.filter(i=>i.rug).concat((()=>{const left=L.filter(i=>!i.rug),res=[];while(left.length){let pk=0;for(let i=0;i<left.length;i++)if(!left.some((B,j)=>j!==i&&behind(B,left[i]))){pk=i;break;}res.push(left.splice(pk,1)[0]);}return res;})());
-  for(const I of order){const [px,py]=P(I.x,I.y,0),bx=Math.round(px)+I.R.ox-Math.round(P(0,0,0)[0]),by=Math.round(py)+I.R.oy-Math.round(P(0,0,0)[1]);
-    const S=I.R.B;for(let y=0;y<S.h;y++)for(let x=0;x<S.w;x++){const i=(y*S.w+x)*4;if(S.d[i+3])setp(out,bx+x,by+y,[S.d[i],S.d[i+1],S.d[i+2]]);}}
-  ART=document.createElement('canvas');ART.width=AW;ART.height=AH;const id=new ImageData(out.d,AW,AH);ART.getContext('2d').putImageData(id,0,0);draw();}
-function draw(){const W=cv.width,H=cv.height;ctx.imageSmoothingEnabled=false;ctx.fillStyle='#241a14';ctx.fillRect(0,0,W,H);const x=Math.round(W/2-AW*K/2+panX),y=Math.round(H/2-AH*K/2+panY-H*.04);ctx.drawImage(ART,x,y,AW*K,AH*K);}
-function resize(){const dpr=window.devicePixelRatio||1;cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(innerHeight*dpr);K=Math.max(1,Math.floor(cv.width/((RW+RD)*TW+24)));draw2();}
+function sortInst(L){const left=L.slice(),res=[];while(left.length){let pk=0;for(let i=0;i<left.length;i++)if(!left.some((B,j)=>j!==i&&behind(B,left[i]))){pk=i;break;}res.push(left.splice(pk,1)[0]);}return res;}
+function toCanvas(B){const c=document.createElement('canvas');c.width=B.w;c.height=B.h;c.getContext('2d').putImageData(new ImageData(B.d,B.w,B.h),0,0);return c;}
+let ART=null,ACTX=null,BG=null,OBJS=[];
+function compose(){BG=toCanvas(renderRoom(ST.objs));OBJS=ST.objs.map(o=>{const R=renderObj(o),[px,py]=P(o.x,o.y,0),o0=P(0,0,0);return {o,c:toCanvas(R.B),bx:Math.round(px)+R.ox-Math.round(o0[0]),by:Math.round(py)+R.oy-Math.round(o0[1]),x:o.x,y:o.y,w:R.w,d:R.d,rug:DEFS[o.t].rug};});
+  if(!ART){ART=document.createElement('canvas');ART.width=AW;ART.height=AH;ACTX=ART.getContext('2d');}}
+
+/* ---------- pelaajahahmo: pelin oma tuvan HD-hahmo, haetaan pelin koodista ----------
+   index.html:stä otetaan värit (HAIR_COLORS, SKINS, EYES, TOPS, PANTS, GLASS_C) ja HDM-moduuli, jonka player(look) piirtää hahmon
+   samoilla pikseleillä kuin tuvassa (48 × 100 HD-pikseliä). Ulkonäkö luetaan pelaajan tallennuksesta. */
+let HAHMO=null,FOOT=96;
+async function loadHahmo(){try{const src=await (await fetch('index.html',{cache:'no-store'})).text();
+  const a=src.indexOf('const HAIR_STYLES='),b=src.indexOf('\n',src.indexOf('const PANTS='));const h0=src.indexOf('const HDM=(function(){'),h1=src.indexOf('})();',h0)+5;
+  const code=src.slice(a,b)+'\n'+src.slice(h0,h1)+'\nreturn {HDM,TOPS};';const M=new Function(code)();
+  let look={hair:0,hairC:0,skin:0,eye:0,glasses:0,top:0,pants:0,shoes:0};try{const s=JSON.parse(localStorage.getItem('mokki-v01')||'null');if(s&&s.look)look=Object.assign(look,s.look);}catch(_){}
+  HAHMO=M.HDM.player(look);const c=HAHMO.down[0],d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;for(let y=c.height-1;y>=0;y--){let f=false;for(let x=0;x<c.width;x++)if(d[(y*c.width+x)*4+3]>0){f=true;break;}if(f){FOOT=y;break;}}
+  return true;}catch(e){console.warn('hahmo',e);return false;}}
+const PL={x:2.3,y:2.0,path:[],dir:'down',walk:0,frame:0};
+const SPEED=2.2;
+function plDirFrom(dx,dy){const sx=dx-dy,sy=(dx+dy)/2;if(Math.abs(sx)>Math.abs(sy)*1.2)return sx>0?'right':'left';return sy>0?'down':'up';}
+/* varjo hahmon alle: rasteroitu soikio, ei pehmeää hohtoa */
+const PSH=(()=>{const B=Buf(30,12);for(let y=0;y<12;y++)for(let x=0;x<30;x++){const nx=(x+.5-15)/14,ny=(y+.5-6)/5.2,d=nx*nx+ny*ny;if(d<1&&(d<.55||dith(x,y)<.5))setp(B,x,y,[60,36,18]);}return toCanvas(B);})();
+
+/* ---------- kulkukelpoisuus ja reitinhaku 0,25 ruudun ruudukossa ---------- */
+const CS=.25,GW=Math.round(RW/CS),GD=Math.round(RD/CS);
+function blocked(gx,gy){const x=(gx+.5)*CS,y=(gy+.5)*CS;if(x<.22||y<.22||x>RW-.15||y>RD-.15)return true;for(const o of ST.objs){const D=DEFS[o.t];if(D.rug)continue;const [w,d]=o.r%2?[D.fd,D.fw]:[D.fw,D.fd];if(x>o.x-.14&&x<o.x+w+.14&&y>o.y-.14&&y<o.y+d+.14)return true;}return false;}
+function findPath(sx,sy,tx,ty){const s=[Math.floor(sx/CS),Math.floor(sy/CS)],t=[Math.floor(tx/CS),Math.floor(ty/CS)];if(t[0]<0||t[1]<0||t[0]>=GW||t[1]>=GD||blocked(t[0],t[1]))return null;
+  const K2=(a,b)=>a+','+b,open=[s],came={},gs={[K2(...s)]:0};let it=0;
+  while(open.length&&it++<3000){open.sort((a,b)=>(gs[K2(...a)]+Math.hypot(a[0]-t[0],a[1]-t[1]))-(gs[K2(...b)]+Math.hypot(b[0]-t[0],b[1]-t[1])));const c=open.shift();
+    if(c[0]===t[0]&&c[1]===t[1]){const p=[];let k=K2(...c);while(came[k]){const [a,b]=k.split(',').map(Number);p.unshift([(a+.5)*CS,(b+.5)*CS]);k=came[k];}if(p.length)p[p.length-1]=[tx,ty];return p;}
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const n=[c[0]+dx,c[1]+dy];if(n[0]<0||n[1]<0||n[0]>=GW||n[1]>=GD||blocked(...n))continue;if(dx&&dy&&(blocked(c[0]+dx,c[1])||blocked(c[0],c[1]+dy)))continue;
+      const ng=gs[K2(...c)]+(dx&&dy?1.414:1);if(gs[K2(...n)]==null||ng<gs[K2(...n)]){gs[K2(...n)]=ng;came[K2(...n)]=K2(...c);if(!open.some(q=>q[0]===n[0]&&q[1]===n[1]))open.push(n);}}}return null;}
+
+/* ---------- ruudun piirto ---------- */
+function step(dt){if(PL.path.length){const [tx,ty]=PL.path[0],dx=tx-PL.x,dy=ty-PL.y,dd=Math.hypot(dx,dy),s=SPEED*dt;if(dd>.001)PL.dir=plDirFrom(dx,dy);PL.walk+=dt;
+    if(dd<=s){PL.x=tx;PL.y=ty;PL.path.shift();}else{PL.x+=dx/dd*s;PL.y+=dy/dd*s;}}else PL.walk=0;}
+function paintArt(){const g=ACTX;g.imageSmoothingEnabled=false;g.clearRect(0,0,AW,AH);g.drawImage(BG,0,0);
+  for(const I of OBJS)if(I.rug)g.drawImage(I.c,I.bx,I.by);
+  const solids=OBJS.filter(i=>!i.rug),P0=HAHMO&&SHOW_PL?{pl:true,x:PL.x-.18,y:PL.y-.18,w:.36,d:.36}:null;
+  for(const I of sortInst(P0?solids.concat([P0]):solids)){if(I.pl){const [fx,fy]=P(PL.x,PL.y,0),fi=PL.path.length?[1,0,2,0][Math.floor(PL.walk*7)%4]:0,c=HAHMO[PL.dir][fi];
+      g.drawImage(PSH,Math.round(fx)-15,Math.round(fy)-6);g.drawImage(c,Math.round(fx-c.width/2),Math.round(fy-FOOT));continue;}g.drawImage(I.c,I.bx,I.by);}}
+function draw(){const W=cv.width,H=cv.height;ctx.imageSmoothingEnabled=false;ctx.fillStyle='#241a14';ctx.fillRect(0,0,W,H);paintArt();DX=Math.round(W/2-AW*K/2+panX);DY=Math.round(H/2-AH*K/2+panY-H*.04);ctx.drawImage(ART,DX,DY,AW*K,AH*K);}
+let DX=0,DY=0,SHOW_PL=true,lastT=0;
+function frame(t){const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;step(dt);if(ART)draw();requestAnimationFrame(frame);}
+function resize(){const dpr=window.devicePixelRatio||1;cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(innerHeight*dpr);K=Math.max(1,Math.floor(cv.width/((RW+RD)*TW+24)));}
 function draw2(){if(ART)draw();}
 addEventListener('resize',resize);
-document.getElementById('zi').onclick=()=>{K=Math.min(K+1,10);draw2();};document.getElementById('zo').onclick=()=>{K=Math.max(1,K-1);draw2();};
+document.getElementById('zi').onclick=()=>{K=Math.min(K+1,10);};document.getElementById('zo').onclick=()=>{K=Math.max(1,K-1);};
 document.getElementById('back').onclick=()=>{location.href='./';};document.getElementById('vekt').onclick=()=>{location.href='kokeilu-tupa.html';};
 document.getElementById('kaanna').onclick=()=>{const c=ST.objs.find(o=>o.t==='nojatuoli');c.r=(c.r+1)%4;compose();};
-let drag=null;cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,px:panX,py:panY};cv.setPointerCapture(e.pointerId);});
-cv.addEventListener('pointermove',e=>{if(!drag)return;const dpr=window.devicePixelRatio||1;panX=drag.px+(e.clientX-drag.x)*dpr;panY=drag.py+(e.clientY-drag.y)*dpr;draw2();});
-cv.addEventListener('pointerup',()=>drag=null);
-resize();compose();
-window.PIKSELI={ST,compose,get art(){return ART;},get K(){return K;},set K(v){K=v;draw2();},setPan:(x,y)=>{panX=x;panY=y;draw2();}};
+document.getElementById('hahmo').onclick=e=>{SHOW_PL=!SHOW_PL;e.target.textContent=SHOW_PL?'Ilman hahmoa':'Hahmon kanssa';};
+/* napautus kävelee, veto panoroi */
+let drag=null;cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,px:panX,py:panY,moved:false};cv.setPointerCapture(e.pointerId);});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const dpr=window.devicePixelRatio||1;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>8)drag.moved=true;if(drag.moved){panX=drag.px+(e.clientX-drag.x)*dpr;panY=drag.py+(e.clientY-drag.y)*dpr;}});
+cv.addEventListener('pointerup',e=>{if(drag&&!drag.moved)tapAt(e.clientX,e.clientY);drag=null;});
+function tapAt(cx,cy){const dpr=window.devicePixelRatio||1,ax=(cx*dpr-DX)/K,ay=(cy*dpr-DY)/K,[wx,wy]=unP(ax,ay);if(!HAHMO||!SHOW_PL)return;const p=findPath(PL.x,PL.y,wx,wy);if(p)PL.path=p;}
+resize();compose();requestAnimationFrame(frame);loadHahmo();
+window.PIKSELI={ST,compose,PL,step,draw,tapAt,findPath,get art(){return ART;},get K(){return K;},set K(v){K=v;},setPan:(x,y)=>{panX=x;panY=y;},get hahmo(){return HAHMO;},get foot(){return FOOT;},toScreen:(x,y)=>{const p=P(x,y,0),dpr=window.devicePixelRatio||1;return [(DX+p[0]*K)/dpr,(DY+p[1]*K)/dpr];}};
 </script>
 </body>
 </html>
