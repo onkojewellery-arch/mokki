@@ -294,7 +294,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.67</div>
+        <div class="sub">mummon mökki · versio 0.68</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -2510,19 +2510,86 @@ function chair(g,X,Y,r){const seat='#b07a45',back='#8a5a32',L='#6e4426';
   box(g,X+12,Y+10,40,36,seat);for(let i=0;i<5;i++)R(g,X+16,Y+16+i*6,32,1,shade(seat,-.14));R(g,X+12,Y+44,40,4,shade(seat,-.35));
   if(r===2){box(g,X+12,Y+40,40,22,back);for(const sx of [22,32,42])R(g,X+sx,Y+44,4,14,'#6e4426');}
   if(r===1)box(g,X+44,Y-10,14,64,back);if(r===3)box(g,X+6,Y-10,14,64,back);}
-function armchair(g,X,Y,r){const U='#5a8a5e',Ud=shade(U,-.3),Udd=shade(U,-.52),Ul=shade(U,.2),Ull=shade(U,.38),LW='#f2ede0',WD='#5a3820',FR='#d8b060';
-  const skirt=y=>{R(g,X+4,y,56,8,Ud);R(g,X+4,y,56,2,U);for(let x=6;x<60;x+=3)R(g,X+x,y+8,1,3,FR);R(g,X+8,y+10,6,6,WD);R(g,X+50,y+10,6,6,shade(WD,-.2));};
-  const tuft=(x,y)=>{P(g,X+x,Y+y,Udd);P(g,X+x+1,Y+y,Udd);P(g,X+x-1,Y+y-1,Ull);};
-  if(r===0){ell(g,X+32,Y-12,26,16,Ud);R(g,X+6,Y-12,52,36,Ud);ell(g,X+32,Y-12,24,14,U);R(g,X+8,Y-12,48,34,U);R(g,X+12,Y-16,6,36,Ul);R(g,X+48,Y-12,6,32,Ud);
-      for(const [x,y] of [[22,-12],[32,-14],[42,-12],[26,-2],[38,-2],[32,8],[20,8],[44,8]])tuft(x,y);
-      R(g,X+20,Y-28,24,12,LW);for(let i=0;i<24;i+=3)ell(g,X+21+i,Y-16,1,1,LW);for(let i=0;i<20;i+=4)P(g,X+22+i,Y-24,'#d8cfba');
-      for(const [ax,c,cl] of [[2,U,Ul],[48,Ud,U]]){R(g,X+ax,Y+2,14,44,c);ell(g,X+ax+7,Y+4,7,6,cl);R(g,X+ax,Y+10,14,2,shade(c,-.25));ell(g,X+ax+7,Y+38,6,6,cl);P(g,X+ax+7,Y+38,Udd);}
-      R(g,X+16,Y+18,32,20,Ul);R(g,X+16,Y+18,32,2,Ull);R(g,X+18,Y+24,28,1,U);R(g,X+16,Y+38,32,8,U);R(g,X+16,Y+38,32,2,Ull);skirt(Y+46);}
-  else if(r===2){for(const [ax,c,cl] of [[2,U,Ul],[48,Ud,U]]){R(g,X+ax,Y-6,14,52,c);ell(g,X+ax+7,Y-6,7,6,cl);}
-      R(g,X+16,Y-2,32,30,Ul);R(g,X+16,Y-2,32,2,Ull);ell(g,X+32,Y+30,26,10,Ud);R(g,X+6,Y+30,52,18,Ud);ell(g,X+32,Y+30,24,9,U);R(g,X+8,Y+30,48,16,U);R(g,X+10,Y+28,44,3,Ul);for(let x=14;x<52;x+=8)R(g,X+x,Y+34,1,10,Ud);skirt(Y+46);}
-  else{ell(g,X+48,Y,12,24,Ud);R(g,X+40,Y,20,46,Ud);ell(g,X+48,Y,10,22,U);R(g,X+42,Y,16,44,U);R(g,X+44,Y-16,4,40,Ul);for(const y of [-8,4,16])tuft(50,y);
-      R(g,X+52,Y-22,8,14,LW);R(g,X+6,Y+2,40,14,U);ell(g,X+26,Y+3,20,5,Ul);R(g,X+6,Y+12,40,2,Ud);
-      R(g,X+6,Y+16,40,22,Ul);R(g,X+6,Y+16,40,2,Ull);R(g,X+6,Y+34,40,4,U);R(g,X+6,Y+38,40,8,Ud);ell(g,X+12,Y+30,6,8,U);skirt(Y+46);}}
+/* v0.68: mallinurkka. Yhteinen piirtotapa: valo ylävasemmalta, vasen ja yläpinta vaaleampia, oikea ja alapinta tummempia.
+   Materiaalit: sametti = pehmeät kiiltoharjat ja tummat urat, hunajainen puu = hillitty syy ja oksakohdat, lasi = valkoinen heijastusviiva, messinki = kirkas reuna. */
+const F68={V:'#3e7048',Vd:'#2d573a',Vdd:'#1d3a26',Vl:'#55895c',Vll:'#74a678',Vs:'#96c49a',LC:'#f4efe2',LCd:'#d6cdb8',
+  W0:'#c98d48',Wl:'#e6b46a',Wd:'#9a6430',Wdd:'#6a4220',BR:'#c8a040',BRl:'#f0d47a'};
+function vGrad(g,x,y,w,h,c1,c2){for(let i=0;i<h;i++)R(g,x,y+i,w,1,lerpC(c1,c2,h>1?i/(h-1):0));}
+function hGrad(g,x,y,w,h,c1,c2){for(let i=0;i<w;i++)R(g,x+i,y,1,h,lerpC(c1,c2,w>1?i/(w-1):0));}
+function turnedLeg(g,x,y,h,dark){const c=dark?F68.Wd:F68.W0,cl=dark?F68.W0:F68.Wl,cd=dark?F68.Wdd:F68.Wd;
+  R(g,x-1,y,8,2,c);R(g,x-1,y,8,1,cl);P(g,x+6,y+1,cd);R(g,x,y+2,6,3,c);P(g,x,y+2,cl);P(g,x,y+3,cl);P(g,x+5,y+3,cd);
+  for(let i=5;i<h-2;i++){const w=i<h*.6?4:3,o=(6-w)>>1;R(g,x+o,y+i,w,1,c);P(g,x+o,y+i,cl);P(g,x+o+w-1,y+i,cd);}
+  R(g,x+1,y+h-2,4,2,F68.BR);P(g,x+1,y+h-2,F68.BRl);}
+function velvetChannels(g,x0,y0,w,h,n){const cw=w/n;for(let k=0;k<n;k++){const x=Math.round(x0+k*cw),cx=Math.round(x0+(k+.5)*cw);
+    if(k>0)R(g,x,y0+3,1,h-6,F68.Vdd);R(g,cx-2,y0+5,2,h-12,k<n/2?F68.Vll:F68.Vl);P(g,cx-2,y0+8,F68.Vs);P(g,cx-1,y0+10,F68.Vs);R(g,cx+1,y0+6,1,h-14,F68.Vd);}}
+function lace(g,x,y,w,h){R(g,x,y,w,h,F68.LC);for(let i=0;i<w;i+=4){ell(g,x+i+2,y+h,2,2,F68.LC);P(g,x+i+2,y+h+1,F68.LCd);}
+  for(let j=2;j<h-1;j+=3)for(let i=2+(j%2)*2;i<w-1;i+=4)P(g,x+i,y+j,F68.LCd);R(g,x,y,w,1,'#ffffff');R(g,x+w-1,y,1,h,F68.LCd);}
+function armchair(g,X,Y,r){const {V,Vd,Vdd,Vl,Vll,Vs}=F68;
+  if(r===0){ /* edestä */
+    turnedLeg(g,X+12,Y+46,12,true);turnedLeg(g,X+46,Y+46,12,true);
+    ell(g,X+32,Y-12,26,17,Vdd);R(g,X+6,Y-12,52,48,Vdd);ell(g,X+32,Y-12,24,15,V);vGrad(g,X+8,Y-12,48,46,V,Vd);
+    for(let i=0;i<15;i++){const w=Math.round(Math.sqrt(1-((i-15)/15)**2)*24);R(g,X+32-w,Y-12-15+i+1,w*2,1,lerpC(Vl,V,i/15));}
+    velvetChannels(g,X+10,Y-24,44,58,4);
+    lace(g,X+21,Y-27,22,11);
+    R(g,X+16,Y+30,32,4,Vdd);vGrad(g,X+16,Y+18,32,14,Vll,Vl);ell(g,X+27,Y+22,9,3,Vs);R(g,X+16,Y+18,32,1,Vs);
+    vGrad(g,X+16,Y+32,32,9,V,Vd);R(g,X+16,Y+32,32,1,Vll);R(g,X+16,Y+40,32,1,Vdd);
+    for(const [ax,dk] of [[1,false],[47,true]]){const a=dk?Vd:Vl,b=dk?Vdd:V;R(g,X+ax,Y+4,16,42,Vdd);hGrad(g,X+ax+1,Y+5,14,40,dk?V:Vll,dk?Vdd:Vd);
+      ell(g,X+ax+8,Y+5,8,5,Vdd);ell(g,X+ax+8,Y+5,7,4,a);ell(g,X+ax+7,Y+3,5,1,dk?V:Vs);ell(g,X+ax+8,Y+13,5,5,Vdd);ell(g,X+ax+8,Y+13,4,4,a);R(g,X+ax+7,Y+16,4,1,b);P(g,X+ax+11,Y+14,b);P(g,X+ax+6,Y+11,dk?Vl:Vs);P(g,X+ax+5,Y+12,dk?Vl:Vs);
+      R(g,X+ax+1,Y+20,14,1,Vdd);R(g,X+ax+2,Y+21,12,1,dk?V:Vl);}
+    vGrad(g,X+4,Y+41,56,9,Vd,Vdd);R(g,X+4,Y+41,56,1,V);R(g,X+4,Y+49,56,2,F68.BR);for(let x=5;x<60;x+=3)P(g,X+x,Y+49,F68.BRl);
+    turnedLeg(g,X+7,Y+51,10,false);turnedLeg(g,X+51,Y+51,10,false);}
+  else if(r===2){ /* takaa */
+    for(const [ax,dk] of [[1,false],[53,true]]){R(g,X+ax,Y+4,10,40,Vdd);hGrad(g,X+ax+1,Y+5,8,38,dk?V:Vl,dk?Vdd:Vd);ell(g,X+ax+5,Y+5,5,5,dk?Vd:Vl);P(g,X+ax+3,Y+3,Vs);}
+    ell(g,X+32,Y-12,26,17,Vdd);R(g,X+6,Y-12,52,56,Vdd);ell(g,X+32,Y-12,24,15,Vd);vGrad(g,X+8,Y-12,48,54,Vd,Vdd);
+    for(let i=0;i<15;i++){const w=Math.round(Math.sqrt(1-((i-15)/15)**2)*24);R(g,X+32-w,Y-26+i,w*2,1,lerpC(V,Vd,i/15));}
+    hGrad(g,X+8,Y-8,6,48,Vl,Vd);R(g,X+31,Y-20,1,60,Vdd);R(g,X+32,Y-20,1,60,V);for(let y=-4;y<38;y+=10){P(g,X+20,Y+y,Vdd);P(g,X+44,Y+y,Vdd);}
+    R(g,X+21,Y-28,22,4,F68.LC);R(g,X+21,Y-25,22,1,F68.LCd);
+    R(g,X+5,Y+44,54,6,Vdd);R(g,X+5,Y+44,54,1,Vd);R(g,X+5,Y+49,54,2,F68.BR);
+    turnedLeg(g,X+7,Y+51,10,false);turnedLeg(g,X+51,Y+51,10,true);}
+  else{ /* sivulta, istuja katsoo vasemmalle */
+    turnedLeg(g,X+50,Y+46,13,true);
+    R(g,X+41,Y-22,20,66,Vdd);ell(g,X+51,Y-22,10,7,Vdd);hGrad(g,X+42,Y-21,18,64,Vl,Vdd);ell(g,X+51,Y-22,9,6,Vl);ell(g,X+48,Y-24,4,2,Vs);
+    R(g,X+42,Y-16,2,54,Vll);for(let y=-12;y<36;y+=12)R(g,X+45,Y+y,12,1,Vdd);
+    R(g,X+41,Y-27,9,12,F68.LC);R(g,X+41,Y-27,9,1,'#ffffff');for(let y=-24;y<-16;y+=3)P(g,X+44,Y+y,F68.LCd);ell(g,X+43,Y-15,2,2,F68.LC);
+    vGrad(g,X+10,Y+12,34,8,Vll,Vl);
+    R(g,X+3,Y+8,44,30,Vdd);vGrad(g,X+4,Y+9,42,28,Vl,Vd);R(g,X+4,Y+8,42,3,Vll);R(g,X+6,Y+8,36,1,Vs);
+    ell(g,X+9,Y+15,5,6,Vdd);ell(g,X+9,Y+15,4,5,Vl);ell(g,X+9,Y+16,2,3,Vd);P(g,X+5,Y+11,Vs);P(g,X+6,Y+10,Vs);ell(g,X+10,Y+9,7,3,Vll);
+    R(g,X+16,Y+26,28,1,Vd);
+    vGrad(g,X+3,Y+38,58,10,Vd,Vdd);R(g,X+3,Y+38,58,1,V);R(g,X+3,Y+47,58,2,F68.BR);for(let x=4;x<61;x+=3)P(g,X+x,Y+47,F68.BRl);
+    turnedLeg(g,X+6,Y+49,12,false);}}
+function sideTable(g,X,Y){const T0='#dba462',Tl='#efc485',Td='#b57b3a',Tdd='#87552a';
+  turnedLeg(g,X+14,Y+28,26,true);turnedLeg(g,X+44,Y+28,26,true);
+  R(g,X+3,Y-3,58,22,Tdd);vGrad(g,X+4,Y-2,56,20,Tl,T0);for(let i=0;i<6;i++)R(g,X+6+Math.floor(hash(i,4,71)*30),Y+i*3,14+Math.floor(hash(i,5,71)*12),1,lerpC(T0,Td,.3));
+  for(const [kx,ky] of [[16,1],[45,9]]){ell(g,X+kx,Y+ky,2,1,Td);P(g,X+kx,Y+ky,Tdd);R(g,X+kx-5,Y+ky-2,10,1,lerpC(T0,Td,.35));R(g,X+kx-5,Y+ky+2,10,1,lerpC(T0,Td,.35));}
+  R(g,X+4,Y-2,56,1,'#f8dca8');R(g,X+4,Y-2,1,20,'#f0cc90');
+  vGrad(g,X+3,Y+18,58,5,Td,Tdd);R(g,X+3,Y+18,58,1,T0);
+  vGrad(g,X+7,Y+23,50,11,T0,Td);R(g,X+7,Y+33,50,1,Tdd);R(g,X+19,Y+24,26,8,Td);vGrad(g,X+20,Y+25,24,6,Tl,T0);ell(g,X+32,Y+28,2,2,F68.BR);P(g,X+31,Y+27,F68.BRl);
+  turnedLeg(g,X+8,Y+34,25,false);turnedLeg(g,X+50,Y+34,25,false);}
+function ambLamp(g,X,Y,on){const cx=X+32,cy=Y+16,A=on?'#f0a030':'#d0862a',Al=on?'#ffcc66':'#eaa848',All=on?'#fff2c0':'#ffdc98',Ad=on?'#c8741c':'#a85e18',Add=on?'#9a5214':'#6e3810';
+  if(on){g.fillStyle='rgba(255,196,110,.20)';g.beginPath();g.ellipse(cx,cy-12,26,20,0,0,6.3);g.fill();}
+  R(g,cx-8,cy+11,16,3,'#7a5420');R(g,cx-8,cy+11,16,1,F68.BRl);R(g,cx+5,cy+11,3,3,'#5a3c14');
+  ell(g,cx,cy+5,8,7,Add);ell(g,cx,cy+5,7,6,Ad);ell(g,cx-1,cy+4,5,4,A);ell(g,cx-2,cy+3,2,2,Al);R(g,cx-5,cy+1,1,5,All);P(g,cx-4,cy,'#ffffff');
+  R(g,cx-1,cy-12,3,8,F68.BR);R(g,cx-1,cy-12,1,8,F68.BRl);R(g,cx+1,cy-12,1,8,'#8a6a20');
+  ell(g,cx,cy-17,16,10,Add);ell(g,cx,cy-18,15,9,Ad);ell(g,cx-1,cy-19,13,7,A);ell(g,cx-3,cy-21,8,4,Al);
+  ell(g,cx+5,cy-15,7,3,Ad);R(g,cx-12,cy-15,24,1,Al);R(g,cx-6,cy-25,2,9,All);P(g,cx-5,cy-26,'#ffffff');for(const a of [-9,9])R(g,cx+a,cy-19,1,7,Ad);
+  R(g,cx-15,cy-10,30,2,on?'#ffd88a':Add);R(g,cx-15,cy-10,30,1,on?'#fff4cc':Ad);ell(g,cx-8,cy-23,3,1,All);P(g,cx-10,cy-21,'#ffffff');P(g,cx+11,cy-15,Al);ell(g,cx,cy-27,2,1,F68.BR);}
+function vase(g,X,Y){const cx=X+32,cy=Y+16,G='#2c5ea8',Gl='#5a8ad0',Gll='#a8c8f0',Gd='#1c3e78',Gdd='#122a54';
+  const stem=(dx,dy,c)=>{g.strokeStyle=c||'#4a8a3e';g.lineWidth=1;g.beginPath();g.moveTo(cx+.5,cy-9);g.quadraticCurveTo(cx+dx*.3+.5,cy+dy*.5,cx+dx+.5,cy+dy+4);g.stroke();};
+  for(const [dx,dy] of [[-12,-30],[-4,-38],[6,-34],[13,-26],[1,-26],[-8,-22]])stem(dx,dy);
+  for(const [dx,dy] of [[-12,-30],[6,-34],[1,-26]]){for(let a=0;a<8;a++){const px=cx+dx+Math.round(Math.cos(a*.785)*4),py=cy+dy+Math.round(Math.sin(a*.785)*3);R(g,px-1,py-1,2,2,a<4?'#fbfaf4':'#e6e2d6');}ell(g,cx+dx,cy+dy,2,2,'#f2c030');P(g,cx+dx-1,cy+dy-1,'#ffe070');}
+  for(const [dx,dy] of [[-4,-38],[13,-26],[-8,-22]]){R(g,cx+dx-1,cy+dy-2,3,4,'#7a6ac8');R(g,cx+dx-2,cy+dy+1,5,2,'#8a7ad8');P(g,cx+dx-1,cy+dy-2,'#a89af0');P(g,cx+dx,cy+dy+3,'#4a3a90');}
+  for(const [dx,dy] of [[-6,-14],[7,-17],[3,-21]]){ell(g,cx+dx,cy+dy,3,1,'#4f8a3e');P(g,cx+dx-1,cy+dy-1,'#7ab060');}
+  ell(g,cx,cy+6,10,9,Gdd);ell(g,cx,cy+6,9,8,Gd);ell(g,cx-1,cy+5,8,7,G);ell(g,cx-3,cy+3,4,4,Gl);
+  R(g,cx-4,cy-8,8,8,Gdd);R(g,cx-3,cy-8,6,8,G);R(g,cx-3,cy-8,2,8,Gl);ell(g,cx,cy-9,5,2,Gdd);ell(g,cx,cy-9,4,1,Gl);P(g,cx-2,cy-10,Gll);
+  R(g,cx-6,cy+1,1,7,Gll);P(g,cx-5,cy,'#ffffff');P(g,cx-6,cy+8,Gl);R(g,cx+6,cy+3,1,6,Gd);R(g,cx-6,cy+13,12,1,Gdd);}
+function rug(g,X,Y,W,H,big){const cols=big?['#b84a3a','#ecdcc0','#5a7eb0','#d8a84a','#ecdcc0','#6f9a58','#b08ac0','#ecdcc0']:['#c8584a','#ecdcc0','#6f8fb8','#d8a84a','#7a9a5a','#ecdcc0','#b48ac0'];
+  const hor=W>H,L=hor?W-24:H-24,Wd=hor?H-16:W-16,x0=X+(hor?12:8),y0=Y+(hor?8:12);
+  const px=(a,b,w,h,c)=>hor?R(g,x0+a,y0+b,w,h,c):R(g,x0+b,y0+a,h,w,c);
+  for(let a=0;a<L;a+=8){const c=cols[(a/8)%cols.length],bw=Math.min(8,L-a);px(a,0,bw,Wd,c);
+    for(let b=0;b<Wd;b+=2){const t=hash(a+b,b,61);px(a+((b>>1)%2),b,bw-1,1,t<.33?shade(c,.12):t<.66?c:shade(c,-.14));if(t>.9)px(a+2+Math.floor(t*4)%4,b,2,1,cols[(a/8+2)%cols.length]);}
+    px(a,0,bw,1,shade(c,.2));px(a,Wd-1,bw,1,shade(c,-.3));px(a+bw-1,0,1,Wd,shade(c,-.18));}
+  for(let b=1;b<Wd;b+=4){px(-8,b,8,1,'#efe6d2');px(-9,b,2,1,'#cfc4aa');px(L,b,8,1,'#e2d8c0');px(L+7,b,2,1,'#cfc4aa');px(-2,b,2,2,'#d8ccb0');px(L,b,2,2,'#d8ccb0');}
+  if(big){g.strokeStyle='#7a2a24';g.lineWidth=2;g.strokeRect(X+(hor?13:9),Y+(hor?9:13),W-(hor?26:18),H-(hor?18:26));}}
 function bed(g,X,Y,W,H,r){box(g,X,Y-12,W,H+8,'#8a5a32');
   if(r===0){box(g,X,Y-28,64,20,'#6e4426');R(g,X+4,Y-28,4,20,'#9a6c44');R(g,X+56,Y-28,4,20,'#9a6c44');R(g,X+12,Y-24,40,2,'#9a6c44');ell(g,X+8,Y-30,4,3,'#9a6c44');ell(g,X+56,Y-30,4,3,'#9a6c44');
     box(g,X+8,Y,48,26,'#ffffff');R(g,X+12,Y+20,40,2,'#d8d4c8');ell(g,X+22,Y+8,8,3,'#ffffff');R(g,X+30,Y+6,2,16,'#e4e0d6');
@@ -2572,20 +2639,6 @@ function lasiVase(g,X,Y,k){const cx=X+32,cy=Y+16;ell(g,cx,cy+14,9,3,'rgba(0,0,0,
     if(k==='ruiskaunokki'){for(const [a,b] of [[-2,0],[2,0],[0,-2],[0,2],[-1,-1],[1,1]])R(g,cx+dx+a,cy+dy+b,2,2,F[0]);P(g,cx+dx,cy+dy,F[1]);}
     else{for(let a=0;a<8;a++)ell(g,cx+dx+Math.cos(a*.785)*4,cy+dy+Math.sin(a*.785)*4,2,2,F[0]);ell(g,cx+dx,cy+dy,2,2,F[1]);}}}
   g.fillStyle='rgba(190,225,235,.55)';g.fillRect(cx-8,cy-8,16,22);R(g,cx-8,cy-8,2,22,'#eef8fb');R(g,cx+6,cy-8,2,22,'#8ab4c2');R(g,cx-9,cy-10,18,3,'#d8eef4');R(g,cx-7,cy+12,14,2,'#8ab4c2');g.fillStyle='rgba(120,180,200,.35)';g.fillRect(cx-6,cy+2,12,9);}
-function sideTable(g,X,Y){const wd='#e8c890',wdD='#c8a064',wdL='#f8e0b0';for(const [lx,c] of [[10,'#a8804e'],[48,'#987044']])R(g,X+lx,Y+24,6,34,c);for(const lx of [16,42])R(g,X+lx,Y+12,4,26,'#8a6038');
-  R(g,X+6,Y-6,52,30,wd);R(g,X+4,Y-2,56,22,wd);R(g,X+8,Y-6,48,2,wdL);R(g,X+6,Y+24,52,6,wdD);R(g,X+6,Y+28,52,2,'#a8804e');for(let i=0;i<7;i++)R(g,X+10+Math.floor(hash(i,3,77)*36),Y-2+i*3,12,1,shade(wd,-.1));}
-function ambLamp(g,X,Y,on){const cx=X+32,cy=Y+16;ell(g,cx,cy+14,10,3,'rgba(0,0,0,.25)');R(g,cx-9,cy+8,18,6,'#2e2420');R(g,cx-9,cy+8,18,2,'#4a3c34');R(g,cx-2,cy-12,4,20,'#2e2420');R(g,cx-2,cy-12,1,20,'#4a3c34');
-  if(on){g.fillStyle='rgba(255,200,110,.22)';g.beginPath();g.ellipse(cx,cy-16,24,16,0,0,6.3);g.fill();}
-  ell(g,cx,cy-16,15,9,on?'#f0a030':'#b8721f');ell(g,cx,cy-18,13,7,on?'#ffc858':'#d08428');ell(g,cx-4,cy-22,6,2,on?'#fff2c0':'#eaa848');for(let a=-12;a<=12;a+=4)P(g,cx+a,cy-12,on?'#d87a18':'#8a5014');R(g,cx-14,cy-10,28,2,on?'#e88a20':'#9a5a1a');}
-function vase(g,X,Y){const cx=X+32,cy=Y+16;ell(g,cx,cy+14,9,3,'rgba(0,0,0,.25)');for(let y=-10;y<14;y++){const w=y<-6?5:y<0?5+(y+6)*.9:11-(y>8?(y-8)*.8:0);R(g,Math.round(cx-w*.65),cy+y,Math.round(w*1.3),1,y<0?'#4a8ac0':'#3a7ab0');}R(g,cx-4,cy-10,8,3,'#5a9ad0');R(g,cx-6,cy-1,2,10,'#7ab8e0');
-  for(const [dx,dy] of [[-9,-34],[2,-40],[11,-30]]){g.strokeStyle='#3f8a4a';g.beginPath();g.moveTo(cx+.5,cy-12);g.lineTo(cx+dx+.5,cy+dy+6);g.stroke();ell(g,cx+dx,cy+dy,6,6,'#f4c020');ell(g,cx+dx,cy+dy,4,4,'#ffd84a');for(let a=0;a<8;a++)P(g,cx+dx+Math.round(Math.cos(a*.785)*6),cy+dy+Math.round(Math.sin(a*.785)*6),'#e0a810');ell(g,cx+dx,cy+dy,2,2,'#6a3a1a');P(g,cx+dx-1,cy+dy-1,'#8a5a2a');}
-  ell(g,cx+6,cy-20,3,2,'#4f8a4a');ell(g,cx-9,cy-17,3,2,'#4f8a4a');}
-function rug(g,X,Y,W,H,big){const cols=big?['#b83a30','#f0e6d0','#3a6aa0','#e0a830','#f0e6d0','#3f8a4a','#c06aa0','#f0e6d0']:['#c0443a','#f0ead8','#4a6fa5','#dfae35','#4f8a4a','#f0ead8','#c7a4e0'];
-  if(W>H){for(let i=0;i<W-24;i+=8){const c=cols[(i/8)%cols.length];R(g,X+12+i,Y+8,Math.min(8,W-24-i),H-16,c);R(g,X+12+i,Y+8,2,H-16,shade(c,.15));for(let k=0;k<H-16;k+=3)P(g,X+12+i+(k%6?3:5),Y+8+k,shade(c,-.22));}
-    for(let k=0;k<H-16;k+=3){R(g,X+4,Y+8+k,8,1,'#f0ead8');R(g,X+W-12,Y+8+k,8,1,'#f0ead8');}}
-  else{for(let i=0;i<H-24;i+=8){const c=cols[(i/8)%cols.length];R(g,X+8,Y+12+i,W-16,Math.min(8,H-24-i),c);R(g,X+8,Y+12+i,W-16,2,shade(c,.15));for(let k=0;k<W-16;k+=3)P(g,X+8+k,Y+12+i+(k%6?3:5),shade(c,-.22));}
-    for(let k=0;k<W-16;k+=3){R(g,X+8+k,Y+4,1,8,'#f0ead8');R(g,X+8+k,Y+H-12,1,8,'#f0ead8');}}
-  if(big){g.strokeStyle='#7a2a24';g.lineWidth=2;g.strokeRect(X+(W>H?13:9),Y+(W>H?9:13),W-(W>H?26:18),H-(W>H?18:26));}}
 function plant(g,X,Y){box(g,X+16,Y+28,32,28,'#c06a3a');R(g,X+12,Y+28,40,8,'#d4804c');R(g,X+12,Y+28,40,2,'#e8a070');R(g,X+20,Y+52,24,4,'#8a4a2a');
   ell(g,X+32,Y+12,24,18,'#3d7a3a');ell(g,X+28,Y+8,20,14,'#4f8a40');ell(g,X+20,Y+4,8,6,'#6aa94c');ell(g,X+42,Y,8,6,'#6aa94c');ell(g,X+32,Y-12,12,8,'#4f8a40');ell(g,X+30,Y-14,6,4,'#6aa94c');
   for(let i=0;i<14;i++){const a=hash(i,1,40)*6.28,rr=8+hash(i,2,40)*16;ell(g,X+32+Math.cos(a)*rr*1.1,Y+4+Math.sin(a)*rr*.8,2,1,'#2e6a32');}
