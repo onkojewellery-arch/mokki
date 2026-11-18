@@ -292,7 +292,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.60</div>
+        <div class="sub">mummon mökki · versio 0.61</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -3294,7 +3294,7 @@ function pajRender(){const M=PAJ;if(!M)return;mode='panel';const p=pajTila();
   showPanel(h,'pajatso');const el=$('#panel');el.classList.add('paj');
   el.querySelectorAll('.molbtn button').forEach(bt=>{const b=bt.dataset.b;bt.addEventListener('contextmenu',e=>e.preventDefault());
     if(b==='laukaise'){bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();pajNappiAlas();});bt.addEventListener('pointerup',e=>{e.preventDefault();e.stopPropagation();pajNappiYlos();});}
-    else bt.addEventListener('click',e=>{e.stopPropagation();if(PAJ&&PAJ.anim)return;if(b==='kolikko')pajMaksa();else if(b==='ohje'){S.flags.pajOhje=false;PAJ=null;openPajatso();}else pajLopeta();});});
+    else bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(PAJ&&PAJ.anim)return;if(b==='kolikko')pajMaksa();else if(b==='ohje'){S.flags.pajOhje=false;PAJ=null;openPajatso();}else pajLopeta();});});
   pajDraw();}
 function pajMaksa(){const p=pajTila();if(p.kolikko)return pajRender();
   if(pajJaljella()<=0){PAJ.msg='Tämän päivän '+PAJ_PAIVA+' laukaisua on käytetty. Pajatso odottaa huomiseen.';return pajRender();}
@@ -3447,7 +3447,7 @@ function molRender(){const st=S.molkky,M=MOL;if(!M)return;mode='panel';const ove
   el.querySelectorAll('.molbtn button').forEach(bt=>{const b=bt.dataset.b;
     if(b==='vas'||b==='oik'){bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(MOL)MOL.hold=b==='vas'?-1:1;});['pointerup','pointercancel','pointerleave'].forEach(t=>bt.addEventListener(t,()=>{if(MOL)MOL.hold=0;}));}
     else if(b==='heita'){bt.addEventListener('contextmenu',e=>e.preventDefault());bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(MOL&&MOL.lat)return molVapauta(true);molLataa();});bt.addEventListener('pointerup',e=>{e.preventDefault();e.stopPropagation();if(MOL&&MOL.lat&&performance.now()-MOL.t0>350)molVapauta(true);});}
-    else bt.addEventListener('click',e=>{e.stopPropagation();if(MOL&&MOL.anim)return;if(b==='ohje'){S.flags.molOhje=false;MOL=null;openMolkky();}else if(b==='uusi')molUusiPeli(false);else if(b==='uusi2')molUusiPeli(true);else molLopeta();});});
+    else bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(MOL&&MOL.anim)return;if(b==='ohje'){S.flags.molOhje=false;MOL=null;openMolkky();}else if(b==='uusi')molUusiPeli(false);else if(b==='uusi2')molUusiPeli(true);else molLopeta();});});
   molDraw();}
 function molTahtaa(e,cv){const M=MOL;if(!M||M.anim||M.over||M.lat)return;const r=cv.getBoundingClientRect(),k=Math.min(r.width/MOL_CW,r.height/MOL_CH),ox=r.left+(r.width-MOL_CW*k)/2,oy=r.top+(r.height-MOL_CH*k)/2;
   const lx=(e.clientX-ox)/k,ly=(e.clientY-oy)/k,wx=(lx-MOL_CW/2)/MOL_U,wy=(MOL_OY-ly)/MOL_U-.4;if(wy<.3)return;M.ang=clamp(Math.atan2(wx,wy)*180/Math.PI,-MOL_KULMA,MOL_KULMA);blip(700,.02);molDraw();}
