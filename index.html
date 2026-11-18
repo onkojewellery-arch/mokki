@@ -292,7 +292,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.58</div>
+        <div class="sub">mummon mökki · versio 0.59</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -2912,6 +2912,12 @@ function renderVihko(){if(vihkoPage>=vihkoPages())vihkoPage=0;
     if(S.flags.jaskaKaynti)h+=vCard('Mandi','Mandin grilli','Kylän grilli ja pubi · juorut ja tarot','Päivän kortin saa kerran päivässä.');
     if(mattiQ().tavattu)h+=vCard('Matti','Matin saari','Asuu pienellä saarella Vattulan edustalla · Petri vie veneellä venelaiturilta','');
     if(S.flags.kylaKaynti)h+=vCard('Kara','kirppis','Torilla klo 7–18, illalla Mandin grillillä','');
+    const MP=[];if(S.flags.kirje)MP.push(vCard('Pasianssi','mummon tupa','Pöydän laatikon korttipakka · voittoja '+(S.flags.pasVoitot||0)+(S.pasianssi?' · jako kesken':''),''));
+    if(omistettu('molkky')||S.flags.molOhje)MP.push(vCard('Mölkky','piha','Mölkkysarja pihalla · voittoja '+(S.flags.molVoitot||0)+(S.flags.molEnnatys?' · ennätys '+S.flags.molEnnatys+' heittoa':''),omistettu('molkky')||S.flags.molOhje?'':''));
+    else if(S.flags.kylaKaynti)MP.push(vCard('Mölkky','kyläkauppa','Mölkkysarja 12 mk kyläkaupasta avaa pihaminipelin.',''));
+    if(S.flags.jaskaKaynti)MP.push(vCard('Pajatso','Mandin grilli','Kolikko '+PAJ_HINTA+' mk · '+PAJ_PAIVA+' laukaisua päivässä'+(S.flags.pajVoitot?' · voitettu yhteensä '+S.flags.pajVoitot+' mk':''),''));
+    if(S.flags.tikkaKierros)MP.push(vCard('Tikanheitto','piha','Koivun taulu · ennätys '+(S.flags.tikkaEnnatys||0)+' pistettä',''));
+    if(MP.length)h+='<p class="vdone">Minipelit</p>'+MP.join('');
     h+='<p class="vdone">Taidot: rakennus '+buildSkill()+' · grillaus '+(S.grill>=3?2:1)+'</p>';}
   else{const logs=(S.log||[]).slice(-7).reverse();h+='<ul class="tasks log">'+(logs.length?logs.map(l=>'<li><span>'+l+'</span></li>').join(''):'<li><span>Ei vielä merkintöjä.</span></li>')+'</ul>';}
   h+='<div class="foot">◀ ▶ sivut · B sulje</div>';showPanel(h,'vihko');
@@ -3088,93 +3094,135 @@ function drawPontto(c,o,p,alpha){if(!PONTTO_SPR)PONTTO_SPR=outlined(14,18,g=>{po
   else if(cyc>400&&cyc<425){const k=425-cyc;bird(hx-1+k*1.2,hy-3-k*.9,(cyc>>2)%2);}
   if(v>=2&&(frame%90)<40){const q=(frame%90)/40;ctx.globalAlpha=1-q;P(ctx,bx+3,by+6-q*6,'#fff6c0');P(ctx,bx+11,by+4-q*7,'#fff6c0');ctx.globalAlpha=1;}}
 
-/* ---------- pajatso (v0.58): Mandin grillin kolikkopeli ----------
+/* ---------- pajatso (v0.58, ulkoasu ja ohjaus v0.59): Mandin grillin kolikkopeli ----------
    S.pajatso = {day, kaytetty, kolikko (maksettu, laukaisematta), viimeisin:{p,tulos}}. Maksu ja käyttökerta tallennetaan yhdessä,
-   tulos ja palkinto tallennetaan heti laukaisussa ennen animaatiota, joten lataus ei toista palkintoa. Ei XP:tä. */
+   tulos ja palkinto tallennetaan heti laukaisussa ennen animaatiota, joten lataus ei toista palkintoa. Ei XP:tä.
+   v0.59: kone vanhan suomalaisen pajatson näköinen (puukaappi, punainen lasi, valkoinen taskurivi, kolikkopinot).
+   Kolikko nousee oikeaa kanavaa ylös, kulkee yläkiskoa vasemmalle voiman verran, putoaa naulojen läpi taskuriviin.
+   Palkintotaskuja on kolme (1/2/3 mk), muut taskut ovat tyhjiä ja kolikko valuu niistä pinoihin. Voittomahdollisuus ≈ 19 % (sama kuin v0.58). */
 const PAJ_HINTA=1,PAJ_PAIVA=5; /* testiarvot */
-const PAJ_TASKUT=[{x0:34,x1:56,p:1,n:'Leveä'},{x0:80,x1:88,p:3,n:'Kapea'},{x0:112,x1:126,p:2,n:'Keskikokoinen'}];
-const PAJ_CW=180,PAJ_CH=260,PAJ_ARC={cx:86,cy:74,r:70},PAJ_R=3.5,PAJ_G=.07,PAJ_POHJA=222,PAJ_SEINA=152;
-const PAJ_NASTAT=(()=>{const L=[[60,140],[96,140],[132,140]];
-  for(const t of PAJ_TASKUT){L.push([t.x0-1,PAJ_POHJA-12],[t.x1+1,PAJ_POHJA-12]);}return L;})();
-const PAJ_OHJAIMET=[]; /* v0.58: seinäohjaimet piirretään koristeena; ne eivät vaikuta rataan */
-const PAJ_KORISTE=[[16,92,26,104],[PAJ_SEINA,92,PAJ_SEINA-10,104]];
-let PAJ=null;
+const PAJ_CW=180,PAJ_CH=284,PAJ_TOP=28,PAJ_GX0=18,PAJ_GX1=146,PAJ_KISKO=PAJ_TOP+10,PAJ_KANAVA=140,PAJ_RIVI=PAJ_TOP+30,PAJ_POHJA=PAJ_TOP+226,PAJ_R=2.6,PAJ_G=.06;
+/* taskurivin solut vasemmalta oikealle: [leveys, palkinto] (0 = tyhjä tasku) */
+const PAJ_SOLUT=[[15,0],[8,1],[16,0],[4,3],[16,0],[15,0],[5,2],[16,0],[25,0]];
+const PAJ_TASKUT=(()=>{let x=PAJ_GX0;const L=[];PAJ_SOLUT.forEach(([w,p])=>{L.push({x0:x,x1:x+w,p,n:p===1?'Leveä':p===2?'Keskikokoinen':p===3?'Kapea':''});x+=w;});return L;})();
+const PAJ_NASTAT=[[30,PAJ_TOP+20],[46,PAJ_TOP+22],[76,PAJ_TOP+20],[104,PAJ_TOP+22]];
+const PAJ_TOLPAT=PAJ_TASKUT.slice(1).map(t=>[t.x0,PAJ_RIVI+2]);
+const PAJ_PINOT=[24,34,44,54,64,74,84,94,104,114,124,134];
+const PAJ_PINOK=PAJ_PINOT.map((x,i)=>Math.round(6+16*Math.exp(-Math.pow((i-5.5)/3.2,2))+((i*7)%5)));
+let PAJ=null,PAJ_TOK=0;
 function pajTila(){const p=S.pajatso=S.pajatso||{day:S.day,kaytetty:0,kolikko:false,viimeisin:null};if(p.day!==S.day){p.day=S.day;p.kaytetty=0;}return p;}
 function pajJaljella(){const p=pajTila();return Math.max(0,PAJ_PAIVA-p.kaytetty);}
 function pajatsoKysy(){const p=pajTila();
-  ask('Pajatso on käytössä. Kolikko maksaa '+PAJ_HINTA+' mk. Taskuista saa 1, 2 tai 3 mk. '+(p.kolikko?'Koneessa odottaa jo maksettu kolikko.':'Laukaisuja tänään jäljellä '+pajJaljella()+'/'+PAJ_PAIVA+'.'),['Pelaa pajatsoa','Peru'],i=>{if(i===0)openPajatso();});}
+  ask('Pajatso on käytössä. Kolikko maksaa '+PAJ_HINTA+' mk. Palkintotaskuista saa 1, 2 tai 3 mk. '+(p.kolikko?'Koneessa odottaa jo maksettu kolikko.':'Laukaisuja tänään jäljellä '+pajJaljella()+'/'+PAJ_PAIVA+'.'),['Pelaa pajatsoa','Peru'],i=>{if(i===0)openPajatso();});}
 function openPajatso(){if(!S.flags.pajMandi){S.flags.pajMandi=true;save();return say(['Mandi: "Petri sai sen toimimaan. Nyt se nielee kolikoita ihan tarkoituksella."'],openPajatso);}
-  if(!S.flags.pajOhje){S.flags.pajOhje=true;save();return say(['Pajatso: laita kolikko koneeseen ('+PAJ_HINTA+' mk) ja laukaise se jousella kaaren yli naulojen sekaan.',
-    'Pidä Laukaise-nappia pohjassa: voimamittari nousee ja laskee. Päästä irti, kun voima on sopiva. Näppäimillä A pohjassa.',
-    'Mitä kovempi laukaisu, sitä pidemmälle vasemmalle kolikko kiertää. Leveä tasku antaa 1 mk, keskikokoinen 2 mk ja kapea 3 mk.','Laukaisuja on '+PAJ_PAIVA+' päivässä. Ohi mennyt kolikko jää koneeseen.'],openPajatso);}
-  PAJ={pow:0,pd:1,lat:false,anim:null,msg:''};pajRender();pajLoop();}
+  if(!S.flags.pajOhje){S.flags.pajOhje=true;save();return say(['Pajatso: laita kolikko koneeseen ('+PAJ_HINTA+' mk). Jousi ampuu sen kanavaa ylös ja yläkiskoa pitkin vasemmalle.',
+    'Napauta Laukaise: voimamittari lähtee liikkeelle. Napauta uudelleen, kun voima on sopiva. Voit myös pitää napin pohjassa ja päästää irti. Näppäimillä A pohjassa.',
+    'Mitä kovempi laukaisu, sitä pidemmälle vasemmalle kolikko kulkee ennen putoamista. Taskurivissä on kolme palkintotaskua: leveä 1 mk, keskikokoinen 2 mk ja kapea 3 mk.','Laukaisuja on '+PAJ_PAIVA+' päivässä. Tyhjään taskuun osunut kolikko valuu koneen pinoihin.'],openPajatso);}
+  PAJ={pow:0,pd:1,lat:false,t0:0,anim:null,msg:''};pajRender();const tok=++PAJ_TOK;requestAnimationFrame(()=>pajLoop(tok));}
 function pajRender(){const M=PAJ;if(!M)return;mode='panel';const p=pajTila();
   let h='<div class="ptitle">Pajatso</div><div class="molst"><span>Saldo <b>'+S.money+'</b> mk</span><span>Laukaisuja '+pajJaljella()+'/'+PAJ_PAIVA+'</span><span>Viimeisin '+(p.viimeisin?p.viimeisin.p+' mk':'–')+'</span></div>';
-  h+='<canvas width="'+PAJ_CW*2+'" height="'+PAJ_CH*2+'"></canvas><div class="molmsg">'+(M.msg||(p.kolikko?'Kolikko on koneessa. Pidä Laukaise pohjassa ja päästä irti.':'Laita kolikko koneeseen. Hinta '+PAJ_HINTA+' mk.'))+'</div>';
-  h+='<div class="molbtn">'+(p.kolikko||M.anim?'<button data-b="laukaise" class="heita">Laukaise</button>':'<button data-b="kolikko" class="heita">Laita kolikko ('+PAJ_HINTA+' mk)</button>')+'</div>';
+  h+='<canvas width="'+PAJ_CW*2+'" height="'+PAJ_CH*2+'"></canvas><div class="molmsg">'+(M.msg||(p.kolikko?(M.lat?'Mittari käy. Napauta uudelleen tai päästä irti, kun voima on sopiva.':'Kolikko on koneessa. Napauta Laukaise ja napauta uudelleen, kun voima on sopiva.'):'Laita kolikko koneeseen. Hinta '+PAJ_HINTA+' mk.'))+'</div>';
+  h+='<div class="molbtn">'+(p.kolikko||M.anim?'<button data-b="laukaise" class="heita">'+(M.lat?'Laukaise nyt!':'Laukaise')+'</button>':'<button data-b="kolikko" class="heita">Laita kolikko ('+PAJ_HINTA+' mk)</button>')+'</div>';
   h+='<div class="molbtn"><button class="pien" data-b="ohje">Ohje</button><button class="pien" data-b="lopeta">Lopeta</button></div>';
   showPanel(h,'pajatso');const el=$('#panel');el.classList.add('paj');
-  el.querySelectorAll('.molbtn button').forEach(bt=>{const b=bt.dataset.b;
-    if(b==='laukaise'){bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();pajLataa();});['pointerup','pointercancel','pointerleave'].forEach(t=>bt.addEventListener(t,e=>{e.preventDefault();pajVapauta();}));}
+  el.querySelectorAll('.molbtn button').forEach(bt=>{const b=bt.dataset.b;bt.addEventListener('contextmenu',e=>e.preventDefault());
+    if(b==='laukaise'){bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();pajNappiAlas();});bt.addEventListener('pointerup',e=>{e.preventDefault();e.stopPropagation();pajNappiYlos();});}
     else bt.addEventListener('click',e=>{e.stopPropagation();if(PAJ&&PAJ.anim)return;if(b==='kolikko')pajMaksa();else if(b==='ohje'){S.flags.pajOhje=false;PAJ=null;openPajatso();}else pajLopeta();});});
   pajDraw();}
 function pajMaksa(){const p=pajTila();if(p.kolikko)return pajRender();
   if(pajJaljella()<=0){PAJ.msg='Tämän päivän '+PAJ_PAIVA+' laukaisua on käytetty. Pajatso odottaa huomiseen.';return pajRender();}
   if(S.money<PAJ_HINTA){PAJ.msg='Rahat eivät riitä. Kolikko maksaa '+PAJ_HINTA+' mk, sinulla on '+S.money+' mk.';blip(180,.1);return pajRender();}
   ask('Laitetaanko kolikko pajatsoon? Hinta '+PAJ_HINTA+' mk. Saldo '+S.money+' mk. Laukaisuja tänään jäljellä '+pajJaljella()+'/'+PAJ_PAIVA+'.',['Laita kolikko','Peru'],i=>{
-    if(i===0){const q=pajTila();if(!q.kolikko&&S.money>=PAJ_HINTA&&pajJaljella()>0){S.money-=PAJ_HINTA;q.kaytetty++;q.kolikko=true;save();hud();blip(880,.05);PAJ.msg='Kolikko kilahti koneeseen. Pidä Laukaise pohjassa ja päästä irti.';}}
+    if(i===0){const q=pajTila();if(!q.kolikko&&S.money>=PAJ_HINTA&&pajJaljella()>0){S.money-=PAJ_HINTA;q.kaytetty++;q.kolikko=true;save();hud();blip(880,.05);PAJ.msg='';}}
     pajRender();});}
-function pajLataa(){const M=PAJ;if(!M||M.anim||M.lat||!pajTila().kolikko)return;M.lat=true;M.pow=0;M.pd=1;}
-function pajVapauta(){const M=PAJ;if(!M||!M.lat||panelKind!=='pajatso')return;M.lat=false;pajLaukaise(M.pow);}
-/* Rata: jousi nostaa kolikon oikeaa kanavaa ylös, kolikko kiertää kaarta voiman mukaan ja putoaa naulojen sekaan. Täysin deterministinen. */
-function pajSim(pow){const A=PAJ_ARC,path=[],X0=PAJ_SEINA+7;
-  for(let y=PAJ_POHJA+4;y>A.cy;y-=5)path.push([X0,y]);
-  if(pow<.06){for(let y=A.cy;y<PAJ_POHJA+4;y+=5)path.push([X0,y]);return {path,tulos:-1,p:0,syy:'heikko'};}
-  const th=Math.min(.12+pow*2.75,Math.PI*.97);for(let t=0;t<th;t+=.06)path.push([A.cx+A.r*Math.cos(t),A.cy-A.r*Math.sin(t)]);
-  let x=A.cx+A.r*Math.cos(th),y=A.cy-A.r*Math.sin(th),sp=.3+pow*.4,vx=-Math.sin(th)*sp,vy=-Math.cos(th)*sp,tulos=-1,hiljaa=0;
-  const tormaa=(px,py,rr)=>{const dx=x-px,dy=y-py,d=Math.hypot(dx,dy),m=PAJ_R+rr;if(d<m&&d>0){let nx=dx/d,ny=dy/d;if(Math.abs(nx)<.2&&ny<0){nx=nx>=0?.2:-.2;const l=Math.hypot(nx,ny);nx/=l;ny/=l;}x=px+nx*m;y=py+ny*m;const vn=vx*nx+vy*ny;if(vn<0){vx-=1.1*vn*nx;vy-=1.1*vn*ny;vx*=.95;vy*=.95;}}};
-  for(let f=0;f<3000;f++){vy+=PAJ_G;x+=vx;y+=vy;
-    if(y<A.cy){const dx=x-A.cx,dy=y-A.cy,d=Math.hypot(dx,dy);if(d>A.r-PAJ_R){const nx=dx/d,ny=dy/d;x=A.cx+nx*(A.r-PAJ_R);y=A.cy+ny*(A.r-PAJ_R);const vn=vx*nx+vy*ny;if(vn>0){vx-=1.4*vn*nx;vy-=1.4*vn*ny;}}}
-    if(x<16+PAJ_R){x=16+PAJ_R;vx=Math.abs(vx)*.4;}if(x>PAJ_SEINA-PAJ_R){x=PAJ_SEINA-PAJ_R;vx=-Math.abs(vx)*.4;}
-    for(const [px,py] of PAJ_NASTAT)tormaa(px,py,1.6);
-    for(const [ax,ay,bx,by] of PAJ_OHJAIMET){const ex=bx-ax,ey=by-ay,t=clamp(((x-ax)*ex+(y-ay)*ey)/(ex*ex+ey*ey),0,1);tormaa(ax+ex*t,ay+ey*t,1);}
-    if(Math.hypot(vx,vy)<.05)hiljaa++;else hiljaa=0;if(hiljaa>30){vx+=(x<PAJ_SEINA/2?.3:-.3);hiljaa=0;}
+/* Ohjaus: napautus käynnistää mittarin ja toinen napautus laukaisee; pitkä painallus laukaisee irrottaessa. */
+function pajNappiAlas(){const M=PAJ;if(!M||M.anim||!pajTila().kolikko)return;if(M.lat)return pajVapauta(true);M.lat=true;M.pow=0;M.pd=1;M.t0=performance.now();pajPaivitaNappi();}
+function pajNappiYlos(){const M=PAJ;if(!M||!M.lat)return;if(performance.now()-M.t0>350)pajVapauta(true);}
+function pajPaivitaNappi(){const b=$('#panel .heita'),m=$('#panel .molmsg');if(b&&PAJ)b.textContent=PAJ.lat?'Laukaise nyt!':'Laukaise';if(m&&PAJ&&PAJ.lat)m.textContent='Mittari käy. Napauta uudelleen tai päästä irti, kun voima on sopiva.';}
+function pajLataa(){const M=PAJ;if(!M||M.anim||M.lat||!pajTila().kolikko)return;M.lat=true;M.pow=0;M.pd=1;M.t0=performance.now();pajPaivitaNappi();}
+function pajVapauta(pakota){const M=PAJ;if(!M||!M.lat||panelKind!=='pajatso')return;if(!pakota&&performance.now()-M.t0<120)return;M.lat=false;pajLaukaise(M.pow);}
+/* Rata (deterministinen): kanava ylös, yläkisko vasemmalle voiman verran, putoaminen naulojen ja tolppien läpi taskuriviin. */
+function pajSim(pow){const path=[],X0=PAJ_KANAVA+4;
+  for(let y=PAJ_POHJA-4;y>PAJ_KISKO;y-=5)path.push([X0,y]);
+  if(pow<.06){for(let y=PAJ_KISKO+4;y<PAJ_POHJA-4;y+=5)path.push([X0,y]);return {path,tulos:-1,p:0,syy:'heikko'};}
+  const xe=PAJ_KANAVA-2-pow*(PAJ_KANAVA-2-PAJ_GX0-6);for(let x=X0;x>xe;x-=4)path.push([x,PAJ_KISKO]);
+  let x=xe,y=PAJ_KISKO,vx=-(.15+pow*.35),vy=0,tulos=-1,hiljaa=0;
+  const tormaa=(px,py,rr)=>{const dx=x-px,dy=y-py,d=Math.hypot(dx,dy),m=PAJ_R+rr;if(d<m&&d>0){let nx=dx/d,ny=dy/d;if(Math.abs(nx)<.2&&ny<0){nx=nx>=0?.2:-.2;const l=Math.hypot(nx,ny);nx/=l;ny/=l;}x=px+nx*m;y=py+ny*m;const vn=vx*nx+vy*ny;if(vn<0){vx-=1.2*vn*nx;vy-=1.2*vn*ny;vx*=.94;vy*=.94;}}};
+  for(let f=0;f<2000;f++){vy+=PAJ_G;x+=vx;y+=vy;
+    if(x<PAJ_GX0+PAJ_R){x=PAJ_GX0+PAJ_R;vx=Math.abs(vx)*.4;}if(x>PAJ_KANAVA-PAJ_R-1){x=PAJ_KANAVA-PAJ_R-1;vx=-Math.abs(vx)*.4;}
+    for(const [px,py] of PAJ_NASTAT)tormaa(px,py,1.4);for(const [px,py] of PAJ_TOLPAT)tormaa(px,py,1.2);
+    if(Math.hypot(vx,vy)<.04)hiljaa++;else hiljaa=0;if(hiljaa>20){vx+=x<80?.25:-.25;hiljaa=0;}
     path.push([x,y]);
-    if(y>=PAJ_POHJA-4){tulos=PAJ_TASKUT.findIndex(t=>x>t.x0+1&&x<t.x1-1);for(let k=0;k<6;k++)path.push([x,Math.min(PAJ_POHJA+8,y+k*2)]);break;}}
-  return {path,tulos,p:tulos>=0?PAJ_TASKUT[tulos].p:0};}
+    if(y>=PAJ_RIVI-1.5){tulos=PAJ_TASKUT.findIndex(t=>x>=t.x0&&x<t.x1);if(tulos<0)tulos=x<PAJ_GX0+1?0:PAJ_TASKUT.length-1;break;}}
+  if(tulos<0){tulos=PAJ_TASKUT.findIndex(t=>x>=t.x0&&x<t.x1);if(tulos<0)tulos=x<80?0:PAJ_TASKUT.length-1;}
+  const T=PAJ_TASKUT[tulos],cx=(T.x0+T.x1)/2;
+  if(T.p){for(let k=1;k<=4;k++)path.push([x+(cx-x)*k/4,PAJ_RIVI+8+k*2]);return {path,tulos,p:T.p};}
+  /* tyhjä tasku: kolikko valuu pohjan läpi lähimpään pinoon */
+  let pi=0;PAJ_PINOT.forEach((px,i)=>{if(Math.abs(px-cx)<Math.abs(PAJ_PINOT[pi]-cx))pi=i;});const px=PAJ_PINOT[pi],pyTop=PAJ_POHJA-6-PAJ_PINOK[pi]*3.2;
+  for(let yy=PAJ_RIVI+10;yy<pyTop;yy+=4)path.push([cx+(px-cx)*Math.min(1,(yy-PAJ_RIVI)/90),yy]);path.push([px,pyTop]);
+  return {path,tulos,p:0};}
 function pajLaukaise(pow){const p=pajTila(),M=PAJ;if(!p.kolikko||!M||M.anim)return;const r=pajSim(pow);
   p.kolikko=false;p.viimeisin={p:r.p,tulos:r.tulos};S.money+=r.p;S.flags.pajLaukaisut=(S.flags.pajLaukaisut||0)+1;if(r.p)S.flags.pajVoitot=(S.flags.pajVoitot||0)+r.p;save();
-  M.anim={r,i:0};M.msgN=r.syy==='heikko'?'Liian heikko laukaisu. Kolikko ei noussut kaaren yli ja jäi koneeseen.':r.tulos>=0?PAJ_TASKUT[r.tulos].n+' tasku! Kone kilisee: '+r.p+' mk.':'Ohi taskuista. Kolikko jäi koneeseen.';
+  M.anim={r,i:0};M.msgN=r.syy==='heikko'?'Liian heikko laukaisu. Kolikko ei noussut kanavaa ylös ja jäi koneeseen.':r.p?PAJ_TASKUT[r.tulos].n+' palkintotasku! Kone kilisee: '+r.p+' mk.':'Tyhjä tasku. Kolikko valui koneen pinoon.';
   if(!S.flags.pajEka){S.flags.pajEka=true;addLog('Pelasin Mandin grillin pajatsoa ensimmäistä kertaa.');save();}
   M.msg='';blip(300,.05,'triangle',.03);pajRender();}
 function pajLopeta(){if(PAJ&&PAJ.anim)return;ask('Lopetetaanko pajatso?'+(pajTila().kolikko?' Maksettu kolikko jää koneeseen odottamaan.':''),['Lopeta','Jatka pelaamista'],i=>{if(i===0)pajSulje();else pajRender();});}
-function pajSulje(){PAJ=null;const el=$('#panel');el.classList.add('hide');el.classList.remove('paj');panelKind='';mode='world';hud();blip(330,.05);}
-function pajPress(b){const M=PAJ;if(!M||M.anim)return;if(b==='a'){if(pajTila().kolikko){if(!M.lat)pajLataa();}else pajMaksa();return;}if(b==='b'||b==='start')return pajLopeta();}
-function pajLoop(){if(!PAJ||panelKind!=='pajatso')return;const M=PAJ;let piirra=false;
-  if(M.lat){M.pow+=M.pd*.013;if(M.pow>=1){M.pow=1;M.pd=-1;}if(M.pow<=0){M.pow=0;M.pd=1;}piirra=true;}
-  if(M.anim){M.anim.i+=2;piirra=true;if(M.anim.i>=M.anim.r.path.length+20){const r=M.anim.r;M.anim=null;M.msg=M.msgN;M.pow=0;if(r.p){blip(990,.06);setTimeout(()=>blip(1180,.06),90);}hud();pajRender();}}
-  if(piirra&&PAJ)pajDraw();requestAnimationFrame(pajLoop);}
-function pajDraw(){const M=PAJ,cv=$('#panel canvas');if(!M||!cv)return;const g=cv.getContext('2d');g.setTransform(2,0,0,2,0,0);const A=PAJ_ARC;
-  g.fillStyle='#3a2218';g.fillRect(0,0,PAJ_CW,PAJ_CH);g.fillStyle='#8a4a2a';g.fillRect(4,4,PAJ_CW-8,PAJ_CH-8);g.fillStyle='#a85e34';g.fillRect(4,4,PAJ_CW-8,3);g.fillStyle='#6a3420';g.fillRect(4,PAJ_CH-8,PAJ_CW-8,4);
-  for(let y=10;y<PAJ_CH-10;y+=7){g.fillStyle='rgba(60,30,16,.18)';g.fillRect(6,y,3,1);g.fillRect(PAJ_CW-9,y+3,3,1);}
-  g.fillStyle='#f2e6c8';g.beginPath();g.arc(A.cx,A.cy,A.r,Math.PI,0);g.lineTo(PAJ_CW-12,PAJ_POHJA+10);g.lineTo(12,PAJ_POHJA+10);g.closePath();g.fill();
-  g.strokeStyle='#b8bcc0';g.lineWidth=2;g.beginPath();g.arc(A.cx,A.cy,A.r+1,Math.PI,0);g.stroke();g.strokeStyle='#eef2f4';g.lineWidth=.6;g.beginPath();g.arc(A.cx,A.cy,A.r+1.6,Math.PI*1.05,-.05);g.stroke();
-  g.fillStyle='#b8bcc0';g.fillRect(PAJ_SEINA,A.cy+4,2,PAJ_POHJA-A.cy+6);g.fillStyle='#e8dcc0';g.fillRect(PAJ_SEINA+2,A.cy,PAJ_CW-14-PAJ_SEINA,PAJ_POHJA-A.cy+10);
-  g.fillStyle='#8a8e94';for(let y=PAJ_POHJA-10;y<PAJ_POHJA+8;y+=3)g.fillRect(PAJ_SEINA+4,y,10,1);
-  g.strokeStyle='#9aa0a6';g.lineWidth=2;for(const [ax,ay,bx,by] of PAJ_KORISTE){g.beginPath();g.moveTo(ax,ay);g.lineTo(bx,by);g.stroke();}
-  for(const t of PAJ_TASKUT){g.fillStyle='#3a2a1e';g.fillRect(t.x0,PAJ_POHJA-10,t.x1-t.x0,18);g.fillStyle='#c8a040';g.fillRect(t.x0-2,PAJ_POHJA-12,2,20);g.fillRect(t.x1,PAJ_POHJA-12,2,20);
-    g.fillStyle='#f4d35e';g.font='bold 8px MokkiNum, monospace';g.textAlign='center';g.textBaseline='middle';g.fillText(t.p+'',(t.x0+t.x1)/2,PAJ_POHJA-2);g.font='5px MokkiNum, monospace';g.fillText('MK',(t.x0+t.x1)/2,PAJ_POHJA+5);}
-  g.fillStyle='rgba(200,160,64,.45)';for(let i=0;i<9;i++){const a=.35+i*.3;g.fillRect(PAJ_ARC.cx+Math.cos(a)*(PAJ_ARC.r-12)-1,PAJ_ARC.cy-Math.sin(a)*(PAJ_ARC.r-12)-1,2,2);}
-  for(const [x,y] of PAJ_NASTAT){g.fillStyle='#6a5020';g.fillRect(x-1,y,3,2);g.fillStyle='#d8b050';g.fillRect(x-1.5,y-1.5,3,3);g.fillStyle='#fff4c0';g.fillRect(x-1,y-1,1,1);}
-  g.fillStyle='#b8302a';g.fillRect(40,18,92,14);g.fillStyle='#f8e8c0';g.font='bold 9px MokkiNum, monospace';g.textAlign='center';g.textBaseline='middle';g.fillText('PAJATSO',86,25.5);
-  /* lasi */
-  g.fillStyle='rgba(255,255,255,.18)';for(let i=0;i<40;i++){g.fillRect(30+i*1.2,40+i*3.6,1.2,2);}
-  /* jousi ja kolikko */
-  const X0=PAJ_SEINA+7,comp=M.lat?M.pow:0;g.fillStyle='#6a6e74';for(let k=0;k<5;k++)g.fillRect(X0-4,PAJ_POHJA+10+k*(3-comp*1.6),9,1.4);g.fillStyle='#2a2a2e';g.fillRect(X0-5,PAJ_POHJA+20,11,6);
-  let cx=null,cy=null;if(M.anim){const P=M.anim.r.path,i=Math.min(P.length-1,M.anim.i);[cx,cy]=P[i];}else if(pajTila().kolikko){cx=X0;cy=PAJ_POHJA+4+comp*6;}
-  if(cx!=null){g.fillStyle='#8a6a20';g.beginPath();g.arc(cx+.5,cy+.5,PAJ_R,0,6.3);g.fill();g.fillStyle='#e8c050';g.beginPath();g.arc(cx,cy,PAJ_R,0,6.3);g.fill();g.fillStyle='#fff0a8';g.fillRect(cx-1.5,cy-2,1.5,1.5);}
-  /* voimamittari */
-  const bx=PAJ_CW-9,by=PAJ_ARC.cy+10,bh=60;g.fillStyle='#2a1a10';g.fillRect(bx-1,by-1,6,bh+2);g.fillStyle='#f4ead0';g.fillRect(bx,by,4,bh);const ph=Math.round(bh*(M.lat?M.pow:0));g.fillStyle=M.pow>.8?'#c0443a':M.pow>.45?'#e0a030':'#5a9a4a';g.fillRect(bx,by+bh-ph,4,ph);}
+function pajSulje(){PAJ=null;PAJ_TOK++;const el=$('#panel');el.classList.add('hide');el.classList.remove('paj');panelKind='';mode='world';hud();blip(330,.05);}
+function pajPress(b){const M=PAJ;if(!M||M.anim)return;if(b==='a'){if(pajTila().kolikko){if(!M.lat)pajLataa();else pajVapauta(true);}else pajMaksa();return;}if(b==='b'||b==='start')return pajLopeta();}
+function pajAskel(){const M=PAJ;if(!M)return;
+  if(M.lat){M.pow+=M.pd*.012;if(M.pow>=1){M.pow=1;M.pd=-1;}if(M.pow<=0){M.pow=0;M.pd=1;}}
+  if(M.anim){M.anim.i+=2;if(M.anim.i>=M.anim.r.path.length+20){const r=M.anim.r;M.anim=null;M.msg=M.msgN;M.pow=0;if(r.p){blip(990,.06);setTimeout(()=>blip(1180,.06),90);}hud();pajRender();return;}}}
+function pajLoop(tok){if(tok!==PAJ_TOK||!PAJ)return;if(panelKind==='pajatso'&&mode==='panel'){const piirra=PAJ.lat||PAJ.anim;pajAskel();if(piirra&&PAJ)pajDraw();}
+  else if(mode==='world'){PAJ=null;return;}requestAnimationFrame(()=>pajLoop(tok));}
+function pajDraw(){const M=PAJ,cv=$('#panel canvas');if(!M||!cv)return;const g=cv.getContext('2d');g.setTransform(2,0,0,2,0,0);const T=PAJ_TOP,F=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
+  g.clearRect(0,0,PAJ_CW,PAJ_CH);
+  /* oranssi seinä ja pullot kaapin päällä */
+  F('#d8642e',0,0,PAJ_CW,PAJ_CH);F('#c85826',0,0,PAJ_CW,2);
+  const pullo=(x,h)=>{F('#5a2a10',x-5,T-h,10,h);F('#7a3a14',x-5,T-h,3,h);F('#5a2a10',x-2,T-h-8,4,9);F('#8a4a1a',x-2,T-h-8,1,9);F('#3a1a08',x-2,T-h-9,4,2);F('#e8dcc0',x-4,T-h+6,8,5);};pullo(36,18);pullo(64,15);
+  /* puukaappi */
+  F('#4a2c14',6,T-2,PAJ_CW-12,PAJ_CH-T-4);F('#9a6a38',8,T,PAJ_CW-16,PAJ_CH-T-8);
+  for(let i=0;i<46;i++){const y=T+2+((i*37)%(PAJ_CH-T-12)),x=10+((i*53)%(PAJ_CW-24));F(i%2?'#8a5c2e':'#aa7a46',x,y,10+(i%4)*4,1);}
+  F('#b88a52',8,T,PAJ_CW-16,2);F('#6a4420',8,PAJ_CH-12,PAJ_CW-16,4);F('#a8a8a8',4,T+40,4,10);F('#a8a8a8',4,PAJ_CH-50,4,10);
+  /* lasi: punainen tausta */
+  const G0=PAJ_GX0-4,G1=PAJ_GX1+18,GY0=T+4,GY1=PAJ_POHJA+4;F('#3a1a10',G0-2,GY0-2,G1-G0+4,GY1-GY0+4);F('#c42a2a',G0,GY0,G1-G0,GY1-GY0);
+  /* yläkisko ja naulat */
+  F('#e8e4dc',PAJ_GX0,PAJ_KISKO+PAJ_R+1,PAJ_KANAVA-PAJ_GX0+8,1.5);
+  for(const [x,y] of PAJ_NASTAT){F('#6a4a18',x-1,y,3,2);F('#d8b050',x-1.5,y-1.5,3,3);F('#fff0b0',x-1,y-1,1,1);}
+  /* valkoinen taskurivi */
+  F('#f2f0ea',PAJ_GX0-2,PAJ_RIVI-2,PAJ_KANAVA-PAJ_GX0+2,22);F('#d8d4cc',PAJ_GX0-2,PAJ_RIVI+19,PAJ_KANAVA-PAJ_GX0+2,1);
+  for(const t of PAJ_TASKUT){const w=t.x1-t.x0;F('#1e1e22',t.x0+1,PAJ_RIVI+5,w-2,11);F('#3a3a40',t.x0+1,PAJ_RIVI+5,w-2,1);
+    if(!t.p)for(let k=0;k<w-3;k+=2)F('#c8c4bc',t.x0+2+k,PAJ_RIVI+1,1,3);
+    if(t.p){const mx=(t.x0+t.x1)/2;F('#b8202a',mx-4,PAJ_RIVI-1.5,8,6);g.fillStyle='#ffffff';g.font='bold 5.5px MokkiNum, monospace';g.textAlign='center';g.textBaseline='middle';g.fillText(t.p+'',mx,PAJ_RIVI+1.6);
+      F('#f4d35e',mx-1,PAJ_RIVI+9,2,2);g.fillStyle='#e8e4dc';g.font='3px MokkiNum, monospace';g.fillText('mk',mx,PAJ_RIVI+14);}
+    else{F('#5a5a60',(t.x0+t.x1)/2-1,PAJ_RIVI+10,2,1);}}
+  for(const [x,y] of PAJ_TOLPAT){F('#a8acb0',x-.6,y-2,1.2,5);F('#e8ecf0',x-1,y-2.5,2,1.2);}
+  /* alakenttä: valkoiset vinoraidat, metallikiskot, pystykourut ja kolikkopinot */
+  const ly0=PAJ_RIVI+22,cxm=(PAJ_GX0+PAJ_KANAVA)/2;
+  g.fillStyle='#f2f0ea';for(const s of [-1,1]){g.beginPath();g.moveTo(cxm+s*62,ly0+2);g.lineTo(cxm+s*66,ly0+2);g.lineTo(cxm+s*3,ly0+40);g.lineTo(cxm-s*1,ly0+40);g.closePath();g.fill();
+    g.beginPath();g.moveTo(cxm+s*62,ly0+18);g.lineTo(cxm+s*66,ly0+18);g.lineTo(cxm+s*10,ly0+52);g.lineTo(cxm+s*6,ly0+52);g.closePath();g.fill();}
+  g.strokeStyle='#2a1a1a';g.lineWidth=1.2;for(const s of [-1,1]){g.beginPath();g.moveTo(cxm+s*58,ly0+8);g.lineTo(cxm+s*20,ly0+28);g.stroke();g.beginPath();g.moveTo(cxm+s*62,ly0+34);g.lineTo(cxm+s*44,ly0+40);g.lineTo(cxm+s*44,ly0+70);g.stroke();}
+  F('#8a8e94',cxm-.5,ly0,1,30);
+  const ky0=ly0+56;F('#f2f0ea',PAJ_GX0,ky0,PAJ_KANAVA-PAJ_GX0,2);for(let i=0;i<PAJ_PINOT.length;i++){const x=PAJ_PINOT[i];F('#e8e6e0',x-4,ky0+2,8,PAJ_POHJA-ky0-6);F('#b8bcc0',x+4,ky0+2,1,PAJ_POHJA-ky0-6);}
+  F('#2a1414',PAJ_GX0,PAJ_POHJA-4,PAJ_KANAVA-PAJ_GX0,6);
+  const kolikko=(x,y)=>{F('#7a5a18',x-3,y,6.5,3);F('#d8b040',x-3,y-.5,6,2.6);F('#f4dc80',x-2,y-.3,3,.8);};
+  PAJ_PINOT.forEach((x,i)=>{for(let k=0;k<PAJ_PINOK[i];k++)kolikko(x+((k*3+i)%3-1)*.3,PAJ_POHJA-7-k*3.2);});
+  /* lasin heijastus */
+  g.fillStyle='rgba(255,255,255,.10)';for(let i=0;i<60;i++)g.fillRect(G0+30+i*1.4,GY0+10+i*3.2,2,2);
+  /* oikea kanava ja jousi */
+  F('#e8e4dc',PAJ_KANAVA,PAJ_KISKO,1.5,PAJ_POHJA-PAJ_KISKO);F('#e8e4dc',PAJ_KANAVA+8,PAJ_KISKO+6,1.5,PAJ_POHJA-PAJ_KISKO-6);
+  g.strokeStyle='#e8e4dc';g.lineWidth=1.5;g.beginPath();g.arc(PAJ_KANAVA,PAJ_KISKO+8,8,-Math.PI/2,0);g.stroke();
+  const comp=M.lat?M.pow:0,X0=PAJ_KANAVA+4;for(let k=0;k<5;k++)F('#a8acb0',X0-3,PAJ_POHJA-8+k*(2.4-comp*1.4),7,1);
+  /* oikea mustakilpi: hinta ja voimamittari */
+  const kx=G1+2;F('#16161a',kx,GY0,PAJ_CW-12-kx,GY1-GY0);F('#2a2a30',kx,GY0,PAJ_CW-12-kx,1);
+  g.fillStyle='#f4f0e4';g.textAlign='center';g.textBaseline='middle';g.font='bold 7px MokkiNum, monospace';const kc=(kx+PAJ_CW-12)/2;g.fillText('1mk',kc,GY0+14);g.font='4px MokkiNum, monospace';g.fillText('PELI',kc,GY0+22);
+  F('#c0c4c8',kc-3,GY0+30,6,14);F('#2a2a2e',kc-.7,GY0+32,1.4,10);
+  const by=GY0+60,bh=GY1-GY0-80;F('#000',kc-3,by-1,6,bh+2);F('#3a3a40',kc-2,by,4,bh);const ph=Math.round(bh*comp);F(comp>.8?'#e0443a':comp>.45?'#f0b030':'#6aba5a',kc-2,by+bh-ph,4,ph);
+  g.font='3.5px MokkiNum, monospace';g.fillStyle='#f4f0e4';g.fillText('VOIMA',kc,by-5);
+  /* kromattu palautuskouru */
+  F('#5a5e64',52,PAJ_CH-30,76,16);F('#c8ccd0',53,PAJ_CH-29,74,14);F('#eef0f2',53,PAJ_CH-29,74,2);F('#3a3e44',58,PAJ_CH-22,64,5);F('#8a8e94',53,PAJ_CH-16,74,1);
+  /* kolikko */
+  let cx=null,cy=null;if(M.anim){const P=M.anim.r.path,i=Math.min(P.length-1,M.anim.i);[cx,cy]=P[i];}else if(pajTila().kolikko){cx=X0;cy=PAJ_POHJA-12-comp*4;}
+  if(cx!=null){g.fillStyle='#6a4a10';g.beginPath();g.arc(cx+.5,cy+.6,PAJ_R,0,6.3);g.fill();g.fillStyle='#f0c850';g.beginPath();g.arc(cx,cy,PAJ_R,0,6.3);g.fill();F('#fff4b0',cx-1.4,cy-1.6,1.4,1.2);}}
 
 /* ---------- mölkky (v0.56): yksinpeli, tasan 50 pistettä mahdollisimman vähin heitoin ----------
    S.molkky = {pins:[{n,x,y}], score, throws, misses, last:{p,txt}} tallennetaan jokaisen heiton jälkeen.
@@ -3216,27 +3264,28 @@ function molFysiikka(pins,ang,pow){const a=ang*Math.PI/180,dx=Math.sin(a),dy=Mat
 function openMolkky(){if(!S.flags.molOhje){S.flags.molOhje=true;save();return say(['Mölkky: kaada numeroituja keiloja ja kerää tasan '+MOL_TAVOITE+' pistettä mahdollisimman vähin heitoin.',
   'Yksi kaatunut keila antaa sen numeron verran pisteitä. Useampi kaatunut keila antaa niiden lukumäärän. Yli '+MOL_TAVOITE+' pistettä pudottaa pisteet '+MOL_PALAUTUS+':een.',
   'Kolme pisteetöntä heittoa peräkkäin päättää pelin. Kaatuneet keilat nostetaan pystyyn siihen, mihin ne päätyivät.',
-  'Tähtää napauttamalla rataa tai nuolinapeilla. Pidä Heitä-nappia pohjassa ja päästä irti, kun voima on sopiva. Näppäimillä: vasen/oikea tähtää, A pohjassa lataa.'],molAloitus);}
+  'Tähtää napauttamalla rataa tai nuolinapeilla. Napauta Heitä: voimamittari lähtee liikkeelle. Napauta uudelleen, kun voima on sopiva. Voit myös pitää napin pohjassa ja päästää irti. Näppäimillä vasen/oikea tähtää ja A lataa ja heittää.'],molAloitus);}
   molAloitus();}
 function molAloitus(){const st=S.molkky;if(st&&st.throws)return ask('Keskeneräinen mölkkypeli: '+st.score+' pistettä, '+st.throws+' heittoa.',['Jatka','Uusi peli','Peru'],i=>{if(i===0)molAvaa();else if(i===1){S.molkky=molUusi();save();molAvaa();}});
   if(!st){S.molkky=molUusi();save();}molAvaa();}
-function molAvaa(){MOL={ang:0,pow:0,lat:false,pd:1,anim:null,hold:0,msg:'',over:null};molRender();molLoop();}
+let MOL_TOK=0;
+function molAvaa(){MOL={ang:0,pow:0,lat:false,pd:1,t0:0,anim:null,hold:0,msg:'',over:null};molRender();const tok=++MOL_TOK;requestAnimationFrame(()=>molLoop(tok));}
 function molRender(){const st=S.molkky,M=MOL;if(!M)return;mode='panel';const over=M.over,sc=st?st.score:over?over.score:0;
   let h='<div class="ptitle">Mölkky</div><div class="molst"><span>Pisteet <b>'+sc+'</b>/'+MOL_TAVOITE+'</span><span>Viimeisin '+(st&&st.last?st.last.p:over?over.p:'–')+'</span><span>Heittoja '+(st?st.throws:over?over.throws:0)+'</span><span>Ohi '+'●'.repeat(st?st.misses:0)+'○'.repeat(MOL_OHI_MAX-(st?st.misses:0))+'</span></div>';
-  h+='<canvas width="'+MOL_CW*2+'" height="'+MOL_CH*2+'"></canvas><div class="molmsg">'+(M.msg||'Tähtää ja pidä Heitä pohjassa. Voittoja '+(S.flags.molVoitot||0)+(S.flags.molEnnatys?', ennätys '+S.flags.molEnnatys+' heittoa':'')+'.')+'</div>';
+  h+='<canvas width="'+MOL_CW*2+'" height="'+MOL_CH*2+'"></canvas><div class="molmsg">'+(M.msg||'Tähtää ja napauta Heitä kahdesti: ensin mittari, sitten heitto. Voittoja '+(S.flags.molVoitot||0)+(S.flags.molEnnatys?', ennätys '+S.flags.molEnnatys+' heittoa':'')+'.')+'</div>';
   h+=over?'<div class="molbtn"><button data-b="uusi" class="heita">Uusi peli</button><button data-b="sulje">Lopeta</button></div>':'<div class="molbtn"><button data-b="vas">◀</button><button data-b="heita" class="heita">Heitä</button><button data-b="oik">▶</button></div>';
   if(!over)h+='<div class="molbtn"><button class="pien" data-b="ohje">Ohje</button><button class="pien" data-b="uusi2">Uusi peli</button><button class="pien" data-b="lopeta">Lopeta</button></div>';
   showPanel(h,'molkky');const el=$('#panel');el.classList.add('mol');
   const cv=el.querySelector('canvas');cv.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();molTahtaa(e,cv);});
   el.querySelectorAll('.molbtn button').forEach(bt=>{const b=bt.dataset.b;
     if(b==='vas'||b==='oik'){bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(MOL)MOL.hold=b==='vas'?-1:1;});['pointerup','pointercancel','pointerleave'].forEach(t=>bt.addEventListener(t,()=>{if(MOL)MOL.hold=0;}));}
-    else if(b==='heita'){bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();molLataa();});['pointerup','pointercancel','pointerleave'].forEach(t=>bt.addEventListener(t,e=>{e.preventDefault();molVapauta();}));}
+    else if(b==='heita'){bt.addEventListener('contextmenu',e=>e.preventDefault());bt.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(MOL&&MOL.lat)return molVapauta(true);molLataa();});bt.addEventListener('pointerup',e=>{e.preventDefault();e.stopPropagation();if(MOL&&MOL.lat&&performance.now()-MOL.t0>350)molVapauta(true);});}
     else bt.addEventListener('click',e=>{e.stopPropagation();if(MOL&&MOL.anim)return;if(b==='ohje'){S.flags.molOhje=false;MOL=null;openMolkky();}else if(b==='uusi')molUusiPeli(false);else if(b==='uusi2')molUusiPeli(true);else molLopeta();});});
   molDraw();}
 function molTahtaa(e,cv){const M=MOL;if(!M||M.anim||M.over||M.lat)return;const r=cv.getBoundingClientRect(),k=Math.min(r.width/MOL_CW,r.height/MOL_CH),ox=r.left+(r.width-MOL_CW*k)/2,oy=r.top+(r.height-MOL_CH*k)/2;
   const lx=(e.clientX-ox)/k,ly=(e.clientY-oy)/k,wx=(lx-MOL_CW/2)/MOL_U,wy=(MOL_OY-ly)/MOL_U-.4;if(wy<.3)return;M.ang=clamp(Math.atan2(wx,wy)*180/Math.PI,-MOL_KULMA,MOL_KULMA);blip(700,.02);molDraw();}
-function molLataa(){const M=MOL;if(!M||M.anim||M.over||M.lat)return;M.lat=true;M.pow=0;M.pd=1;}
-function molVapauta(){const M=MOL;if(!M||!M.lat||panelKind!=='molkky')return;M.lat=false;molHeita(M.ang,M.pow);}
+function molLataa(){const M=MOL;if(!M||M.anim||M.over||M.lat)return;M.lat=true;M.pow=0;M.pd=1;M.t0=performance.now();const b=$('#panel .heita');if(b)b.textContent='Heitä nyt!';}
+function molVapauta(pakota){const M=MOL;if(!M||!M.lat||panelKind!=='molkky')return;if(!pakota&&performance.now()-M.t0<120)return;M.lat=false;molHeita(M.ang,M.pow);}
 function molHeita(ang,pow){const st=S.molkky,M=MOL;if(!st||!M||M.anim)return;ang=clamp(ang+(Math.random()-.5)*1.2,-MOL_KULMA-1,MOL_KULMA+1);pow=clamp(pow*(1+(Math.random()-.5)*.04),0,1);
   const F=molFysiikka(st.pins,ang,pow),nums=F.kaatuneet.map(q=>q.p.n),r=molLaske(st,nums);
   for(const q of F.kaatuneet){q.p.x=q.x1;q.p.y=q.y1;}M.lastPins=st.pins.map(p=>({...p}));
@@ -3251,16 +3300,16 @@ function molHeita(ang,pow){const st=S.molkky,M=MOL;if(!st||!M||M.anim)return;ang
 function molUusiPeli(kysy){const go=()=>{S.molkky=molUusi();save();MOL.over=null;MOL.msg='Uusi peli. Keilat ovat aloitusasetelmassa.';molRender();};
   if(kysy&&S.molkky&&S.molkky.throws)return ask('Aloitetaanko uusi mölkkypeli? Keskeneräinen peli hylätään.',['Uusi peli','Peru'],i=>{if(i===0)go();else molRender();});go();}
 function molLopeta(){if(MOL&&MOL.anim)return;if(MOL&&MOL.over)return molSulje();ask('Lopetetaanko mölkky? Peli on tallessa, ja voit jatkaa myöhemmin.',['Lopeta','Jatka pelaamista'],i=>{if(i===0)molSulje();else molRender();});}
-function molSulje(){MOL=null;const el=$('#panel');el.classList.add('hide');el.classList.remove('mol');panelKind='';mode='world';blip(330,.05);}
+function molSulje(){MOL=null;MOL_TOK++;const el=$('#panel');el.classList.add('hide');el.classList.remove('mol');panelKind='';mode='world';blip(330,.05);}
 function molPress(b){const M=MOL;if(!M)return;if(M.anim)return;
   if(b==='left'||b==='right'){if(!M.over&&!M.lat){M.ang=clamp(M.ang+(b==='left'?-1.5:1.5),-MOL_KULMA,MOL_KULMA);molDraw();}return;}
-  if(b==='a'){if(M.over)return molUusiPeli(false);if(!M.lat)molLataa();return;}
+  if(b==='a'){if(M.over)return molUusiPeli(false);if(!M.lat)molLataa();else molVapauta(true);return;}
   if(b==='b'||b==='start')return molLopeta();}
-function molLoop(){if(!MOL||panelKind!=='molkky')return;const M=MOL;let piirra=false;
+function molLoop(tok){if(tok!==MOL_TOK||!MOL)return;if(panelKind!=='molkky'||mode!=='panel'){if(mode==='world'){MOL=null;return;}return requestAnimationFrame(()=>molLoop(tok));}const M=MOL;let piirra=false;
   if(M.hold&&!M.lat&&!M.anim&&!M.over){M.ang=clamp(M.ang+M.hold*.6,-MOL_KULMA,MOL_KULMA);piirra=true;}
   if(M.lat){M.pow+=M.pd*.016;if(M.pow>=1){M.pow=1;M.pd=-1;}if(M.pow<=0){M.pow=0;M.pd=1;}piirra=true;}
   if(M.anim){M.anim.t++;piirra=true;if(M.anim.t>=M.anim.end){M.anim=null;M.msg=M.msgN||'';M.pow=0;molRender();}}
-  if(piirra&&MOL)molDraw();requestAnimationFrame(molLoop);}
+  if(piirra&&MOL)molDraw();requestAnimationFrame(()=>molLoop(tok));}
 function molDraw(){const M=MOL,cv=$('#panel canvas');if(!M||!cv)return;const g=cv.getContext('2d');g.setTransform(2,0,0,2,0,0);g.imageSmoothingEnabled=false;
   const X=x=>MOL_CW/2+x*MOL_U,Y=y=>MOL_OY-y*MOL_U;
   g.fillStyle='#6a9a4a';g.fillRect(0,0,MOL_CW,MOL_CH);for(let i=0;i<140;i++){const x=(i*73)%MOL_CW,y=(i*131)%MOL_CH;g.fillStyle=i%2?'#5a8a3e':'#7aaa56';g.fillRect(x,y,2,1);}
