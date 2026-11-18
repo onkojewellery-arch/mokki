@@ -294,7 +294,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.69</div>
+        <div class="sub">mummon mökki · versio 0.70</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -3220,7 +3220,10 @@ $('#dialog').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='di
 function openMenu(){const items=[['Mökkivihko',()=>showTasks(0)],['Reppu',showInv],['Hahmo',()=>openCustom('menu')]];
   if(pyoraAuki()&&PYORA_ULKO[S.scene])items.splice(1,0,['Pyöräile',()=>openPyoraile(false)]);
   if(S.scene==='tupa')items.push(['Sisusta',openDecor]);else if(S.scene==='piha')items.push(['Rakenna',openBuildMenu]);else if(S.scene==='rtupa')items.push(['Sisusta',openDecorR]);else if(S.scene==='ranta'&&S.flags.rantaOstettu)items.push(['Rakenna',openBuildMenuR]);
+  items.push(['Kokeilu: vino tupa',openVinoTupa]);
   items.push(['Kosketuskokeilu: '+(TOUCHX?'päällä':'pois'),toggleTouchX],['Kellonaika (testi)',pickTime],['Päävalikko',toTitle],['Sulje',null]);menu={items,sel:0};mode='menu';blip(700,.04);renderMenu();}
+/* v0.70: vinon tuvan kokeilu on erillinen sivu kokeilu-tupa.html (oma tallennus). Artifaktista avataan julkaistu sivu. */
+function openVinoTupa(){save();const web=/^https?:$/.test(location.protocol)&&!/claude/.test(location.hostname);if(web)location.href='kokeilu-tupa.html';else window.open('https://onkojewellery-arch.github.io/mokki/kokeilu-tupa.html','_blank');}
 function renderMenu(){const el=$('#menu');if(!menu){el.classList.add('hide');return;}el.classList.remove('hide');const ul=el.querySelector('.opts');ul.innerHTML='';
   menu.items.forEach((it,i)=>{const li=document.createElement('li');li.textContent=it[0];if(i===menu.sel)li.className='sel';
     li.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();menu.sel=i;press('a');});ul.appendChild(li);});}
