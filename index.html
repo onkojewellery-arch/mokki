@@ -103,6 +103,9 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
 .tab{padding:0 calc(var(--s)*3px);border-radius:calc(var(--s)*1px);cursor:pointer;color:#6a5f4c;border:calc(var(--s)*.5px) solid #c9b98f}
 .tab.on{background:#3f6b4a;color:#f6efdc;border-color:#3f6b4a}
 .shoplist{list-style:none;margin:0;padding:0}
+#panel.shopp{display:flex;flex-direction:column;overflow:hidden}body.tall #panel.shopp{height:calc(100% - 64px - env(safe-area-inset-top,0px));overflow:hidden}
+#panel.shopp .ptitle{padding-right:calc(var(--s)*16px)}#panel.shopp .sscroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:calc(var(--s)*1px)}
+#panel.shopp .sscroll .vgrid{max-height:none;overflow:visible}.vcard .erä{display:block;font-size:calc(var(--s)*5px);color:#7a6f5a}
 .shoplist li{display:flex;justify-content:space-between;align-items:center;gap:calc(var(--s)*3px);padding:calc(var(--s)*1.1px) calc(var(--s)*2px);border-radius:calc(var(--s)*1px);cursor:pointer}
 .shoplist li.sel{background:var(--box-sel)}
 .shoplist small{display:block;font-size:calc(var(--s)*5.5px);color:#7a6f5a}
@@ -135,7 +138,7 @@ header b{color:var(--ink);font-weight:600;font-size:18px;letter-spacing:.25em}
 .nimiok{text-align:right;margin-top:calc(var(--s)*2px)}
 .vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(var(--s)*2.5px);max-height:calc(var(--s)*92px);overflow-y:auto;padding:calc(var(--s)*1px)}
 .vcard{min-width:0;overflow-wrap:anywhere;hyphens:auto;background:#efe4c6;border:calc(var(--s)*1px) solid #cdbd98;border-radius:calc(var(--s)*2px);padding:calc(var(--s)*2px) calc(var(--s)*1.5px);text-align:center;font-size:calc(var(--s)*6px);line-height:1.1;cursor:pointer}
-.vcard img{display:block;width:100%;height:calc(var(--s)*24px);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;margin-bottom:calc(var(--s)*1.5px)}
+.vcard img{display:block;margin:0 auto calc(var(--s)*1.5px);width:auto;height:calc(var(--s)*24px);--ih:calc(var(--s)*24px);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;margin-bottom:calc(var(--s)*1.5px)}
 .vcard.sel{background:#fff8e2;border-color:#3f6b4a;box-shadow:0 0 0 calc(var(--s)*1.5px) #3f6b4a}
 .vinfo{margin-top:calc(var(--s)*3px);font-size:calc(var(--s)*7px)}
 .panel.tarotbox{top:auto;height:calc(var(--s)*72px);background:#f6ecd6;padding-top:calc(var(--s)*3px)}
@@ -182,19 +185,19 @@ body.tall #title{padding-bottom:calc(env(safe-area-inset-bottom,0px) + var(--s)*
 #title .warn{font-size:calc(var(--s)*6px);margin-bottom:calc(var(--s)*1px)}
 /* customization */
 .custom{font-size:calc(var(--s)*6.5px)}
-.cgrid{display:flex;gap:calc(var(--s)*4px)}
-.cleft{display:flex;flex-direction:column;align-items:center;gap:calc(var(--s)*2px)}
+.cgrid{display:flex;flex-direction:column;gap:calc(var(--s)*2px)}#pv,#mini{image-rendering:pixelated;image-rendering:crisp-edges;background:#e9dcbc;border-radius:calc(var(--s)*1px)}
+.cleft{display:flex;flex-direction:row;justify-content:center;align-items:flex-end;gap:calc(var(--s)*3px)}
 #portrait{width:calc(var(--s)*40px);height:calc(var(--s)*40px);image-rendering:pixelated;border:calc(var(--s)*1px) solid var(--box-edge);border-radius:calc(var(--s)*1px)}
 #mini{width:calc(var(--s)*19px);height:calc(var(--s)*29px);image-rendering:pixelated}
 .crows{list-style:none;margin:0;padding:0;flex:1;min-width:0}
-.crows li{display:flex;align-items:center;padding:calc(var(--s)*.9px) calc(var(--s)*1.5px);border-radius:calc(var(--s)*1px);cursor:pointer}
+.crows li{display:grid;grid-template-columns:minmax(0,30%) calc(var(--s)*16px) minmax(0,1fr) calc(var(--s)*16px);align-items:center;column-gap:calc(var(--s)*1px);min-height:calc(var(--s)*13px);padding:0 calc(var(--s)*1px);border-radius:calc(var(--s)*1px);cursor:pointer}
 .crows li.sel{background:var(--box-sel)}
-.crows .lab{flex:1;color:#6a5f4c}
-.crows .arr{padding:0 calc(var(--s)*1.5px);cursor:pointer}
-.crows .val{min-width:calc(var(--s)*36px);text-align:center}
+.crows .lab{color:#6a5f4c;overflow-wrap:anywhere}
+.crows .arr{display:flex;align-items:center;justify-content:center;height:calc(var(--s)*12px);border-radius:calc(var(--s)*2px);background:rgba(63,107,74,.12);color:#3f6b4a;cursor:pointer;touch-action:manipulation}.crows .arr:active{background:rgba(63,107,74,.3)}
+.crows .val{text-align:center;line-height:1.1;overflow-wrap:anywhere;hyphens:auto}
 .namerow{display:flex;align-items:center;gap:calc(var(--s)*3px);margin-bottom:calc(var(--s)*2px);color:#6a5f4c}
 .namerow input{flex:1;min-width:0;font:inherit;color:var(--box-ink);background:#fffaee;border:calc(var(--s)*.5px) solid #c9b98f;border-radius:calc(var(--s)*1px);padding:calc(var(--s)*.8px) calc(var(--s)*2px);user-select:text;-webkit-user-select:text;touch-action:auto}
-.crows li.done{justify-content:center;font-weight:600;margin-top:calc(var(--s)*2px)}
+.crows li.done{display:flex;justify-content:center;font-weight:600;margin-top:calc(var(--s)*2px)}
 /* controls */
 #dpad{grid-area:dpad;position:relative;width:114px;height:114px;touch-action:none}
 #dpad span{position:absolute;width:38px;height:38px;background:var(--btn);box-shadow:0 4px 0 var(--btn-edge)}
@@ -266,7 +269,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.52</div>
+        <div class="sub">mummon mökki · versio 0.53</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -276,7 +279,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
         <div class="ptitle"></div>
         <label class="namerow">Nimi <input id="pname" maxlength="22" autocomplete="off" spellcheck="false"></label>
         <div class="cgrid">
-          <div class="cleft"><canvas id="portrait" width="40" height="40"></canvas><canvas id="mini" width="38" height="58"></canvas></div>
+          <div class="cleft"><canvas id="pv" width="160" height="106"></canvas><canvas id="mini" width="40" height="60"></canvas><canvas id="portrait" width="40" height="40" hidden></canvas></div>
           <ul class="crows"></ul>
         </div>
       </div>
@@ -392,7 +395,7 @@ let XP_HYVITYS=null;
 const SAVE_KEY='mokki-v01';
 function migrate(s){s.inv=s.inv||{};s.inv.maali=s.inv.maali||0;s.money=s.money||0;s.log=s.log||[];s.flags=s.flags||{};s.tasks=s.tasks||{};if(s.look&&s.look.glasses==null)s.look.glasses=0;
   if(s.started&&!s.flags.bussi)s.tasks.reitti=true;if(s.flags.bussi&&!s.flags.reitti){s.flags.reitti=1;s.tasks.hahmo=true;}
-  s.facade=s.facade||{color:'haalistunut',renovated:false};if(s.time==null)s.time=540;
+  s.facade=s.facade||{color:'haalistunut',renovated:false};if(s.time==null)s.time=540;while(s.time>=1440){s.time-=1440;s.day=(s.day||1)+1;}
   if(s.porch&&!s.flags.kunnostus){s.flags.kunnostus=true;s.log.push('Kuisti rakennettu.');}
   if(s.furn&&!s.furn.some(f=>f.t==='tiski')){
     const fits=(f,x,y)=>{const [w,h]=dims(f);for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){if(xx<1||xx>8||yy<2||yy>7)return false;if(yy===2&&(xx===2||xx===3))return false;
@@ -793,12 +796,14 @@ function karaTalk(){ask('Kara: "Kaupungissa oli kaappi kaapeille. Nyt on peräko
   if(i===1)return say(nextLine('k',KARA_TORI));});}
 function kirppisInfo(it){return tuoteKaytto(it);}
 function openKirppis(){S.kirppis=S.kirppis||{};ksel=clamp(ksel,0,KIRPPIS.length-1);
-  let h='<div class="ptitle">Karan peräkonttikirppis</div><div class="vgrid">'+KIRPPIS.map((it,i)=>{const sold=S.kirppis[it.id];return '<div class="vcard'+(i===ksel?' sel':'')+(sold?' myyty':'')+'" data-i="'+i+'"><img src="'+cardImg(it.id)+'" alt=""><span>'+it.n+'</span><span class="hinta">'+(sold?'Myyty':it.p+' mk')+'</span></div>';}).join('')+'</div>';
+  const old=$('#panel .sscroll'),keep=old&&panelKind==='kirppis'?old.scrollTop:kirppisPos;
+  let h='<div class="ptitle">Karan peräkonttikirppis</div><div class="sscroll"><div class="vgrid">'+KIRPPIS.map((it,i)=>{const sold=S.kirppis[it.id];return '<div class="vcard'+(i===ksel?' sel':'')+(sold?' myyty':'')+'" data-i="'+i+'"><img src="'+cardImg(it.id)+'" alt=""><span>'+it.n+'</span><span class="hinta">'+(sold?'Myyty':it.p+' mk')+'</span></div>';}).join('')+'</div></div>';
   const it=KIRPPIS[ksel],sold=S.kirppis[it.id];
   h+='<div class="vinfo"><b>'+it.n+'</b> · '+kirppisInfo(it)+' · '+(sold?'<b>Myyty</b>':it.p+' mk')+'</div>'+(it.repl?'<div class="vrepl">Kara: "'+it.repl+'"</div>':'')+'<div class="foot">Rahaa '+S.money+' mk · A osta · B takaisin</div>';
-  showPanel(h,'kirppis');
-  document.querySelectorAll('#panel .vcard').forEach(c=>c.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const k=+c.dataset.i;if(k===ksel)kirppisBuy();else{ksel=k;blip(660,.03);openKirppis();}}));}
-function kirppisBuy(){const it=KIRPPIS[ksel];if(S.kirppis[it.id]){blip(200,.08);return toastNow('Tämä on jo myyty.');}
+  showPanel(h,'kirppis');$('#panel').classList.add('shopp');const sc=$('#panel .sscroll');sc.scrollTop=keep;fitPixImgs($('#panel'));if(kirppisKb){kirppisKb=false;const sel=$('#panel .vcard.sel');if(sel)try{sel.scrollIntoView({block:'nearest'});}catch(_){}}
+  document.querySelectorAll('#panel .vcard').forEach(c=>c.addEventListener('click',e=>{e.stopPropagation();const k=+c.dataset.i;if(k===ksel)kirppisBuy();else{ksel=k;blip(660,.03);openKirppis();}}));}
+let kirppisKb=false,kirppisPos=0;
+function kirppisBuy(){const it=KIRPPIS[ksel];const sc0=$('#panel .sscroll');kirppisPos=sc0?sc0.scrollTop:0;if(S.kirppis[it.id]){blip(200,.08);return toastNow('Tämä on jo myyty.');}
   if(S.money<it.p){blip(180,.12);return toastNow('Rahaa puuttuu '+(it.p-S.money)+' mk. '+it.n+' maksaa '+it.p+' mk.');}
   $('#panel').classList.add('hide');panelKind='';mode='world';
   ask('Ostetaanko '+it.n.toLowerCase()+'? Hinta '+it.p+' mk · sinulla '+S.money+' mk.',['Osta','Ei vielä'],i=>{if(i!==0)return openKirppis();
@@ -1603,16 +1608,21 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
     R(g,X(11),Y+33,11,5,Pn);R(g,X(11),Y+33,11,1,Pl);R(g,X(11),Y+32,11,2,'#4a3426');P(g,X(13),Y+32,'#d8b060');
     R(g,X(11),Y+20,11,13,C);R(g,X(12),Y+19,9,1,C);R(g,X(11),Y+20,2,13,Cl);R(g,X(19),Y+20,3,13,Cd);R(g,X(13),Y+29,6,1,Cd);if(L.hood){R(g,X(15),Y+16,8,6,Cd);R(g,X(15),Y+16,8,1,Cl);R(g,X(12),Y+21,1,5,'#d8d8d8');}
     const ax=fr===1?-3:fr===2?3:0;R(g,X(14+ax),Y+21,4,10,C);R(g,X(14+ax),Y+21,1,10,Cl);R(g,X(17+ax),Y+21,1,10,Cd);R(g,X(14+ax),Y+30,4,3,S);P(g,X(17+ax),Y+32,Sd);
-    R(g,X(14),Y+17,5,3,Sd);
-    ell(g,X(16),Y+11,8,9,Sd);ell(g,X(15),Y+10,8,8,S);R(g,X(6),Y+13,2,3,S);P(g,X(6),Y+15,Sd);
-    if(!blink){R(g,X(9),Y+11,3,4,'#ffffff');R(g,X(9),Y+12,2,3,L.eye);P(g,X(9),Y+13,T(L.eye,-.55));P(g,X(9),Y+12,'#ffffff');R(g,X(9),Y+10,4,1,Hdd);}
-    else R(g,X(9),Y+13,3,1,Sd);
-    R(g,X(9),Y+8,4,1,Hd);R(g,X(10),Y+16,3,1,BL);R(g,X(8),Y+18,3,1,MO);
-    ell(g,X(18),Y+8,9,8,H);R(g,X(16),Y+8,10,11,H);ell(g,X(13),Y+4,7,4,H);R(g,X(7),Y+3,9,5,H);
-    for(let x=7;x<15;x+=3)R(g,X(x),Y+7,2,2+(x%2),H);
-    R(g,X(18),Y+11,4,4,S);R(g,X(19),Y+12,2,2,Sd);
-    ell(g,X(13),Y+2,4,1,Hl);R(g,X(10),Y+3,5,1,Hl);for(let y=4;y<18;y+=3)R(g,X(22),Y+y,1,2,Hd);R(g,X(24),Y+6,2,12,Hd);R(g,X(16),Y+17,9,2,Hd);
-    if(st===2){ell(g,X(22),Y+1,4,3,Hd);ell(g,X(21),Y,3,2,H);P(g,X(20),Y-1,Hl);}
+    /* v0.53: sivuprofiili uusiksi – kasvot, korva ja hiukset pään muotoon */
+    R(g,X(13),Y+16,5,5,Sd);R(g,X(13),Y+16,2,5,S);
+    ell(g,X(15),Y+11,8,9,Sd);ell(g,X(14),Y+11,8,8,S);R(g,X(8),Y+17,7,2,S);R(g,X(9),Y+19,5,1,S);R(g,X(10),Y+20,4,1,Sd);
+    R(g,X(5),Y+12,2,3,S);P(g,X(5),Y+14,Sd);P(g,X(6),Y+15,Sd);
+    if(!blink){R(g,X(8),Y+11,3,4,'#ffffff');R(g,X(8),Y+12,2,3,L.eye);P(g,X(8),Y+13,T(L.eye,-.55));P(g,X(8),Y+12,'#ffffff');}
+    else R(g,X(8),Y+13,3,1,Sd);
+    R(g,X(10),Y+15,3,1,BL);R(g,X(6),Y+17,3,1,MO);P(g,X(7),Y+18,Sd);
+    const ear=()=>{R(g,X(16),Y+12,3,4,S);R(g,X(16),Y+12,1,4,Sd);P(g,X(17),Y+13,Sd);P(g,X(18),Y+15,Sd);};
+    ell(g,X(16),Y+7,9,6,H);R(g,X(8),Y+3,12,5,H);R(g,X(19),Y+6,5,11,H);ell(g,X(21),Y+12,3,6,H);R(g,X(18),Y+16,5,2,Hd);
+    R(g,X(7),Y+6,6,3,H);P(g,X(7),Y+9,H);P(g,X(10),Y+9,H);R(g,X(14),Y+9,2,4,H);P(g,X(15),Y+13,Hd);
+    if(st===1){R(g,X(15),Y+9,8,12,H);R(g,X(15),Y+9,1,12,Hd);for(let y=11;y<21;y+=3)R(g,X(18+(y%2)),Y+y,1,2,Hd);}
+    if(st!==1)ear();
+    R(g,X(8),Y+10,3,1,Hdd);
+    ell(g,X(13),Y+2,4,1,Hl);R(g,X(10),Y+3,5,1,Hl);for(let y=5;y<16;y+=3)R(g,X(23),Y+y,1,2,Hd);R(g,X(9),Y+6,3,1,Hd);
+    if(st===2){ell(g,X(23),Y+3,4,3,Hd);ell(g,X(22),Y+2,3,2,H);P(g,X(21),Y+1,Hl);}
     if((st===3||L.pipo)){ell(g,X(16),Y+3,10,6,KN);for(let x=8;x<26;x+=3)R(g,X(x),Y-1,1,7,KNd);ell(g,X(13),Y,4,2,KNl);R(g,X(6),Y+6,20,4,CU);R(g,X(6),Y+9,20,1,CUd);for(let x=7;x<26;x+=2)P(g,X(x),Y+7,CUd);ell(g,X(18),Y-4,3,3,CU);P(g,X(17),Y-5,L.pipoC?KNl:'#ffffff');}
   }else{
     const up=dir==='up';
@@ -1650,7 +1660,7 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
     else{ell(g,X(16),Y+4,10,5,Cp);R(g,X(6),Y+4,20,5,Cp);ell(g,X(13),Y+1,4,1,Cpl);R(g,X(5),Y+8,22,3,Cpd);R(g,X(5),Y+8,22,1,Cp);R(g,X(13),Y+4,6,3,'#f2ead8');}}
   if(L.glasses&&dir!=='up'){const G=L.glasses,rd=L.glassesT===1,th=L.glassesT===2;
     const fr=(x,y)=>{if(rd){R(g,X(x+1),y,3,1,G);R(g,X(x+1),y+5,3,1,G);R(g,X(x),y+1,1,4,G);R(g,X(x+4),y+1,1,4,G);}else{R(g,X(x),y,5,1,G);R(g,X(x),y+5,5,1,G);R(g,X(x),y,1,6,G);R(g,X(x+4),y,1,6,G);if(th)R(g,X(x),y+1,5,1,G);}};
-    if(dir==='left'){fr(8,Y+10);R(g,X(13),Y+11,5,1,G);}else{fr(9,Y+11);fr(18,Y+11);R(g,X(14),Y+12,4,1,G);}}
+    if(dir==='left'){fr(6,Y+10);R(g,X(11),Y+11,5,1,G);}else{fr(9,Y+11);fr(18,Y+11);R(g,X(14),Y+12,4,1,G);}}
   if(L.beard&&dir!=='up'){const B=L.beard,Bd=T(B,-.3),Bl=T(B,.25);if(dir==='left'){R(g,X(7),Y+16,7,5,B);R(g,X(8),Y+21,5,2,B);R(g,X(9),Y+23,3,1,Bd);P(g,X(8),Y+17,Bl);R(g,X(12),Y+13,2,4,B);}
     else{R(g,X(10),Y+15,2,5,B);R(g,X(20),Y+15,2,5,B);R(g,X(11),Y+18,10,4,B);R(g,X(12),Y+22,8,2,B);R(g,X(14),Y+24,4,1,Bd);P(g,X(12),Y+19,Bl);P(g,X(18),Y+20,Bl);R(g,X(14),Y+19,4,1,'#3a2014');}}
   if(L.moustache&&dir!=='up'){if(dir==='left')R(g,X(8),Y+17,4,1,L.moustache);else{R(g,X(13),Y+17,6,1,L.moustache);P(g,X(13),Y+18,L.moustache);P(g,X(18),Y+18,L.moustache);}}
@@ -1668,7 +1678,7 @@ function drawCharRaw(g,dir,fr,blink,L){const o=3,oy=4;
     for(let y=Y+20;y<Y+34;y++)for(let x=0;x<38;x++){const i=(y*38+x)*4;if(!a[i+3])continue;const k=cs.findIndex(c=>c[0]===a[i]&&c[1]===a[i+1]&&c[2]===a[i+2]);if(k<0)continue;
       let c=null;if(sc&&((y-Y-20)%4)<2)c=sc[k];if(L.top.knit&&((y-Y)===23||(y-Y)===27)&&x%2===0)c=kn;if(L.top.knit&&(y-Y)===25&&x%2===1)c=kn;
       if(c){a[i]=c[0];a[i+1]=c[1];a[i+2]=c[2];}}
-    g.putImageData(d,0,0);if(L.top.knit&&dir!=='up')R(g,X(12),Y+19,8,2,'#f0ead8');}}
+    g.putImageData(d,0,0);if(L.top.knit&&dir==='down'){R(g,X(13),Y+21,6,1,'#f0ead8');P(g,X(12),Y+20,'#f0ead8');P(g,X(19),Y+20,'#f0ead8');}if(L.top.knit&&dir==='left')R(g,X(13),Y+21,5,1,'#f0ead8');}}
 function coat32(g,dir,L,X,Y,fr){const k=L.top.coat,C=L.top.c,Cd=T(C,-.36),Cl=T(C,.3),Cdd=T(C,-.55),W='#f6f6f2';
   if(dir==='left'){const ax=fr===1?-3:fr===2?3:0;
     if(k==='sade'){R(g,X(11),Y+32,11,5,C);R(g,X(11),Y+32,2,5,Cl);R(g,X(19),Y+32,3,5,Cd);R(g,X(11),Y+36,11,1,Cd);R(g,X(11),Y+28,3,4,Cd);R(g,X(11),Y+28,3,1,Cdd);R(g,X(18),Y+19,4,3,C);R(g,X(18),Y+19,4,1,Cl);R(g,X(21),Y+20,1,2,Cd);R(g,X(14+ax),Y+29,4,1,Cd);}
@@ -1680,6 +1690,22 @@ function coat32(g,dir,L,X,Y,fr){const k=L.top.coat,C=L.top.c,Cd=T(C,-.36),Cl=T(C
       R(g,X(10),Y+29,4,4,Cd);R(g,X(10),Y+29,4,1,Cdd);R(g,X(18),Y+29,4,4,Cd);R(g,X(18),Y+29,4,1,Cdd);}}
   else{R(g,X(9),Y+31,14,2,Cd);R(g,X(6),Y+21+aL,1,8,W);R(g,X(25),Y+21+aR,1,8,'#dcdcd6');R(g,X(6),Y+29+aL,3,1,Cdd);R(g,X(23),Y+29+aR,3,1,Cdd);
     if(up)R(g,X(12),Y+19,8,2,C);else{R(g,X(13),Y+20,6,2,C);R(g,X(13),Y+20,6,1,Cl);R(g,X(16),Y+21,1,11,'#e2e2de');P(g,X(16),Y+22,'#a8a8a4');}}}
+/* v0.53: kyläkaupan tuotekuvat pelin omalla pikseligrafiikalla (32 × 32) */
+const ITEM_IKONI={porkkana_s:1,kehakukka:1,paivankakkara:1,ruiskaunokki:1,polli:1,onki:1,maali:1,lautoja:1,kiuas:1,naulat:1,lasi:1};
+function itemIkoni(t){return outlined(30,30,g=>{
+  const pussi=(pic)=>{R(g,6,3,18,25,'#efe2c0');R(g,6,3,18,3,'#d8c8a0');for(let x=7;x<24;x+=2)P(g,x,4,'#c8b890');R(g,8,8,14,13,'#f8f2e0');pic();R(g,8,23,14,3,'#c8402e');R(g,8,23,14,1,'#e0604a');};
+  const kukka=(cx,cy,c,k)=>{R(g,cx,cy+2,1,6,'#4f8a40');for(let a=0;a<6;a++)P(g,cx+Math.round(Math.cos(a*1.05)*2),cy+Math.round(Math.sin(a*1.05)*2),c);P(g,cx,cy,k);};
+  if(t==='porkkana_s')pussi(()=>{poly(g,[[12,12],[18,12],[15,20]],'#e8762c');R(g,13,13,4,1,'#f8a868');for(const dx of [-2,0,2])R(g,15+dx,9,1,3,'#4f8a40');});
+  else if(t==='kehakukka')pussi(()=>{kukka(11,12,'#f08a24','#a8481a');kukka(18,13,'#f4c430','#b86a1a');});
+  else if(t==='paivankakkara')pussi(()=>{kukka(11,12,'#ffffff','#f0b820');kukka(18,13,'#ffffff','#f0b820');});
+  else if(t==='ruiskaunokki')pussi(()=>{kukka(11,12,'#4a7ae0','#2a3aa0');kukka(18,13,'#5a8af0','#2a3aa0');});
+  else if(t==='polli'){for(const [x,y] of [[4,14],[15,14],[9,5]]){R(g,x,y,12,10,'#a07848');R(g,x,y,12,2,'#c8a070');HDM.ell(g,x+3,y+5,3,4,'#e8c890');HDM.ell(g,x+3,y+5,1,2,'#a07848');R(g,x+8,y+2,3,1,'#6a4a2a');}R(g,3,24,26,1,'#6a4a2a');}
+  else if(t==='onki'){line(g,4,27,24,4,'#8a5a32');line(g,5,27,25,4,'#a8784a');HDM.ell(g,8,22,3,3,'#3a3a40');P(g,8,22,'#9aa0a8');line(g,25,4,27,18,'#d8d8d0');HDM.ell(g,27,21,2,3,'#f4f2ea');R(g,25,21,5,2,'#d8423a');}
+  else if(t==='maali'){R(g,7,8,16,19,'#9aa0a8');R(g,7,8,16,2,'#c8ccd2');R(g,21,8,2,19,'#6a6e74');HDM.ell(g,15,8,8,2,'#b83a30');R(g,9,13,12,8,'#f2ece0');R(g,10,15,10,4,'#b83a30');R(g,9,6,1,4,'#4a4a50');R(g,21,6,1,4,'#4a4a50');R(g,9,5,13,1,'#4a4a50');R(g,10,9,2,6,'#b83a30');}
+  else if(t==='lautoja'){poly(g,[[3,22],[22,4],[27,8],[8,26]],'#d0a46c');line(g,4,22,22,5,'#e8c08a');line(g,8,25,26,8,'#9a6a3c');for(const [x,y] of [[10,17],[16,12]])R(g,x,y,4,1,'#b08050');}
+  else if(t==='kiuas'){R(g,7,12,16,15,'#2a2a2e');R(g,7,12,16,2,'#4a4a52');R(g,11,19,8,5,'#16161a');for(let i=0;i<6;i++)HDM.ell(g,9+(i%3)*6,9+Math.floor(i/3)*3,3,2,i%2?'#8e8a84':'#a8a49c');R(g,6,26,18,2,'#1a1a1e');}
+  else if(t==='naulat'){for(const [x,y,l] of [[8,6,17],[14,9,15],[20,5,18]]){R(g,x-2,y,5,2,'#8a9098');R(g,x,y+2,1,l,'#a8aeb6');P(g,x,y+2+l,'#6a7078');R(g,x+1,y+2,1,l-2,'#7a8088');}}
+  else if(t==='lasi'){R(g,5,5,20,21,'#7a5a3a');R(g,7,7,16,17,'#b8dcec');R(g,7,7,16,4,'#d8eef6');line(g,10,20,18,9,'#f4fbff');line(g,13,21,20,12,'#e4f4fa');}},-.72);}
 function makeTakkiIkoni(t){const tp=TOPS.find(q=>q.lock===t),C=tp.c,Cd=T(C,-.36),Cl=T(C,.3),W='#f6f6f2';return mk(40,40,g=>{
   R(g,19,2,2,4,'#6a6a70');R(g,12,6,16,2,'#8a6a40');R(g,10,8,20,30,C);R(g,4,10,6,22,C);R(g,30,10,6,22,C);R(g,10,8,2,30,Cl);R(g,28,8,2,30,Cd);R(g,4,10,2,22,Cl);R(g,34,10,2,22,Cd);
   if(tp.coat==='sade'){R(g,15,8,10,4,Cd);R(g,19,12,1,26,Cd);for(const y of [15,21,27,33])P(g,21,y,'#6a4a14');R(g,12,28,5,5,Cd);R(g,23,28,5,5,Cd);R(g,12,28,5,1,T(C,-.55));R(g,23,28,5,1,T(C,-.55));}
@@ -2641,7 +2667,7 @@ function menuPress(b){if(b==='up'){menu.sel=(menu.sel-1+menu.items.length)%menu.
 
 /* paneelit */
 let panelKind='',vihkoPage=0;
-function showPanel(html,kind){const el=$('#panel');html+='<button class="pclose" aria-label="Sulje">✕</button>';if(kind!=='tarot')el.classList.remove('tarotbox');el.innerHTML=html;el.classList.remove('hide');mode='panel';panelKind=kind||'';}
+function showPanel(html,kind){const el=$('#panel');el.classList.remove('shopp');html+='<button class="pclose" aria-label="Sulje">✕</button>';if(kind!=='tarot')el.classList.remove('tarotbox');el.innerHTML=html;el.classList.remove('hide');mode='panel';panelKind=kind||'';}
 /* ---------- Vattulan Sanomat (v0.14) ---------- */
 const LEHTI=[{main:true,img:'ranta',h:()=>S.flags.rantaOstettu?'Rantamökki sai uuden omistajan':curLevel()>=5?'Rantamökkiä pääsee katsomaan':'Rantamökki myynnissä',
     t:()=>S.flags.rantaOstettu?'Vattulanjärven rantamökki on myyty. Uusi omistaja antoi mökille nimen '+rantaNimi()+'.':curLevel()>=5?'Vattulanjärven rantamökki on myynnissä '+DREAMS[0].p+' markalla. Puomi on nostettu: kulje metsäpolulta itään venelaiturille ja sieltä rantatietä pohjoiseen.':'Rantamökki saattaa tulla myyntiin. Lisää tietoa seuraavassa numerossa.'},
@@ -2710,8 +2736,8 @@ function panelPress(b){
   if(panelKind==='inv'&&b==='a'&&(S.inv.kirjeet||0)>0){$('#panel').classList.add('hide');panelKind='';mode='world';blip(660,.03);lueMatinKirjeet();return;}
   if(panelKind==='kuva'){if(b==='a'||b==='b'||b==='start'){$('#panel').classList.add('hide');panelKind='';mode='world';blip(660,.03);const cb=kuvaCb;kuvaCb=null;if(cb)cb();}return;}
   if(panelKind==='tarot'&&(b==='a'||b==='b'||b==='start')){TFX.on=false;$('#panel').classList.remove('tarotbox');}
-  if(panelKind==='kirppis'){if(DIRS[b]){const st={left:-1,right:1,up:-3,down:3}[b];ksel=clamp(ksel+st,0,KIRPPIS.length-1);blip(660,.03);openKirppis();return;}
-    if(b==='a')return kirppisBuy();if(b==='b'||b==='start'){$('#panel').classList.add('hide');panelKind='';mode='world';blip(330,.05);}return;}
+  if(panelKind==='kirppis'){if(DIRS[b]){const st={left:-1,right:1,up:-3,down:3}[b];ksel=clamp(ksel+st,0,KIRPPIS.length-1);blip(660,.03);kirppisKb=true;openKirppis();return;}
+    if(b==='a')return kirppisBuy();if(b==='b'||b==='start'){$('#panel').classList.add('hide');$('#panel').classList.remove('shopp');panelKind='';mode='world';blip(330,.05);}return;}
   if(panelKind==='varasto'){const n=storeArr(vctx).length;
     if(n&&DIRS[b]){const st={left:-1,right:1,up:-3,down:3}[b];vsel=clamp(vsel+st,0,n-1);blip(660,.03);renderStore();return;}
     if(b==='a'){if(n)storePlace();else closeStore();return;}if(b==='b'||b==='start'){blip(330,.05);closeStore();}return;}
@@ -2721,7 +2747,7 @@ function panelPress(b){
   if(panelKind==='hinnasto'){if(b==='left'||b==='right'){hinPage=hinPage?0:1;blip(660,.03);renderHinnasto();return;}if(b==='a'){if(hinPage===0){hinPage=1;blip(660,.03);renderHinnasto();}else{blip(660,.03);showTasks(1);}return;}}
   if(panelKind==='vihko'){const n=vihkoPages();if(b==='left'||b==='right'||(b==='a'&&vihkoPage<n-1)){vihkoPage=(vihkoPage+(b==='left'?-1:1)+n)%n;blip(660,.03);renderVihko();return;}}
   if(b==='a'||b==='b'||b==='start'){$('#panel').classList.add('hide');mode='world';panelKind='';blip(330,.05);}}
-$('#panel').addEventListener('pointerdown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('pclose')){e.preventDefault();e.stopPropagation();press('b');return;}if(panelKind==='inv'){e.preventDefault();press('b');return;}if(panelKind==='nimi'||panelKind==='varasto'||panelKind==='kirppis')return;e.preventDefault();if(mode==='panel')press('a');});
+$('#panel').addEventListener('pointerdown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('pclose')){e.preventDefault();e.stopPropagation();press('b');return;}if(panelKind==='inv'){e.preventDefault();press('b');return;}if(panelKind==='nimi'||panelKind==='varasto'||panelKind==='kirppis'||mode==='shop')return;e.preventDefault();if(mode==='panel')press('a');});
 let hinPage=0;
 function openHinnasto(pg){hinPage=pg||0;renderHinnasto();}
 function renderHinnasto(){let h;
@@ -2783,11 +2809,16 @@ function openCustom(ctxName){custom={ctx:ctxName,sel:ctxName==='kaappi'?5:0};mod
   $('#custom').classList.remove('hide');hud();renderCustom();}
 function renderCustom(){const ul=$('#custom .crows');ul.innerHTML='';
   CROWS.forEach((row,i)=>{const li=document.createElement('li');if(i===custom.sel)li.className='sel';
-    li.innerHTML='<span class="lab">'+row.l+'</span><span class="arr" data-d="-1">◀</span><span class="val">'+row.o()[S.look[row.k]]+'</span><span class="arr" data-d="1">▶</span>';
+    li.innerHTML='<span class="lab">'+row.l+'</span><span class="arr" data-d="-1" aria-label="Edellinen">◀</span><span class="val">'+row.o()[S.look[row.k]]+'</span><span class="arr" data-d="1" aria-label="Seuraava">▶</span>';
     li.addEventListener('pointerdown',e=>{e.preventDefault();custom.sel=i;const d=e.target.dataset&&e.target.dataset.d;if(d)cycleLook(i,+d);else renderCustom();});ul.appendChild(li);});
   const li=document.createElement('li');li.className='done'+(custom.sel===CROWS.length?' sel':'');li.textContent='Valmis ✓';
   li.addEventListener('pointerdown',e=>{e.preventDefault();custom.sel=CROWS.length;press('a');});ul.appendChild(li);
-  drawPortrait(pctx,S.look);}
+  drawPreview();}
+/* v0.53: esikatselu pelin omilla hahmoilla (sisätilan tarkka hahmo edestä, sivulta ja takaa + ulkohahmo kävelemässä), kokonaislukuskaalaus */
+function pixFit(c,maxW,maxH){const dpr=window.devicePixelRatio||1,k=Math.max(1,Math.floor(Math.min(maxW*dpr/c.width,maxH*dpr/c.height)));c.style.width=(c.width*k/dpr)+'px';c.style.height=(c.height*k/dpr)+'px';}
+function drawPreview(){const pv=$('#pv');if(!pv)return;const g=pv.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,pv.width,pv.height);const H=hdPlayer();
+  ['down','left','up'].forEach((d,i)=>{const c=H[d][0];g.drawImage(c,2+i*53,2);});
+  const box=$('#custom').getBoundingClientRect(),w=box.width||300;pixFit(pv,w*.66,w*.48);pixFit($('#mini'),w*.22,w*.48);}
 function cycleLook(i,d){const row=CROWS[i],n=row.o().length;let v=S.look[row.k];
   do{v=(v+d+n)%n;}while(row.k==='top'&&TOPS[v].lock&&!S.unlocked[TOPS[v].lock]);
   S.look[row.k]=v;CH=buildChar(S.look);blip(740,.03);renderCustom();}
@@ -2817,7 +2848,7 @@ function saunaInteract(){const st=S.saunaSt||0;
   const V=S.inv.vesi||0,Kl=S.inv.klapi||0;
   if(V<1||Kl<1)return say('Sauna odottaa lämmitystä. Tarvitset kaivolta ämpärillisen vettä ('+Math.min(V,1)+'/1) ja klapin ('+Math.min(Kl,1)+'/1). Klapeja saa hakkuupölkyltä.');
   ask('Lämmitetäänkö sauna?',['Lämmitetään','Ei vielä'],i=>{if(i)return;S.inv.vesi--;S.inv.klapi--;saunaSmoke=900;
-    fadeTo(()=>{S.time=Math.min(1439,S.time+60);hud();save();},()=>{const first=!S.flags.loylyt;S.flags.loylyt=true;if(first)addLog('Ensimmäiset löylyt omassa pihasaunassa.');save();
+    fadeTo(()=>{kuluAika(60);hud();save();},()=>{const first=!S.flags.loylyt;S.flags.loylyt=true;if(first)addLog('Ensimmäiset löylyt omassa pihasaunassa.');save();
       say(first?['Kiuas sihahtaa. Ensimmäiset löylyt omassa saunassa!','Iho tuoksuu savulta ja koivulta. Mummokin olisi ylpeä.']:['Löyly on pehmeä. Pihalla laulaa rastas.'],()=>{if(first)award('loylyt',5,'Ensimmäiset löylyt');});},0.03);});}
 
 /* ---------- naapuri Petri ---------- */
@@ -3106,7 +3137,7 @@ function petriMatti(){const M=mattiQ();
     ()=>questNote('Tehtävä päivittyi','Lähde Petrin kanssa Matin saarelle'));}
 /* venekyyti: Petri soutaa venelaiturilta saarelle ja takaisin. Petri näkyy aina vain yhdessä paikassa. */
 let BOAT=null,COFFEE=false;
-function lahdeSaarelle(){say('Petri: "Mennään. Vene on venelaiturilla, ja Matin postit ovat jo repussa."',()=>fadeTo(()=>{S.scene='laituri';useMap('laituri');S.time=Math.min(1439,S.time+MATTI_MATKA_MIN);
+function lahdeSaarelle(){say('Petri: "Mennään. Vene on venelaiturilla, ja Matin postit ovat jo repussa."',()=>fadeTo(()=>{S.scene='laituri';useMap('laituri');kuluAika(MATTI_MATKA_MIN);
     BOAT={dir:'out',x:10*TS,y:9*TS,t:0,v:0};placePlayer(9,8,'down');groundDirty=true;AUTO=null;hud();save();},()=>{mode='cutscene';}));}
 function updateBoat(){const B=BOAT;if(!B||B.fading)return;B.t++;
   if(frame%7===0)PARTS.push({x:B.x+6+Math.random()*24,y:B.y+(B.dir==='out'?4:96),vx:(Math.random()-.5)*.3,vy:0,life:0,max:40,c:'#e6f6fc',s:1});
@@ -3124,7 +3155,7 @@ function saariPerilla(){const M=mattiQ();if(M.saari)return say('Petri: "Minä od
   M.saari=true;addLog('Petri souti minut Matin saarelle.');save();
   say(['Pieni saari: kallioita, muutama koivu ja siisti mökki kuisteineen. Kaislikossa kahisee.','Petri: "Tässä se on. Minä odotan veneellä. Sano, kun lähdetään."'],()=>questNote('Tehtävä päivittyi','Palauta kirjeet Matille'));}
 function paluuKysy(){ask('Petri: "Lähdetäänkö takaisin Vattulaan? Vene on valmiina."',['Palaa Vattulaan','Jäädään vielä'],i=>{if(i===0)palaaVattulaan();});}
-function palaaVattulaan(){fadeTo(()=>{S.scene='laituri';useMap('laituri');S.time=Math.min(1439,S.time+MATTI_MATKA_MIN);BOAT={dir:'in',x:10*TS,y:YH*TS-40,t:0,v:1.3};placePlayer(9,8,'up');groundDirty=true;AUTO=null;hud();save();},()=>{mode='cutscene';});}
+function palaaVattulaan(){fadeTo(()=>{S.scene='laituri';useMap('laituri');kuluAika(MATTI_MATKA_MIN);BOAT={dir:'in',x:10*TS,y:YH*TS-40,t:0,v:1.3};placePlayer(9,8,'up');groundDirty=true;AUTO=null;hud();save();},()=>{mode='cutscene';});}
 /* Matti */
 const MATTI_JUTUT=['Matti: "Järvi on tänään peilityyni. Sellaisina päivinä kuulee, kun kylässä kolahtaa ovi."',
   'Matti: "Kaislikossa pesii kaakkuri. Huonompi naapuri kuin Petri, mutta laulaa paremmin."',
@@ -3187,7 +3218,7 @@ function kiuasInteract(){const id=S.saunaNyt||'piha';
   if(saunaLammin())return ask('Kiuas hehkuu, ja kivet ovat kuumia. Löylyt heitetään lauteilta.',['Heitä löylyä','Peru'],i=>{if(i===0)heitaLoyly();});
   const Kl=S.inv.klapi||0;if(Kl<1)return say(['Kiuas on kylmä. Lämmitykseen tarvitaan klapi ('+Kl+'/1).','Klapeja saa hakkaamalla pöllejä hakkuupölkyllä mummon mökin pihalla.']);
   ask('Lämmitetäänkö kiuas? Siihen menee 1 klapi.',['Lämmitetään','Ei vielä'],i=>{if(i)return;S.inv.klapi--;
-    fadeTo(()=>{S.saunaLampo=S.saunaLampo||{};S.time=Math.min(1439,S.time+SAUNA_LAMPO_MIN);S.saunaLampo[id]=gameNow()+SAUNA_KUUMA_MIN;hud();save();},
+    fadeTo(()=>{S.saunaLampo=S.saunaLampo||{};kuluAika(SAUNA_LAMPO_MIN);S.saunaLampo[id]=gameNow()+SAUNA_KUUMA_MIN;hud();save();},
       ()=>say(['Tuli rätisee pesässä. Kiuas lämpenee hitaasti, ja lauteilta nousee puun tuoksu.','Sauna on lämmin. Istu lauteille ja heitä löylyä.']),.04);});}
 function lauteetInteract(fx,fy){const w=saunaLammin(),o=['Istu lauteille'],a=[()=>istu(fx,fy)];if(w){o.push('Heitä löylyä');a.push(heitaLoyly);}o.push('Peru');a.push(()=>{});
   ask(w?'Lauteet ovat lämpimät. Ylälauteella on kuuminta.':'Lauteet ovat haaleat. Kiuas pitää lämmittää ensin.',o,i=>a[i]());}
@@ -3291,7 +3322,7 @@ function buildSaunaGround(){const ranta=S.saunaNyt==='ranta',W=576,H=448,sh=HDM.
 function uimaanKysy(){const yo=isNight();ask(yo?'Uimalaituri kuutamossa. Rannalla ei ole ketään, ja vesi on tyyni.':'Uimalaituri. Vesi on kirkasta, ja pohja näkyy laiturin päästä.',yo?['Käy uimassa','Kuutamouinti nakuna','Peru']:['Käy uimassa','Peru'],i=>{if(i===0)uimaan();else if(yo&&i===1)nakuUinti();});}
 /* kuutamouinti nakuna (v0.49): vain yöllä. Hahmo ei näy; laiturilla on vaatepino ja vedessä pelkkä pää. */
 let NAKU=null;
-function nakuUinti(){const px=PL.x,py=PL.y;fadeTo(()=>{S.time=Math.min(1439,S.time+UINTI_MIN);NAKU={x:px,y:py};hud();save();},()=>{const first=!S.flags.nakuUinti;
+function nakuUinti(){const px=PL.x,py=PL.y;fadeTo(()=>{kuluAika(UINTI_MIN);NAKU={x:px,y:py};hud();save();},()=>{const first=!S.flags.nakuUinti;
   say(['Rannalla ei ole ketään. Jätät vaatteet laiturille siistiin pinoon.','Liu\'ut kuutamoon. Vesi tuntuu silkiltä koko iholla, ja kuu piirtää järveen hopeisen polun.','Kaislikossa narahtaa. Vain sorsa. Kukaan ei näe.'],()=>{
     if(first){S.flags.nakuUinti=true;addLog('Kävin kuutamouinnilla nakuna. Kukaan ei nähnyt, paitsi kuu.');}if(!S.flags.uinti){S.flags.uinti=true;addLog('Kävin ensimmäistä kertaa uimassa Vattulan uimarannalla.');}save();
     fadeTo(()=>{NAKU=null;},()=>say('Kuivattelet pyyhkeellä ja puet vaatteet takaisin. Olo on kevyt.',()=>award('uinti',UINTI_XP,'Ensimmäinen uinti')),.05);});},.05);}
@@ -3299,7 +3330,7 @@ function drawNaku(){if(!NAKU)return;const L=S.look,top=TOPS[L.top].c,pa=PANTS[L.
   R(ctx,X+8,Y+22,16,4,pa);R(ctx,X+8,Y+22,16,1,T(pa,.25));R(ctx,X+9,Y+18,14,4,top);R(ctx,X+9,Y+18,14,1,T(top,.3));R(ctx,X+5,Y+24,4,3,'#3a2a20');R(ctx,X+23,Y+24,4,3,'#3a2a20');
   const hx=6*TS+16,hy=27*TS+12+Math.round(Math.sin(frame/18));for(let r=0;r<2;r++){const rr=7+((frame/4+r*8)%12);ctx.globalAlpha=Math.max(0,1-rr/19);ctx.strokeStyle='#e6f6fc';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(hx,hy+3,rr,rr/3,0,0,6.3);ctx.stroke();}ctx.globalAlpha=1;
   ell(ctx,hx,hy,4,4,SKINS[L.skin][1]);ell(ctx,hx,hy-2,4,3,HAIR_COLORS[L.hairC][1]);P(ctx,hx-2,hy,'#2a2320');P(ctx,hx+1,hy,'#2a2320');}
-function uimaan(){fadeTo(()=>{S.time=Math.min(1439,S.time+UINTI_MIN);hud();save();},()=>{const t=S.time,first=!S.flags.uinti;
+function uimaan(){fadeTo(()=>{kuluAika(UINTI_MIN);hud();save();},()=>{const t=S.time,first=!S.flags.uinti;
   const L=t<600?['Aamu-uinti. Vesi on viileää ja peilityyntä. Uit laiturilta kaislikon reunaan ja takaisin.']:t<1080?['Järvi on lämmin kuin kylpyamme. Joku huutaa rannalta, että vesi on ihanaa. Se on totta.']:
     t<1260?['Iltauinti. Aurinko laskee puiden taakse, ja vesi on lämpimämpää kuin ilma.']:['Yöuinti. Kuu piirtää veteen hopeisen polun. Rannalla ei ole ketään muita.'];
   L.push('Kuivattelet pyyhkeellä laiturilla. Iho tuntuu raikkaalta.');
@@ -3570,7 +3601,11 @@ function tupaFurnAct(f){
     case 'matto':return say('Räsymatto. Mummo kutoi sen vanhoista lakanoista.');
     case 'isomatto':return say('Iso räsymatto Karan kirppikseltä. Raidat ovat kirkkaammat kuin mummon matossa.');}}
 let grew=false;
-function sleep(){fadeTo(()=>{S.day++;S.time=420;grew=growPlants();save();hud();},
+/* v0.53: pelikello kiertää keskiyön yli. Päivä vaihtuu kerran klo 00.00; päiväkohtaiset asiat (kylmälaukku, tarot, marjat ja sienet)
+   lasketaan S.day-arvosta, joten ne päivittyvät automaattisesti kerran. Nukkuminen keskiyön jälkeen herättää saman päivän aamuun. */
+function kuluAika(min){S.time+=min;while(S.time>=1440){S.time-=1440;S.day++;paivanVaihde();}}
+function paivanVaihde(){grew=growPlants()||grew;save();hud();if(mode==='world'||mode==='sit')toast('Keskiyö · päivä '+S.day);}
+function sleep(){fadeTo(()=>{if(S.time>=420)S.day++;S.time=420;grew=growPlants();save();hud();},
   ()=>{const L=['Käki kukkuu jossain kaukana.','Aamukaste kimmeltää nurmella.','Joku soutaa järvellä. Airot kolahtelevat.','Ikkunasta paistaa aamuaurinko suoraan tyynylle.'];
     const pg=['Päivä '+S.day+'. '+L[S.day%L.length]];if(grew)pg.push('Kasvimaalla on tapahtunut yön aikana jotain.');say(pg);},0.025);}
 function startGrill(){mode='busy';grilling=110;}
@@ -3586,7 +3621,7 @@ const OUT_T={ulkopoyta:1,ulkotuoli:1,emalivati:1,kansituoli:1};
 function sizeTxt(it){const [w,h]=dims({t:it.t,r:it.r||0});return w+' × '+h+(w*h>1?' ruutua':' ruutu');}
 function placeTxt(it){if(isVase(it.t))return 'Pöydälle';return OUT_T[it.t]?'Ulos: kuisti, terassi tai kesäkeittiö':vctx==='ranta'?'Rantamökkiin':'Tupaan';}
 function storeArr(ctx){return ctx==='ranta'?(rantaR().store=rantaR().store||[]):(S.store=S.store||[]);}
-const CARDIMG={};function cardImg(t){if(CARDIMG[t])return CARDIMG[t];const c=t==='saappaat'?SPR.saappaat:t==='sadetakki'||t==='verkkatakki'?makeTakkiIkoni(t):OUT_T[t]?({ulkopoyta:SPR.ulkopoyta,emalivati:SPR.emalivati,kansituoli:SPR.kansituoli}[t]||SPR.muovituoli):furnSprite(t,0);
+const CARDIMG={};function cardImg(t){if(CARDIMG[t])return CARDIMG[t];const c=ITEM_IKONI[t]?itemIkoni(t):t==='saappaat'?SPR.saappaat:t==='sadetakki'||t==='verkkatakki'?makeTakkiIkoni(t):OUT_T[t]?({ulkopoyta:SPR.ulkopoyta,emalivati:SPR.emalivati,kansituoli:SPR.kansituoli}[t]||SPR.muovituoli):furnSprite(t,0);
   const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let x0=c.width,y0=c.height,x1=0,y1=0;
   for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++)if(d[(y*c.width+x)*4+3]>8){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
   const w=x1-x0+3,h=y1-y0+3,q=mk(w,h,g=>g.drawImage(c,x0-1,y0-1,w,h,0,0,w,h));return CARDIMG[t]=q.toDataURL();}
@@ -3650,7 +3685,7 @@ function renderStore(){const L=storeArr(vctx);let h='<div class="ptitle">'+(vctx
   else{h+='<div class="vgrid">'+L.map((it,i)=>'<div class="vcard'+(i===vsel?' sel':'')+'" data-i="'+i+'"><img src="'+cardImg(it.t)+'" alt=""><span>'+fname(it)+'</span></div>').join('')+'</div>';
     const it=L[vsel];h+='<div class="vinfo"><b>'+fname(it)+'</b> · '+sizeTxt(it)+' · '+placeTxt(it)+'</div><div class="foot">Nuolet valitse · A Sijoita · B takaisin</div>';}
   showPanel(h,'varasto');
-  document.querySelectorAll('#panel .vcard').forEach(c=>c.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const k=+c.dataset.i;if(k===vsel)storePlace();else{vsel=k;blip(660,.03);renderStore();}}));
+  document.querySelectorAll('#panel .vcard').forEach(c=>c.addEventListener('click',e=>{e.stopPropagation();const k=+c.dataset.i;if(k===vsel)storePlace();else{vsel=k;blip(660,.03);renderStore();}}));fitPixImgs($('#panel'));
   const sel=document.querySelector('#panel .vcard.sel');if(sel)try{sel.scrollIntoView({block:'nearest'});}catch(_){}}
 function closeStore(){$('#panel').classList.add('hide');panelKind='';if(vctx==='tupa')openDecor();else if(vctx==='ranta')openDecorR();else mode='world';}
 function storePlace(){const it=storeArr(vctx)[vsel];if(!it)return;const out=!!OUT_T[it.t];
@@ -3769,41 +3804,47 @@ function openShop(){const pages=['Päivää! Ostan porkkanoita ja mustikoita. My
   if((S.inv.porkkana||0)<=0&&(S.inv.porkkana_s||0)<=0&&S.money<SHOP_BUY[0].p&&!growing){S.inv.porkkana_s=(S.inv.porkkana_s||0)+1;
     pages.push('Taidat tarvita alun. Otahan tästä porkkanansiemen, lantit maksat sitten sadosta.');toast('Sait porkkanansiemenen');save();}
   say(pages,()=>{shop={tab:0,sel:0};mode='shop';renderShop();});}
-function renderShop(){if(shop.tab===2)return renderShopTavarat();const list=shop.tab===0?buyList():sellList();shop.sel=clamp(shop.sel,0,list.length-1);
-  let h='<div class="ptitle">Vattulan kyläkauppa</div><div class="shoptop"><span>Rahaa: <b>'+S.money+' mk</b></span><span class="tabs"><span class="tab'+(shop.tab===0?' on':'')+'" data-tab="0">Osta</span><span class="tab'+(shop.tab===1?' on':'')+'" data-tab="1">Myy</span><span class="tab" data-tab="2">Tavarat</span></span></div><ul class="shoplist">';
-  list.forEach((it,i)=>{h+='<li data-i="'+i+'" class="'+(i===shop.sel?'sel':'')+'"><span>'+it.n+'<small>Sinulla: '+(shop.tab===1?qty(it.id):(S.inv[it.id]||0))+(it.d?' · '+it.d:'')+'</small></span><span class="pr">'+(shop.tab===1?'+':'')+it.p+' mk</span></li>';});
-  h+='</ul><div class="foot">◀ ▶ osta · myy · tavarat · A '+(shop.tab===0?'osta':'myy')+' · B poistu</div><button class="pclose" aria-label="Sulje">✕</button>';
-  const el=$('#panel');el.innerHTML=h;el.classList.remove('hide');
-  el.querySelectorAll('.tab').forEach(t=>t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();shop.tab=+t.dataset.tab;shop.sel=0;blip(660,.03);renderShop();}));
-  el.querySelectorAll('.shoplist li').forEach(li=>li.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();shop.sel=+li.dataset.i;shopPress('a');}));}
+/* v0.53: kyläkauppa kuvallisin kortein. Osta = kaikki kaupan tuotteet (SHOP_BUY + TUOTE/KAUPPA_TAVARAT), Myy = lista.
+   Napautus valitsee, toinen napautus valittuun avaa ostovahvistuksen. Vieritys ei valitse mitään (click-tapahtuma). */
+function shopOstot(){return buyList().map(it=>({src:'inv',...it})).concat(KAUPPA_TAVARAT.map(id=>({src:'tuote',id,...TUOTE[id]})));}
+function ostoOmistettu(it){return it.src==='inv'?(it.once&&(S.inv[it.id]||0)>0):(it.kind==='vaate'&&S.unlocked[it.lock]);}
+function ostoInfo(it){if(it.src==='tuote')return tuoteKaytto(it)+(it.monta?' · voi ostaa useita':'')+(it.monta&&omistettu(it.id)?' · sinulla '+omistettu(it.id):'');
+  return (it.give>1?it.give+' kpl erä · ':'')+(it.d?it.d+' · ':'')+'sinulla '+(S.inv[it.id]||0);}
+function shopHead(){return '<div class="ptitle">Vattulan kyläkauppa</div><div class="shoptop"><span>Rahaa: <b>'+S.money+' mk</b></span><span class="tabs"><span class="tab'+(shop.tab===0?' on':'')+'" data-tab="0">Osta</span><span class="tab'+(shop.tab===1?' on':'')+'" data-tab="1">Myy</span></span></div>';}
+function renderShop(kb){const el=$('#panel'),old=el.querySelector('.sscroll'),keep=old&&shop.lastTab===shop.tab?old.scrollTop:0;shop.lastTab=shop.tab;let h=shopHead();
+  if(shop.tab===0){const L=shopOstot();shop.sel=clamp(shop.sel,0,L.length-1);const it=L[shop.sel];
+    h+='<div class="sscroll"><div class="vgrid">'+L.map((q,i)=>{const own=ostoOmistettu(q);return '<div class="vcard'+(i===shop.sel?' sel':'')+(own?' myyty':'')+'" data-i="'+i+'"><img src="'+cardImg(q.id)+'" alt=""><span>'+q.n+'</span><span class="hinta">'+(own?'Omistat':q.p+' mk')+'</span>'+(q.give>1?'<span class="erä">'+q.give+' kpl</span>':'')+'</div>';}).join('')+'</div></div>';
+    h+='<div class="vinfo"><b>'+it.n+'</b> · '+ostoInfo(it)+' · '+(ostoOmistettu(it)?'<b>Omistat</b>':it.p+' mk')+'</div><div class="foot">◀ ▶ osta · myy · ▲ ▼ valitse · A osta · B poistu</div>';}
+  else{const L=sellList();shop.sel=clamp(shop.sel,0,L.length-1);
+    h+='<div class="sscroll"><ul class="shoplist">'+L.map((it,i)=>'<li data-i="'+i+'" class="'+(i===shop.sel?'sel':'')+'"><span>'+it.n+'<small>Sinulla: '+qty(it.id)+'</small></span><span class="pr">+'+it.p+' mk</span></li>').join('')+'</ul></div>';
+    h+='<div class="foot">Napauta valitse, uudelleen myy · ◀ ▶ osta · myy · A myy · B poistu</div>';}
+  h+='<button class="pclose" aria-label="Sulje">✕</button>';el.innerHTML=h;el.classList.add('shopp');el.classList.remove('hide');
+  const sc=el.querySelector('.sscroll');sc.scrollTop=keep;fitPixImgs(el);
+  if(kb){const sel=el.querySelector('.sel');if(sel)try{sel.scrollIntoView({block:'nearest'});}catch(_){}}
+  el.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',e=>{e.stopPropagation();shop.tab=+t.dataset.tab;shop.sel=0;blip(660,.03);renderShop();}));
+  el.querySelectorAll('.vcard,.shoplist li').forEach(c=>c.addEventListener('click',e=>{e.stopPropagation();const k=+c.dataset.i;if(k===shop.sel)shopPress('a');else{shop.sel=k;blip(660,.03);renderShop();}}));}
 function shopPress(b){
-  if(b==='left'||b==='right'){shop.tab=(shop.tab+(b==='right'?1:2))%3;shop.sel=0;blip(660,.03);renderShop();return;}
-  if(shop.tab===2){if(b==='up'||b==='down'){shop.sel=(shop.sel+(b==='up'?-1:1)+KAUPPA_TAVARAT.length)%KAUPPA_TAVARAT.length;blip(660,.03);renderShop();return;}if(b==='a')return kauppaOsta();}
-  const list=shop.tab===0?buyList():sellList();
-  if(b==='up'||b==='down'){shop.sel=(shop.sel+(b==='up'?-1:1)+list.length)%list.length;blip(660,.03);renderShop();return;}
-  if(b==='a'){const it=list[shop.sel];
-    if(shop.tab===0){if(it.once&&(S.inv[it.id]||0)>0){blip(180,.12);toastNow('Sinulla on jo '+it.n.toLowerCase()+'. Se ei kulu.');return;}if(S.money<it.p){blip(180,.12);toastNow('Rahaa ei ole tarpeeksi. '+it.n+' maksaa '+it.p+' mk.');return;}
-      S.money-=it.p;S.inv[it.id]=(S.inv[it.id]||0)+(it.give||1);toastNow('Ostit: '+it.n+' (−'+it.p+' mk)');if(it.id==='onki')kalaInit();}
-    else{if((S.inv[it.id]||0)<1){blip(180,.12);toastNow('Sinulla ei ole '+it.e+' myytäväksi.');return;}
-      S.inv[it.id]--;S.money+=it.p;toastNow('Myit: '+it.n+' (+'+it.p+' mk)');
-      if(!S.flags.ekaMyynti){S.flags.ekaMyynti=true;addLog('Myin ensimmäisen sadon Vattulan kyläkauppaan.');}award('myynti',10,'Ensimmäinen myynti');}
+  if(b==='left'||b==='right'){shop.tab=shop.tab?0:1;shop.sel=0;blip(660,.03);renderShop();return;}
+  const L=shop.tab===0?shopOstot():sellList();
+  if(b==='up'||b==='down'){const st=shop.tab===0?(b==='up'?-3:3):(b==='up'?-1:1);shop.sel=clamp(shop.sel+st,0,L.length-1);blip(660,.03);renderShop(true);return;}
+  if(b==='a'){const it=L[shop.sel];if(!it)return;if(shop.tab===0)return kauppaOsta(it);
+    if((S.inv[it.id]||0)<1){blip(180,.12);toastNow('Sinulla ei ole '+it.e+' myytäväksi.');return;}
+    S.inv[it.id]--;S.money+=it.p;toastNow('Myit: '+it.n+' (+'+it.p+' mk)');
+    if(!S.flags.ekaMyynti){S.flags.ekaMyynti=true;addLog('Myin ensimmäisen sadon Vattulan kyläkauppaan.');}award('myynti',10,'Ensimmäinen myynti');
     blip(990,.06);save();hud();renderShop();return;}
-  if(b==='b'||b==='start'){shop=null;$('#panel').classList.add('hide');mode='world';blip(330,.05);hud();}}
-function renderShopTavarat(){shop.sel=clamp(shop.sel,0,KAUPPA_TAVARAT.length-1);const id=KAUPPA_TAVARAT[shop.sel],it={id,...TUOTE[id]};
-  const own=t=>{const T=TUOTE[t];return T.kind==='vaate'?(S.unlocked[T.lock]?'Omistat':''):(omistettu(t)?'Sinulla '+omistettu(t):'');};
-  let h='<div class="ptitle">Vattulan kyläkauppa</div><div class="shoptop"><span>Rahaa: <b>'+S.money+' mk</b></span><span class="tabs"><span class="tab" data-tab="0">Osta</span><span class="tab" data-tab="1">Myy</span><span class="tab on" data-tab="2">Tavarat</span></span></div>';
-  h+='<div class="vgrid">'+KAUPPA_TAVARAT.map((t,i)=>{const T=TUOTE[t],o=own(t),omist=T.kind==='vaate'&&S.unlocked[T.lock];return '<div class="vcard'+(i===shop.sel?' sel':'')+(omist?' myyty':'')+'" data-i="'+i+'"><img src="'+cardImg(t)+'" alt=""><span>'+T.n+'</span><span class="hinta">'+(omist?'Omistat':T.p+' mk')+'</span>'+(o&&!omist?'<span class="hinta">'+o+'</span>':'')+'</div>';}).join('')+'</div>';
-  h+='<div class="vinfo"><b>'+it.n+'</b> · '+tuoteKaytto(it)+' · '+(it.kind==='vaate'&&S.unlocked[it.lock]?'<b>Omistat</b>':it.p+' mk')+(it.monta?' · voi ostaa useita':'')+'</div><div class="foot">◀ ▶ välilehdet · ▲ ▼ valitse · A osta · B poistu</div><button class="pclose" aria-label="Sulje">✕</button>';
-  const el=$('#panel');el.innerHTML=h;el.classList.remove('hide');
-  el.querySelectorAll('.tab').forEach(t=>t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();shop.tab=+t.dataset.tab;shop.sel=0;blip(660,.03);renderShop();}));
-  el.querySelectorAll('.vcard').forEach(c=>c.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const k=+c.dataset.i;if(k===shop.sel)kauppaOsta();else{shop.sel=k;blip(660,.03);renderShop();}}));}
-function kauppaOsta(){const id=KAUPPA_TAVARAT[shop.sel],it={id,...TUOTE[id]};
-  if(it.kind==='vaate'&&S.unlocked[it.lock]){blip(200,.08);return toastNow('Sinulla on jo '+it.n.toLowerCase()+'. Sen voi pukea vaatekaapilta.');}
+  if(b==='b'||b==='start'){shop=null;$('#panel').classList.add('hide');$('#panel').classList.remove('shopp');mode='world';blip(330,.05);hud();}}
+function kauppaOsta(it){
+  if(ostoOmistettu(it)){blip(200,.08);return toastNow('Sinulla on jo '+it.n.toLowerCase()+'.'+(it.kind==='vaate'?' Sen voi pukea vaatekaapilta.':' Se ei kulu.'));}
   if(S.money<it.p){blip(180,.12);return toastNow('Rahaa puuttuu '+(it.p-S.money)+' mk. '+it.n+' maksaa '+it.p+' mk.');}
-  const back=()=>{mode='shop';renderShop();};$('#panel').classList.add('hide');
+  const el=$('#panel'),sc=el.querySelector('.sscroll'),pos=sc?sc.scrollTop:0;
+  const back=()=>{mode='shop';renderShop();const s2=$('#panel .sscroll');if(s2)s2.scrollTop=pos;};el.classList.add('hide');
   ask('Ostetaanko '+it.n.toLowerCase()+'? Hinta '+it.p+' mk · sinulla '+S.money+' mk.',['Osta','Ei vielä'],i=>{if(i!==0)return back();
-    const nid=it.monta?id+'_'+Date.now().toString(36)+Math.floor(Math.random()*999):id;
+    if(it.src==='inv'){S.money-=it.p;S.inv[it.id]=(S.inv[it.id]||0)+(it.give||1);if(it.id==='onki')kalaInit();save();hud();blip(990,.06);toastNow('Ostit: '+it.n+' (−'+it.p+' mk)');return back();}
+    const nid=it.monta?it.id+'_'+Date.now().toString(36)+Math.floor(Math.random()*999):it.id;
     deliverTuote(it,nid,where=>{S.money-=it.p;addLog('Ostin kyläkaupasta: '+it.n.toLowerCase()+'.');save();hud();blip(990,.06);say(ostoViesti(it,where),back);});});}
+/* kuvakkeiden kokonaislukuskaalaus: jokainen lähdepikseli = sama määrä näyttöpikseleitä */
+function fitPixImgs(root){const dpr=window.devicePixelRatio||1;root.querySelectorAll('.vcard img').forEach(im=>{const go=()=>{const box=im.parentElement.getBoundingClientRect(),bw=box.width*.86,bh=(parseFloat(getComputedStyle($('#ui')).getPropertyValue('--s'))||2)*24;
+    const w=im.naturalWidth,h=im.naturalHeight;if(!w)return;const k=Math.max(1,Math.floor(Math.min(bw*dpr/w,bh*dpr/h)));im.style.width=(w*k/dpr)+'px';im.style.height=(h*k/dpr)+'px';};if(im.complete)go();else im.addEventListener('load',go,{once:true});});}
 function openBuildMenu(){const o=[],a=[];
   if(!S.porch){o.push('Rakenna kuisti (8 lautaa)');a.push(openBuild);}else if(!S.porch.terrace){o.push('Terassi: esikatsele laajennus');a.push(openTerrace);}
 
@@ -3952,7 +3993,7 @@ function update(){frame++;if(mode==='mg')mgUpdate();updateHare();updQbar();updTa
   if(frame%15===0&&S&&S.started)uimarantaCheck();
   if(frame%30===0&&S&&S.started&&(mode==='world'||mode==='sit'))ponttoCheck();
   if(frame%30===0){growPlants();updatePlantHint();if(S&&S.started&&mode==='world')kukkaCheck();}
-  if((mode==='world'||mode==='sit')&&frame%AIKA_FRAMET===0&&S.time<1439){S.time++;hud();}
+  if((mode==='world'||mode==='sit')&&frame%AIKA_FRAMET===0){kuluAika(1);hud();}
   if(!INDOOR[S.scene]&&mode!=='title'&&frame%25===0&&darkness(ambientAt(S.time))>.45&&PARTS.filter(q=>q.fly).length<14)
     PARTS.push({fly:true,x:camX+Math.random()*VW,y:camY+40+Math.random()*240,life:0,max:500,c:'#eaff9a',sd:Math.random()*6});
   if(mode==='world'||mode==='busy'&&!fade)updatePlayer();
@@ -4043,7 +4084,7 @@ function draw(){
   if(VIGN)ctx.drawImage(VIGN,0,0);
   if(fade){ctx.fillStyle='rgba(14,18,16,'+clamp(fade.a,0,1)+')';ctx.fillRect(0,0,VW,VH);}
   if(mode==='custom'&&CH){const dirs=['down','left','up','right'];const d=dirs[(frame>>6)%4];
-    mctx.clearRect(0,0,38,58);mctx.drawImage(CH[d][(frame>>3)%2?1:2],0,0);}}
+    mctx.clearRect(0,0,40,60);mctx.drawImage(CH[d][(frame>>3)%2?1:2],1,1);}}
 
 const TALL=[[100,428],[180,472],[294,348],[378,312],[84,248],[548,444],[248,220],[392,372],[40,360],[568,240]];
 function drawTallGrass(){for(let i=0;i<TALL.length;i++){const [x,y]=TALL[i],sw=Math.sin(frame/95+i*1.7);
