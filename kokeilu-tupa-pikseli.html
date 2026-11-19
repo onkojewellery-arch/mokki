@@ -22,7 +22,7 @@ button{pointer-events:auto;white-space:nowrap;font:inherit;font-size:14px;font-w
 <div class="bar bottom"><button id="koko">Koko tupa</button><button id="hahmo">Ilman hahmoa</button><button id="vekt">Vektori</button></div>
 <script>
 /* ===================================================================
-   MÖKKI – vino tupa ja piha, pikselikokeilu (v0.80: vapaa liikkuminen suorina pätkinä; v0.79: pihan hionta, kuisti ja istutukset tallennuksesta, kuvaustekstit; v0.78: mummon mökin piha ja ovi tuvan ja pihan välillä; v0.77: koko tupa pelaajan tallennuksesta; v0.76: ilman rasterikohinaa; v0.75: hahmo ja tarkempi mittakaava)
+   MÖKKI – vino tupa ja piha, pikselikokeilu (v0.81: rauhallisempi nurmi tupsuineen, yhtenäiset varjot, kasvupaikoille ei kävellä; v0.80: vapaa liikkuminen suorina pätkinä; v0.79: pihan hionta, kuisti ja istutukset tallennuksesta, kuvaustekstit; v0.78: mummon mökin piha ja ovi tuvan ja pihan välillä; v0.77: koko tupa pelaajan tallennuksesta; v0.76: ilman rasterikohinaa; v0.75: hahmo ja tarkempi mittakaava)
    Vain kuvakulma muuttuu: grafiikka on alkuperäisen pelin kaltaista pikseligrafiikkaa.
    Kaikki piirretään pikselipuskureihin ilman reunanpehmennystä: monikulmiot rivi kerrallaan,
    pinnat pikselikohtaisilla materiaalivarjostimilla (rasterointi Bayer 4×4), ja jokainen esine
@@ -443,22 +443,60 @@ Object.assign(DEFS,{
   for(let y=Math.floor(c[1]-ry);y<=Math.ceil(c[1]+ry);y++)for(let x=Math.floor(c[0]-rx);x<=Math.ceil(c[0]+rx);x++){const nx=(x+.5-c[0])/rx,ny=(y+.5-c[1])/ry,d=nx*nx+ny*ny,e=(rnd(Math.floor(x/3),Math.floor(y/2))-.5)*.25;if(d>1+e*.6)continue;
     let t=.58-(nx*.5+ny*.7)*.45-d*.12+e;setp(B,x-ox,y-oy,ramp(R,t,x,y));}};}
 
+/* v0.81: yhtenäiset varjot. Valo tulee vasemmalta takaa, joten varjo lankeaa hieman oikealle (+x).
+   Jokaisella varjolla on tumma ydin ja yhden sävyn reunus; reuna on hieman rosoinen, jotta se ei näytä viivalta. */
+const WORN=['#3f6a3e','#557f45','#6f9850','#8faa5c','#aab86a','#c6c47c'],FLWILD=['#fff6e0','#f4d35e','#d89ae0','#e8f0ff'];
+const TUFT=[[-2,-1],[-1,-2],[0,-1],[0,-2],[0,-3],[1,-1],[2,-2]];let YARD_WORN=[];
+function yardShadows(Y){const sh=[];YARD_WORN=[];
+  const box=(x,y,w,d,rad,k,f)=>sh.push({cx:x+w/2,cy:y+d/2,hx:w/2,hy:d/2,rad,k,f});
+  for(const o of Y.objs){const D=DEFS[o.t];if(D.flat||D.rail||o.z)continue;const [w,d]=o.r%2?[D.fd,D.fw]:[D.fw,D.fd];
+    switch(o.t){
+      case 'house':box(o.x-.15,o.y-.15,w+.6,d+.45,.25,2,.3);break;
+      case 'sauna':case 'shed':box(o.x-.1,o.y-.1,w+.45,d+.35,.2,2,.25);break;
+      case 'huussi':box(o.x-.05,o.y,1.3,1.2,.2,2,.2);break;
+      case 'katos':box(o.x+.05,o.y+.05,(o.kw||w)+.2,(o.kd||d)+.1,.25,1,.2);break;
+      case 'tree':{const r=o.big?.95:o.small?.42:.72;box(o.x+.5+r*.35-r,o.y+.55-r*.85,r*2,r*1.7,r*.85,2,.22);break;}
+      case 'well':box(o.x+.12,o.y+.15,.9,.85,.4,2,.18);YARD_WORN.push([o.x+.5,o.y+.6,1.15]);break;
+      case 'lippu':box(o.x+.38,o.y+.4,.3,.3,.15,1,.08);break;
+      case 'pyykki':box(o.x+.05,o.y+.4,.25,.25,.12,1,0);box(o.x+3.75,o.y+.4,.25,.25,.12,1,0);break;
+      case 'istutus':break;
+      default:if(D.nb)break;if(w===1&&d===1)box(o.x+.2,o.y+.22,.7,.68,.33,1,.12);else box(o.x+.05,o.y+.08,w+.1,d+.06,.2,1,.12);}}
+  return sh;}
+function shadowAt(sh,wx,wy,x,y){let best=0;const jit=(rnd(x>>1,y)-.5)*.05;
+  for(const s of sh){const qx=Math.abs(wx-s.cx)-s.hx+s.rad,qy=Math.abs(wy-s.cy)-s.hy+s.rad,sd=Math.hypot(Math.max(qx,0),Math.max(qy,0))+Math.min(Math.max(qx,qy),0)-s.rad+jit;
+    if(sd<-s.f*.5)best=Math.max(best,s.k*.2);else if(sd<s.f*.5&&s.f>0)best=Math.max(best,(s.k-1)*.2||.0);}
+  return best;}
 /* ---------- pihan maa: nurmi, polut, kasvimaa, kukkapenkki, varjot ---------- */
 const PATHC=['#7a5232','#9a6a40','#b88654','#cfa06a','#e2bc88'],SOIL=['#4b2e1c','#5e3922','#6a4228','#7a4c2c','#8c5c38'];
 function renderYard(Y){const B=Buf(AW,AH),G=Y.G,isP=(x,y)=>{const c=(G[y]||[])[x];return c==='p'||c==='x'||(y>=YH&&x===10);};
-  const sh=[];for(const o of Y.objs){const D=DEFS[o.t];if(D.flat||D.nb||D.rail||o.z||D.solid)continue;if(o.t==='tree')sh.push({c:true,x:o.x+.6,y:o.y+.6,r:.5,k:.14});else if(D.fw===1&&D.fd===1)sh.push({c:true,x:o.x+.55,y:o.y+.56,r:o.t==='lippu'?.15:.36,k:.14});else if(o.t!=='pyykki')sh.push({x:o.x,y:o.y,w:D.fw,d:D.fd,k:.14});}
+  const sh=yardShadows(Y);
   fillPoly(B,[P(0,0,0),P(YW,0,0),P(YW,YH,0),P(0,YH,0)],(x,y)=>{const [wx,wy]=unP(x+.5,y+.5),tx=Math.floor(wx),ty=Math.floor(wy),fx=wx-tx,fy=wy-ty,ch=(G[ty]||[])[tx]||'g';
-    let R=GRASS,t=.5+(Math.sin(wx*.9+Math.sin(wy*.7)*1.5)+Math.sin(wy*1.1+wx*.3))*.035;
-    const blade=rnd(x,y*3+1);if(blade>.94)t+=.2;else if(blade<.05)t-=.16;if(rnd(x>>1,y)>.985)t+=.3;
+    /* v0.81: nurmen pohja pysyy yhdessä sävyssä (t .6 = sävykaistan keskellä), vaihtelu tulee isoista pehmeistä laikuista ja tupsuista */
+    let R=GRASS,t=.6+(Math.sin(wx*.9+Math.sin(wy*.7)*1.5)+Math.sin(wy*1.1+wx*.3))*.02;
+    const isG=ch==='g'||ch==='.'||!'pxDBfwPo'.includes(ch);
+    if(isG){const jit=(rnd(x>>1,y)-.5)*.12,n=Math.sin(wx*.53+Math.sin(wy*.41)*2.1)+Math.sin(wy*.62-wx*.27+1.3)+jit;
+      if(n>1.3)t+=.2; /* tummia laikkuja ei ole, jotta ne eivät sekoitu varjoihin */
+      /* kulunut nurmi polun reunoilla ja kaivon ympärillä */
+      let wd=9;if(isP(tx-1,ty))wd=Math.min(wd,fx);if(isP(tx+1,ty))wd=Math.min(wd,1-fx);if(isP(tx,ty-1))wd=Math.min(wd,fy);if(isP(tx,ty+1))wd=Math.min(wd,1-fy);
+      for(const w of YARD_WORN){const d=Math.hypot(wx-w[0],(wy-w[1])*1.2)/w[2];if(d<1)wd=Math.min(wd,(d-.55)*.6);}
+      if(wd<.2+Math.sin(wx*7+wy*5)*.06+jit*.6)R=WORN;
+      /* heinätupsut ryhminä */
+      const cx=Math.floor(x/9),cy=Math.floor(y/6),h=rnd(cx+77,cy*3+5),dens=.12+Math.max(0,Math.sin(cx*.7+Math.sin(cy*.9)*2)+Math.sin(cy*.55-cx*.3))*.22;
+      if(h<dens&&R===GRASS){const ax=cx*9+2+Math.floor(rnd(cx,cy+9)*5),ay=cy*6+3+Math.floor(rnd(cx+3,cy)*3),dx=x-ax,dy=y-ay,ln=rnd(cy,cx+1)>.5?1:-1;
+        if(dy===0&&Math.abs(dx)<=1)t-=.2;else if(TUFT.some(([u,v])=>u*ln===dx&&v===dy))t+=dy===-3?.4:.2;}
+      /* kukkaryhmät */
+      const fcx=Math.floor(x/17),fcy=Math.floor(y/11),fh=rnd(fcx+13,fcy+31);
+      if(fh>.955&&R===GRASS){const ox=fcx*17+5+Math.floor(rnd(fcx,fcy)*7),oy=fcy*11+4+Math.floor(rnd(fcy,fcx)*4),col=FLWILD[Math.floor(rnd(fcx+1,fcy+2)*FLWILD.length)];
+        for(let k=0;k<5;k++){const px=ox+Math.round((rnd(fcx*5+k,fcy)-.5)*7),py=oy+Math.round((rnd(fcy*5+k,fcx)-.5)*4);if(x===px&&y===py)return C(col);if(x===px&&y===py+1)t-=.2;}}}
     if(ch==='p'||ch==='x'){const w=.32+Math.sin(wy*5+wx*3)*.03+(rnd(Math.floor(wx*8),Math.floor(wy*8))-.5)*.05;const along=isP(tx,ty-1)||isP(tx,ty+1)?'y':'x';
       let dist=Math.min(isP(tx-1,ty)?1:fx,isP(tx+1,ty)?1:1-fx,isP(tx,ty-1)?1:fy,isP(tx,ty+1)?1:1-fy);
-      if(dist>.5-w){R=PATHC;t=.55+(rnd(x>>1,y)-.5)*.16;if(rnd(Math.floor(wx*14),Math.floor(wy*14))>.9)t+=.25;if(dist<.5-w+.04)t-=.3;}}
+      if(dist>.5-w){R=PATHC;t=.55+(rnd(x>>1,y)-.5)*.16;if(rnd(Math.floor(wx*14),Math.floor(wy*14))>.9)t+=.25;if(dist<.5-w+.04)t-=.3;}else R=WORN;}
     else if(ch==='D'||ch==='B'){const same=(a,b)=>(G[b]||[])[a]===ch;const e=Math.min(same(tx-1,ty)?1:fx,same(tx+1,ty)?1:1-fx,same(tx,ty-1)?1:fy,same(tx,ty+1)?1:1-fy);
       if(ch==='D'){if(e<.12){R=GWOOD;t=e<.02?.15:(e<.05?.85:.55);}else{R=SOIL;const r=(wy*5)%1;t=r<.18?.85:r<.35?.6:r>.85?.1:.4;if(rnd(x,y)>.93)t+=.3;}}
       else{if(e<.13){R=STONE;const sx=Math.floor((wx+wy)*7);t=((wx+wy)*7)%1<.1?.1:.55+(rnd(sx,ty)-.5)*.3;}else{R=SOIL;t=.45+(rnd(x>>1,y)-.5)*.2;const f=rnd(Math.floor(wx*7),Math.floor(wy*7));const kk=SAVE&&SAVE.kukka&&SAVE.kukka.v>=3;if(f>.82)return C(kk?(f>.94?'#f4d35e':f>.88?'#e8443a':'#c88ae0'):(f>.9?'#7aba4a':'#4f8a30'));}}}
     else if(ch==='f'){const fx2=Math.floor(fx*5),fy2=Math.floor(fy*5);if(rnd(tx*5+fx2,ty*5+fy2)>.82){const lx=(fx*5)%1,ly=(fy*5)%1;if(Math.abs(lx-.5)<.12&&Math.abs(ly-.5)<.14){const k=rnd(fx2,fy2+tx);return C(k>.66?'#fff6e0':k>.33?'#f4d35e':'#d89ae0');}}}
-    for(const s of sh){if(s.c){const d=Math.hypot((wx-s.x)/s.r,(wy-s.y)/(s.r*.8));if(d<1)t-=s.k;}else if(wx>s.x&&wx<s.x+s.w+.18&&wy>s.y&&wy<s.y+s.d+.2)t-=s.k;}
-    if(wx<.6)t-=(.6-wx)*.3;if(wy<.6)t-=(.6-wy)*.3;
+    t-=shadowAt(sh,wx,wy,x,y);
+    {const e=Math.min(wx,wy)+(rnd(x>>2,y>>1)-.5)*.12;if(e<.55)t-=e<.3?.4:.2;}
     return ramp(R,t,x,y);});
   /* maan reunat kameran puolella: multaa ja kiveä */
   fillPoly(B,[P(0,YH,0),P(YW,YH,0),P(YW,YH,-.5),P(0,YH,-.5)],(x,y)=>ramp(SOIL,.45+(rnd(x>>2,y>>1)-.5)*.3,x,y));
@@ -605,6 +643,7 @@ const CS=.25;let GW=Math.round(RW/CS),GD=Math.round(RD/CS);
 function blocked(gx,gy){const x=(gx+.5)*CS,y=(gy+.5)*CS;
   if(CUR.name==='tupa'){if(x<.22||y<.22||x>RW-.15||y>RD-.15)return true;for(const o of ST.objs){const D=DEFS[o.t];if(D.rug)continue;const [w,d]=o.r%2?[D.fd,D.fw]:[D.fw,D.fd];if(x>o.x-.14&&x<o.x+w+.14&&y>o.y-.14&&y<o.y+d+.14)return true;}return false;}
   if(x<.3||y<.3||x>YW-.25||y>YH-.2)return true;
+  {const ch=(YARDD.G[Math.floor(y)]||[])[Math.floor(x)];if(ch==='D'||ch==='B')return true;} /* v0.81: kasvupaikoille ei kävellä, kuten pelissäkään */
   for(const o of YARDD.objs){const D=DEFS[o.t];if(D.flat)continue;if(D.solid){if(D.solid(x-o.x,y-o.y))return true;continue;}if(D.nb)continue;if(o.t==='tree'){if(Math.abs(x-o.x-.5)<.36&&Math.abs(y-o.y-.5)<.36)return true;continue;}
     if(o.t==='lippu'){if(Math.abs(x-o.x-.5)<.2&&Math.abs(y-o.y-.5)<.2)return true;continue;}
     if(o.t==='pyykki'){for(const px of [.15,3.85])if(Math.abs(x-o.x-px)<.2&&Math.abs(y-o.y-.5)<.2)return true;continue;}
