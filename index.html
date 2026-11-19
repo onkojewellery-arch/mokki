@@ -294,7 +294,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.72</div>
+        <div class="sub">mummon mökki · versio 0.73</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -1354,21 +1354,28 @@ function vaaliPiirrä(g,W,H,iso){const k=iso?2:1;R(g,0,0,W,H,'#efe6cf');R(g,0,0,
   const cx=Math.floor(W/2),hy=iso?13:6;
   if(iso){R(g,cx-9,hy+11,18,6,'#26262c');R(g,cx-2,hy+9,4,3,'#eec4a0');ell(g,cx,hy+1,7,8,'#eec4a0');R(g,cx-7,hy-7,14,5,'#6a4428');R(g,cx-8,hy-4,2,6,'#6a4428');R(g,cx+6,hy-4,2,6,'#6a4428');
     R(g,cx-4,hy,2,2,'#ffffff');R(g,cx+2,hy,2,2,'#ffffff');P(g,cx-3,hy+1,'#3a7a3a');P(g,cx+3,hy+1,'#3a7a3a');R(g,cx-2,hy+5,4,1,'#a85a4a');P(g,cx-3,hy+4,'#a85a4a');P(g,cx+2,hy+4,'#a85a4a');R(g,cx-6,hy-3,12,1,'#7a5434');}
-  else{R(g,cx-4,hy+4,8,2,'#222228');ell(g,cx,hy,3,3,TIITUS_IHO);R(g,cx-2,hy+3,4,1,'#222228');R(g,cx-3,hy-4,6,2,TIITUS_HIUS);P(g,cx-2,hy-2,TIITUS_HIUS);P(g,cx,hy-2,TIITUS_HIUS);P(g,cx-3,hy-2,T(TIITUS_HIUS,-.4));P(g,cx+3,hy-2,T(TIITUS_HIUS,-.4));P(g,cx-1,hy,'#3a7a3a');P(g,cx+1,hy,'#3a7a3a');R(g,cx-1,hy+2,3,1,'#7a3430');}
+  else{R(g,cx-4,hy+4,8,2,'#1e1e24');ell(g,cx,hy,3,3,TIITUS_IHO);R(g,cx-1,hy+3,2,1,T(TIITUS_IHO,-.16));P(g,cx-2,hy+4,'#5a5a68');P(g,cx+1,hy+4,'#5a5a68');P(g,cx,hy+5,'#3a3a44');R(g,cx-3,hy-4,6,2,TIITUS_HIUS);P(g,cx-2,hy-2,TIITUS_HIUS);P(g,cx,hy-2,TIITUS_HIUS);P(g,cx-3,hy-2,T(TIITUS_HIUS,-.4));P(g,cx+3,hy-2,T(TIITUS_HIUS,-.4));P(g,cx-1,hy,'#3a7a3a');P(g,cx+1,hy,'#3a7a3a');R(g,cx-1,hy+2,3,1,'#9a4a40');P(g,cx-2,hy+1,T(TIITUS_IHO,-.2));P(g,cx+2,hy+1,T(TIITUS_IHO,-.2));}
   const big=(ch,x,y,sc,c)=>{const gl=GLYPH[ch];for(let r=0;r<5;r++)for(let q=0;q<3;q++)if(gl[r][q]==='1')R(g,x+q*sc,y+r*sc,sc,sc,c);};
   if(iso){text3x5(g,'TIITUS',cx-12,33,'#26262c');big('6',cx-13,41,4,'#c8402e');big('6',cx+1,41,4,'#c8402e');R(g,4,H-5,W-8,1,'#3a6aa8');}
-  else{big('6',cx-7,14,2,'#c8402e');big('6',cx+1,14,2,'#c8402e');}}
+  else{big('6',cx-7,13,2,'#c8402e');big('6',cx+1,13,2,'#c8402e');versoLogo(g,4,H-5,2);R(g,8,H-6,7,1,'#2f6e3c');R(g,8,H-4,5,1,'#2f6e3c');}}
+/* v0.73: kuvitteellinen puolue Vihreä Verso: kahden lehden verso vihreän ympyrän sisällä */
+function versoLogo(g,x,y,r){ell(g,x,y,r,r,'#2f6e3c');if(r<4){P(g,x,y,'#f4f0e0');P(g,x-1,y-1,'#cfe8b0');P(g,x+1,y-1,'#cfe8b0');return;}ell(g,x,y,r-1,r-1,'#4f9a52');
+  const L='#f4f0e0',Ld='#c8dcb0';R(g,x,y-1,1,5,L);R(g,x-2,y+4,5,1,'#3f7a44');
+  for(const [dx,dy,c] of [[-1,-1,L],[-2,-1,Ld],[-2,-2,L],[-3,-2,L],[-4,-2,Ld],[-3,-3,L],[-4,-3,L],[-5,-3,L],[-4,-4,L],[-5,-4,Ld],[1,-2,L],[2,-2,Ld],[2,-3,L],[3,-3,L],[4,-3,Ld],[3,-4,L],[4,-4,L],[5,-4,L],[4,-5,L],[5,-5,Ld]])P(g,x+dx,y+dy,c);}
 /* v0.67: suurennos tarkemmilla pikseleillä (92 × 138) */
 function vaaliIso(g,W,H){const Hh=TIITUS_HIUS,Hd=T(Hh,-.38),Hdd=T(Hh,-.6),Hl=T(Hh,.35),Sk=TIITUS_IHO,Skd=T(Sk,-.16),Skdd=T(Sk,-.32),Bk='#1e1e24',Bkl='#34343e';
   R(g,0,0,W,H,'#efe6cf');for(let i=0;i<W;i+=2){P(g,i,0,'#d8ccb0');P(g,i+1,H-1,'#c8b890');}for(let j=0;j<H;j+=3){P(g,0,j,'#d8ccb0');P(g,W-1,j+1,'#c8b890');}
   R(g,3,3,W-6,78,'#3a6aa8');for(let y=3;y<81;y+=6)R(g,3,y,W-6,1,'#4272b0');R(g,3,3,W-6,2,'#5a8ac8');
   const cx=46;
   poly(g,[[4,81],[8,72],[16,67],[cx-12,64],[cx+12,64],[W-16,67],[W-8,72],[W-4,81]],Bk);R(g,4,80,W-8,1,'#141418');line(g,10,74,24,67,Bkl);line(g,cx-2,70,cx-2,80,'#141418');
-  R(g,cx-12,53,24,13,Bk);for(let y=55;y<66;y+=3)R(g,cx-12,y,24,1,Bkl);R(g,cx-12,53,2,13,Bkl);R(g,cx+10,53,2,13,'#141418');R(g,cx-12,65,24,1,'#141418');
+  /* musta kauluspaita: kaula, taitettu kaulus ja hillitty nappilista */
+  R(g,cx-6,52,12,10,Skd);R(g,cx-6,52,12,2,Skdd);poly(g,[[cx-6,60],[cx+6,60],[cx,68]],Skd);
+  poly(g,[[cx-12,59],[cx-6,58],[cx,68],[cx-4,73],[cx-14,64]],'#2c2c34');poly(g,[[cx+12,59],[cx+6,58],[cx,68],[cx+4,73],[cx+14,64]],'#26262e');
+  line(g,cx-6,58,cx,68,'#4a4a56');line(g,cx-12,59,cx-6,58,'#4a4a56');line(g,cx+6,58,cx,68,'#3e3e48');line(g,cx-14,64,cx-4,73,'#141418');line(g,cx+14,64,cx+4,73,'#141418');
+  R(g,cx,69,1,12,'#141418');R(g,cx+1,69,1,12,'#3a3a44');for(const by of [71,76])P(g,cx+1,by,'#6a6a76');
   ell(g,cx-15,38,3,5,Skd);ell(g,cx+15,38,3,5,Skdd);P(g,cx-15,38,Skdd);P(g,cx+15,38,T(Sk,-.42));
   ell(g,cx,36,15,18,Skd);ell(g,cx-1,35,14,17,Sk);poly(g,[[cx-14,38],[cx-10,50],[cx-4,55],[cx+4,55],[cx+10,50],[cx+14,38]],Sk);
   poly(g,[[cx+9,40],[cx+14,38],[cx+10,50],[cx+4,55],[cx+2,55],[cx+8,49]],Skd);R(g,cx-4,55,9,1,Skdd);
-  for(const [ex,c] of [[cx-15,'#d8d8e0'],[cx+15,'#b4b4be']]){R(g,ex-1,44,3,1,c);R(g,ex-1,47,3,1,c);P(g,ex-2,45,c);P(g,ex-2,46,c);P(g,ex+2,45,c);P(g,ex+2,46,c);P(g,ex-1,44,'#ffffff');}
   ell(g,cx,19,16,9,Hh);R(g,cx-16,18,32,8,Hh);ell(g,cx-2,13,11,4,Hh);
   for(let y=20;y<34;y++){if(y%2===0)P(g,cx-16,y,Hd);P(g,cx-15,y,y%3?Hd:Hdd);P(g,cx+15,y,y%3?Hdd:Hd);if(y%2)P(g,cx+16,y,Hdd);}
   R(g,cx-15,20,2,6,Hd);R(g,cx+13,20,2,6,Hdd);
@@ -1378,17 +1385,17 @@ function vaaliIso(g,W,H){const Hh=TIITUS_HIUS,Hd=T(Hh,-.38),Hdd=T(Hh,-.6),Hl=T(H
   R(g,cx-10,31,7,2,Hd);R(g,cx+3,31,7,2,Hd);P(g,cx-11,32,Hd);P(g,cx+10,32,Hd);
   for(const ex of [cx-10,cx+3]){R(g,ex,35,7,3,'#ffffff');R(g,ex+2,35,3,3,'#4a8a4a');P(g,ex+3,36,'#1e3a1e');P(g,ex+2,35,'#ffffff');R(g,ex,34,7,1,'#5a3a2a');R(g,ex,38,7,1,Skd);P(g,ex-1,38,Skdd);P(g,ex+7,38,Skdd);}
   R(g,cx,36,1,7,Skd);R(g,cx-2,43,5,1,Skdd);P(g,cx-3,42,Skd);P(g,cx+3,42,Skd);
-  ell(g,cx-10,43,3,1,'#f2bcae');ell(g,cx+10,43,3,1,'#eab0a2');
-  poly(g,[[cx-10,46],[cx+10,46],[cx+6,50],[cx-6,50]],'#6a2a28');R(g,cx-8,46,16,2,'#fbf6ee');R(g,cx-8,47,16,1,'#ece4d6');R(g,cx-4,49,8,1,'#b85a50');
-  P(g,cx-11,45,'#a85a4a');P(g,cx+10,45,'#a85a4a');P(g,cx-12,44,Skd);P(g,cx+11,44,Skd);
+  /* hymy suu kiinni */
+  R(g,cx-5,47,10,1,'#9a4a40');P(g,cx-6,46,'#9a4a40');P(g,cx+5,46,'#9a4a40');P(g,cx-7,45,Skd);P(g,cx+6,45,Skd);R(g,cx-3,48,6,1,Skd);R(g,cx-2,50,4,1,Skd);
   const big=(ch,x,y,sc,c)=>{const gl=GLYPH[ch];for(let r=0;r<5;r++)for(let q=0;q<3;q++)if(gl[r][q]==='1')R(g,x+q*sc,y+r*sc,sc,sc,c);};
   let tx=cx-23;for(const ch of 'TIITUS'){big(ch,tx,86,2,'#1e1e24');tx+=8;}
   big('6',cx-21,100,6,'#8a2a22');big('6',cx+3,100,6,'#8a2a22');big('6',cx-22,99,6,'#c8402e');big('6',cx+2,99,6,'#c8402e');
-  R(g,8,H-6,W-16,2,'#3a6aa8');}
-function makeVaali(){return outlined(18,26,g=>vaaliPiirrä(g,18,26,false));}
-let VAALI_ISO=null;function vaaliIsoUrl(){if(!VAALI_ISO)VAALI_ISO=mk(92,138,g=>vaaliIso(g,92,138)).toDataURL();return VAALI_ISO;}
+  R(g,8,134,W-16,2,'#3a6aa8');
+  versoLogo(g,cx-28,146,7);text3x5(g,'VIHREA',cx-17,140,'#2f6e3c');P(g,cx+3,138,'#2f6e3c');P(g,cx+5,138,'#2f6e3c');text3x5(g,'VERSO',cx-17,148,'#2f6e3c');R(g,cx+9,142,22,1,'#9ac08a');R(g,cx+9,150,18,1,'#9ac08a');}
+function makeVaali(){return outlined(18,28,g=>vaaliPiirrä(g,18,28,false));}
+let VAALI_ISO=null;function vaaliIsoUrl(){if(!VAALI_ISO)VAALI_ISO=mk(92,156,g=>vaaliIso(g,92,156)).toDataURL();return VAALI_ISO;}
 function vaaliPiirra(c,o){if(!vaaliTasta(o))return;const id=vaaliTasta(o),V=VAALI[id],[x0,y0]=sprPos(c,o);dS(ctx,SPR.vaali,x0+V.dx,y0+V.dy);}
-function vaaliKatso(cb){showPhoto('<div class="ptitle">Vanha vaalimainos</div><div class="kuva"><img style="image-rendering:pixelated" alt="Vaalimainos: Tiituksen kuva, nimi TIITUS ja numero 66" src="'+vaaliIsoUrl()+'"></div><p class="kuvateksti">TIITUS · 66</p><div class="foot">A jatka</div>',cb);}
+function vaaliKatso(cb){showPhoto('<div class="ptitle">Vanha vaalimainos</div><div class="kuva"><img style="image-rendering:pixelated;width:auto;max-width:100%;height:min(calc(100dvh - 230px),calc(var(--s)*254px))" alt="Vaalimainos: Tiituksen kuva, nimi TIITUS, numero 66 ja Vihreä Verso -puolueen logo" src="'+vaaliIsoUrl()+'"></div><p class="kuvateksti">TIITUS · 66 · Vihreä Verso</p><div class="foot">A jatka</div>',cb);}
 let VAALI_OHI=null;
 function vaaliOhita(o){VAALI_OHI=o;interactYard(o.x,o.y);}
 function vaaliInteract(o){if(VAALI_OHI===o){VAALI_OHI=null;return false;}const id=vaaliTasta(o);if(!id)return false;const N=n66Q(),V=VAALI[id];
@@ -2858,7 +2865,7 @@ function makeSprites(){
   SPR.house2=A(makeRaimoHouse());SPR.palju=A(makePalju());SPR.mopo=A(makeMopo());SPR.tsauna=A(makeTynnyriSauna());SPR.kelo=A(makeKelo());const RN=buildNPC(RAIMO_LOOK);for(const d in RN)RN[d].forEach(A);SPR.raimo=RN;SPR.saunaB=A(makeSaunaB());SPR.rsauna=A(makeSaunaB(true));SPR.muovituoli=A(makeMuovituoli());SPR.muovituoliL=A(mk(SPR.muovituoli.width,SPR.muovituoli.height,g=>{g.translate(SPR.muovituoli.width,0);g.scale(-1,1);g.drawImage(SPR.muovituoli,0,0);}));SPR.mustikka=A(makeBlueberry(true));SPR.kantarelli=A(makeKantarelli(true));SPR.kantarelliTyhja=A(makeKantarelli(false));SPR.mustikkaTyhja=A(makeBlueberry(false));SPR.pkyltti=SPR.sign;}
 const GLYPH={'6':['111','1..','111','1.1','111'],'5':['111','1..','111','..1','111'],K:['1.1','1.1','11.','1.1','1.1'],Y:['1.1','1.1','.1.','.1.','.1.'],L:['1..','1..','1..','1..','111'],A:['.1.','1.1','111','1.1','1.1'],
   'Ä':['1.1','.1.','1.1','111','1.1'],H:['1.1','1.1','111','1.1','1.1'],I:['111','.1.','.1.','.1.','111'],N:['11.','1.1','1.1','1.1','1.1'],T:['111','.1.','.1.','.1.','.1.'],U:['1.1','1.1','1.1','1.1','111'],P:['11.','1.1','11.','1..','1..'],J:['..1','..1','..1','1.1','.1.'],S:['.11','1..','.1.','..1','11.'],G:['.11','1..','1.1','1.1','.11'],R:['11.','1.1','11.','1.1','1.1'],B:['11.','1.1','11.','1.1','11.'],'&':['.1.','1.1','.1.','1.1','.11'],' ':['...','...','...','...','...'],M:['1.1','111','111','1.1','1.1'],D:['11.','1.1','1.1','1.1','11.']};
-Object.assign(GLYPH,{E:['111','1..','11.','1..','111'],'3':['111','..1','.11','..1','111']}); /* v0.72: Karan kyltit */
+Object.assign(GLYPH,{E:['111','1..','11.','1..','111'],'3':['111','..1','.11','..1','111'],V:['1.1','1.1','1.1','1.1','.1.'],O:['111','1.1','1.1','1.1','111']}); /* v0.72: Karan kyltit */
 const HOUSE_COLORS={haalistunut:['#b06a56',true],punainen:['#b04b37',false],keltainen:['#e2c878',false],vihrea:['#9db08a',false],sininen:['#8aa3bc',false]};
 const HCACHE={};function houseSprite(k){const hc=HOUSE_COLORS[k]||HOUSE_COLORS.haalistunut;return HCACHE[k]||(HCACHE[k]=A(makeHouse(hc[0],hc[1])));}
 function sprFor(o){switch(o.k){
