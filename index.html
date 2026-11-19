@@ -294,7 +294,7 @@ body.tall #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
       <div id="hint" class="hide"></div>
       <div id="title" class="hide">
         <div class="logo">MÖKKI</div>
-        <div class="sub">mummon mökki · versio 0.75</div>
+        <div class="sub">mummon mökki · versio 0.76</div>
         <div class="box tbox"><div class="warn hide"></div><ul class="opts" id="tmenu"></ul></div>
       </div>
       <div id="dialog" class="box hide"><div class="t"></div><ul class="opts"></ul><span class="more">▼</span></div>
@@ -1103,7 +1103,7 @@ function karaKorttiTalk(){const K=kortti(),P=TALON_VIINI_HINTA,opts=[],acts=[];
     opts.push('Kysy Mandin kortista');acts.push(()=>say('Kara: "Kortti, niin. Se on aivan kielen päällä. Ehkä lasillinen talon viiniä nostaisi sen siitä."'));}
   if(K.v===3){opts.push('Entäs se Mandin kortti?');acts.push(()=>{K.v=4;save();say(['Kara: "Nyt muistan. Mandi piti kesällä torilla yhden kortin luentoja. Yksi kortti kerrallaan, kuten nimi lupaa.','Sitten tuli puuska. Se vei pari hintalappua kirppikseltäni, ja ilmeisesti myös yhden kortin.','Lappujen perään en lähtenyt. Ne lensivät torin laitaa kohti, sinne vanhan puhelinkopin suuntaan."'],()=>questNote('Uusi vihje','Tutki torin laitaa puhelinkopin luona'));});}
   if(K.v===4){opts.push('Entäs se Mandin kortti?');acts.push(()=>say('Kara: "Torin laita, puhelinkoppi. Jos löydät hintalappuni, ne saa pitää. Kaksi markkaa kumpikin, ei neuvotella."'));}
-  opts.push('Jutellaan');acts.push(()=>say(nextLine('kp',KARA_ILTA)));opts.push('Hei hei');acts.push(()=>{});
+  opts.push('Jutellaan');acts.push(karaIltaJuttu);opts.push('Hei hei');acts.push(()=>{});
   ask('Kara istuu pöydässään lasillinen talon viiniä edessään.',opts,i=>acts[i]());}
 function puhelinKortti(){const K=kortti();if(K.v!==4||K.loydetty)return false;
   K.loydetty=true;K.v=5;S.inv.kuukortti=1;addLog('Löysin Mandin Kuu-kortin puhelinkopin kynnyksen alta.');save();jingle();
@@ -1150,6 +1150,62 @@ const KARA_ILTA=[
   ['Kara: "Nostin tänään saappaiden hintaa, koska joku katsoi niitä kahdesti.','Hän katsoikin kelloa. Se oli saappaiden takana."'],
   ['Kara: "Tänään myin yhden maton. Siinä oli koko päivän tulosraportti."']];
 function nextLine(key,list){S.gossip=S.gossip||{};const i=(S.gossip[key]||0)%list.length;S.gossip[key]=i+1;save();return list[i];}
+/* v0.76: Karan puhetyyli. Arki ja keramiikka ovat yleisimpiä. Läheiset asiat avautuvat luottamuksen kasvaessa.
+   Flirtti on harvinaista (enintään kerran päivässä), pelaaja voi vastata tai jatkaa tavallisesti. Kaksi vastaamatonta kertaa peräkkäin, ja Kara lopettaa.
+   S.karaSuhde: l = juttelupäivät, pv = viimeisin juttelupäivä, fe = vastaamattomat flirtit peräkkäin, fv = vastatut, fpv = viimeisin flirttipäivä, lah = kuullut läheiset, kukka = annetut kukat */
+const KARA_TERVE=['Kara: "Moikka! Mitä kuuluu?"','Kara: "Hei! Kiva nähdä."','Kara: "Moikka. Kirppis on auki, ja mä olen tässä."','Kara: "Kaupungissa oli kaappi kaapeille. Nyt on peräkontti. Tervetuloa penkomaan!"'];
+const KARA_ARKI=[
+  ['Kara: "Moikka! Mitä sulle kuuluu? Mulla ei ole mitään ihmeellistä kerrottavaa, mutta voidaan silti jutella."'],
+  ['Kara: "Toi väri sopii sulle tosi hyvin. Mun piti sanoa jo äsken."'],
+  ['Kara: "Miten se sun juttu muuten meni? Se, mistä puhuit viimeksi."']];
+const KARA_LAHDOSSA=['Kara: "Olin oikeastaan lähdössä. Mutta voin mä hetkeksi vielä jäädä."'];
+const KARA_SAVI=[
+  ['Kara: "Mä näin yhden kulhon, jota olen ajatellut nyt kolme päivää. Se oli aivan ihana kulho."'],
+  ['Kara: "Olen käynyt katsomassa keramiikkakurssin sivua ehkä seitsemän kertaa. Seuraava vaihe olisi ilmeisesti ilmoittautuminen."'],
+  ['Kara: "Haluaisin tehdä vähän vinon maljakon. Tosin tunnen itseni. Yrittäisin varmaan saada sen täydellisen vinoksi."'],
+  ['Kara: "Sä voisit tulla mun kanssa kokeilemaan. Olisi kiva, että siellä olisi joku tuttu. Voitaisiin sitten ihmetellä yhdessä."'],
+  ['Kara: "Mietin jo, minkä värisiä astioita tekisin. En siis ole vielä koskenut saveen."'],
+  ['Kara: "Tarvitsen varmaan keramiikkaan jotkut sotkuvaatteet. Mulla on yksi vanha huppari, mutta olen siihen aika kiintynyt."']];
+const KARA_KAUPUNKI=[
+  ['Kara: "Huomasin tekeväni keramiikkaharrastukselle suunnitelmaa ja tavoitteita. Sitten laitoin koneen kiinni."'],
+  ['Kara: "Mulla oli kaupungissa aina vastaus siihen, mitä teen ensi viikolla. Siihen, mitä haluaisin tehdä, olikin paljon vaikeampi vastata."'],
+  ['Kara: "Tänään ei ole mitään sovittua. Tuntuu vähän oudolta. Mutta ehkä mä käyn kävelyllä ja katson, mihin päädyn."'],
+  ['Kara: "Mä tykkään edelleen laittautua aamulla. Vaikka päivän ainoa suunnitelma olisi hakea kahvia."'],
+  ['Kara: "Välillä huomaan selittäväni ihan hirveästi, miksi en ehdi johonkin. Vaikka voisin vaan sanoa, etten tällä kertaa tule."']];
+const KARA_LAHEISET=[
+  ['Kara: "Mä olen palanut loppuun useamman kerran. Viimeksi päätin, että jotain täytyy oikeasti muuttaa. Vielä mä opettelen, mitä se käytännössä tarkoittaa."'],
+  ['Kara: "Musta oli pitkään tärkeää, että vaikutin siltä, että kaikki on hallussa. Vaikka olin ihan poikki."'],
+  ['Kara: "Ehkä siinä savessa kiinnostaa sekin, että saisi tehdä jotain käsillä. Ja nähdä, mitä on tehnyt."'],
+  ['Kara: "Sun kanssa on jotenkin helppo olla. Ei tarvitse keksiä koko ajan mitään sanottavaa."']];
+const KARA_FLIRTTI=[
+  'Kara: "Kiva kun tulit. Mä vähän toivoinkin, että näkisin sut täällä."',
+  'Kara: "Sä saat mut aina jäämään juttelemaan pidemmäksi aikaa kuin olin ajatellut."',
+  'Kara: "Jos säkin ilmoittaudut sille kurssille, mun on kyllä vaikea enää keksiä tekosyitä."'];
+const KARA_ILTA_FLIRTTI=['Kara: "Sulla on muuten ihana hymy. Mun on pitänyt sanoa se aiemminkin."','Kara: "Mä taisin vähän flirttailla. No, nyt mä ainakin sanoin sen ääneen."'];
+const KARA_FLIRTTI_V=['Kara hymyilee ja katsoo hetken muualle.','Kara naurahtaa hiljaa ja korjaa hiuksiaan.','Kara hymyilee. "Hyvä."'];
+const KARA_ILTA2=[
+  ['Kara: "Mä lähdin pienelle kävelylle. Olen päässyt tähän asti, kun olen jäänyt kaikkien kanssa suustani kiinni."'],
+  ['Kara: "Mä olen nyt kertonut sulle todella pitkään yhdestä kulhosta. Saat kyllä vaihtaa aihetta."'],
+  KARA_ILTA[0],
+  ['Kara: "Tää on ollut kiva ilta. Mä en olisi vielä ihan valmis lähtemään."'],
+  [KARA_LAHDOSSA[0]],
+  KARA_ILTA[1],KARA_ILTA[2]];
+function kSuhde(){return S.karaSuhde||(S.karaSuhde={l:0,pv:0,fe:0,fv:0,fpv:0,lah:0,kukka:0});}
+function karaLuottamus(){const R=kSuhde();return R.l+(kq1().v>=5?2:0)+(kq2().v>=2?2:0)+Math.min(R.kukka,2)+(kortti().v>=6?1:0);}
+function karaLahN(){if(kSuhde().l<3)return 0;return Math.max(0,Math.min(KARA_LAHEISET.length,Math.floor((karaLuottamus()-4)/2)+1));} /* 4, 6, 8 ja 10 luottamusta, aikaisintaan kolmantena juttelupäivänä */
+function karaJuteltu(){const R=kSuhde();if(R.pv!==S.day){R.pv=S.day;R.l++;save();}}
+function karaFlirttiOk(ilta){const R=kSuhde();if(R.fe>=2||R.fpv===S.day||karaLuottamus()<3)return false;return Math.random()<(ilta?.3:.15);}
+function karaFlirtti(ilta){const R=kSuhde();R.fpv=S.day;save();
+  const L=ilta?(R.fv>=1?nextLine('kfi',KARA_ILTA_FLIRTTI):KARA_ILTA_FLIRTTI[0]):nextLine('kf',KARA_FLIRTTI);
+  say(L,()=>ask('Miten vastaat Karalle?',['Hymyile takaisin','Jatka juttelua'],i=>{
+    if(i===0){R.fe=0;R.fv++;save();return say(nextLine('kfv',KARA_FLIRTTI_V));}
+    R.fe++;save();say(ilta?nextLine('ki',KARA_ILTA2):nextLine('ka',KARA_ARKI));}));}
+function karaLaheinen(){const R=kSuhde(),n=karaLahN();
+  if(R.lah<n&&R.lahPv!==S.day&&Math.random()<.5){const L=KARA_LAHEISET[R.lah];R.lah++;R.lahPv=S.day;save();say(L);return true;} /* uusi läheinen hetki korkeintaan kerran päivässä */
+  if(R.lah>0&&Math.random()<.08){say(nextLine('kl',KARA_LAHEISET.slice(0,R.lah)));return true;}return false;}
+function karaTervehdys(){if(S.time>=1020&&Math.random()<.3)return KARA_LAHDOSSA[0];return KARA_TERVE[Math.random()*KARA_TERVE.length|0];}
+function karaIltaJuttu(){karaJuteltu();if(karaFlirttiOk(true))return karaFlirtti(true);if(karaLaheinen())return;
+  if(Math.random()<.3)return say(nextLine('ks',KARA_SAVI));say(nextLine('ki',KARA_ILTA2));}
 /* v0.54: tavaroiden myynti Karalle (mökkien varastoista, yksi kerrallaan) */
 const MYYNTI_HINTA={tuoli:2,matto:2,kasvi:2,ulkopoyta:3,ulkotuoli:1,poyta:3,maljakko:3,isomatto:4}; /* löydetyt ja kirppiksen tavarat; muut = puolet ostohinnasta */
 const EI_MYYNTI={nojatuoli:'Vaarin nojatuoli on muisto. Sitä ei myydä.',kaappi:'Vaatekaappia tarvitaan vaatteiden vaihtoon.',kylmalaukku:'Kylmälaukussa säilyvät makkarat. Sitä tarvitaan.',sanky:'Sänky jää mökkiin.',hella:'Puuhella on muurattu paikalleen.',tiski:'Tiskipöytä on kiinni seinässä.'};
@@ -1241,7 +1297,7 @@ function makeKoiraNuk(){return outlined(46,26,g=>{const O=['#8a3e14','#b85a20','
   ell(g,32,15,6,5,O[1]);ell(g,31,13,4,2,O[2]);R(g,36,15,6,3,O[2]);R(g,36,17,6,1,'#f0d0a8');R(g,41,15,2,2,D);
   R(g,32,14,3,1,D);poly(g,[[27,13],[28,5],[31,12]],O[1]);poly(g,[[28,12],[28,8],[30,12]],'#6a3010');poly(g,[[31,12],[34,6],[35,13]],O[0]);});}
 /* ---------- Karan illat Mandin grillillä ---------- */
-function karaPubTalk(){const K=kortti();if(K.v>=1&&K.v<=4)return karaKorttiTalk();say(nextLine('kp',KARA_ILTA));}
+function karaPubTalk(){const K=kortti();if(K.v>=1&&K.v<=4)return karaKorttiTalk();karaIltaJuttu();}
 /* ---------- Karan tehtäväpolku (v0.72): Karan viimeinen muuttolaatikko ja Karalle vapaapäivä ----------
    S.kara1: v 0 = laatikkoa ei tutkittu, 1 = laatikko nähty (kysy Karalta), 2 = hyväksytty, 3 = laatikko pöydän vieressä (tavarat tutkitaan),
    4 = kaikki tutkittu (kyltin vaihto), 5 = valmis. kat{kyltti,palkinto,kortit,kuva} = tutkitut tavarat, kyltti = nimikyltin uusi käyttö,
@@ -1269,7 +1325,9 @@ function kara2Tarjolla(){const K1=kq1(),K2=kq2();return K1.v>=5&&K2.v===0&&S.day
 function kara2Valmis(){const K=kq2();return K.v===1&&K.purkki===2&&K.kyltti&&K.evaat>=1;}
 function kvAikaOk(){return S.time>=KV_ALKU&&S.time<KV_LOPPU;}
 function kvTarkista(){if(kara2Valmis())setTimeout(()=>questNote('Kaikki valmiina','Tapaa Kara kirppiksellä klo 16–18'),300);}
-function karaJuttu(){const L=kq2().v>=2?KARA_TORI.concat([['Kara: "Soitin Emmille. Hän kysyi, onko Vattulassa koirapuistoa.','Kara: "Sanoin, että koko kylä on aika lailla koirapuisto. Maukka on samaa mieltä."']]):KARA_TORI;return nextLine('k',L);}
+function karaJuttu(){karaJuteltu();if(karaFlirttiOk(false))return karaFlirtti(false);if(karaLaheinen())return;
+  const L=kq2().v>=2?KARA_TORI.concat([['Kara: "Soitin Emmille. Hän kysyi, onko Vattulassa koirapuistoa.','Kara: "Sanoin, että koko kylä on aika lailla koirapuisto. Maukka on samaa mieltä."']]):KARA_TORI;
+  const r=Math.random();say(r<.38?nextLine('ka',KARA_ARKI):r<.72?nextLine('ks',KARA_SAVI):r<.88?nextLine('kk',KARA_KAUPUNKI):nextLine('k',L));}
 function karaTalk(){const K1=kq1(),K2=kq2();
   if(!S.flags.karaTuttu){S.flags.karaTuttu=true;save();if(!karaTavattuEnnen())return say(['Kara: "Kara. Peräkonttikirppis, auki seitsemästä kuuteen."','Kara: "Entinen kaupunkilainen, nykyinen kauppias. Hinnoista voi neuvotella, kunhan en huomaa."'],karaTalk);}
   if(kara2Tarjolla()&&!K2.tarjottu)return kara2Tarjous();
@@ -1279,9 +1337,9 @@ function karaTalk(){const K1=kq1(),K2=kq2();
   if(kara2Tarjolla()){o.push('Puhutaan vapaapäivästä');a.push(kara2Tarjous);}
   if(K2.v===1&&K2.purkki===0){o.push('Ota Ilonan kahvipurkki');a.push(kara2Purkki);}
   if(kara2Valmis()&&kvAikaOk()){o.push('Lähdetään rannalle');a.push(kvLahtoKysy);}
-  o.push('Katso tavaroita','Myy tavaroita','Jutellaan');a.push(openKirppis,()=>openMyynti(),()=>say(karaJuttu()));
+  o.push('Katso tavaroita','Myy tavaroita','Jutellaan');a.push(openKirppis,()=>openMyynti(),karaJuttu);
   if(kukatRepussa().length){o.push('Anna kukka');a.push(()=>annaKukka('kara'));}o.push('Hei hei');a.push(()=>{});
-  const tervehdys=K2.v===1?(kara2Valmis()?'Kara: "Kaikki on valmiina. Jännittää enemmän kuin yksikään asiakastapaaminen."':'Kara: "Kirppis on auki. Vapaapäivän järjestelyt etenevät, mikä on jo itsessään uutta."'):'Kara: "Kaupungissa oli kaappi kaapeille. Nyt on peräkontti. Tervetuloa penkomaan!"';
+  const tervehdys=K2.v===1?(kara2Valmis()?'Kara: "Kaikki on valmiina. Jännittää enemmän kuin yksikään asiakastapaaminen."':'Kara: "Kirppis on auki. Vapaapäivän järjestelyt etenevät, mikä on jo itsessään uutta."'):karaTervehdys();
   ask(tervehdys,o,i=>a[i]());}
 /* 1. Karan viimeinen muuttolaatikko */
 function kara1Kysy(){const K=kq1();if(K.v!==1)return;
@@ -2190,7 +2248,7 @@ function maljakkoAseta(va){valitseKukka('Mikä kukka maljakkoon?',k=>{const vanh
   say((vanha?KUKKA[vanha].n+' palasi reppuun. ':'')+k.n+' on nyt lasimaljakossa.');});}
 const KUKKALAHJA={petri:'Petri: "Kiitos. Tälle löytyy paikka, jossa Maukka ei istu sen päälle."',mandi:'Mandi: "Juuri sopiva tiskille. Täällä onkin ollut vähän liikaa pelkkää sinappia."',
   kara:'Kara: "Kiitos. Tämän kohdalle laitan lapun: ei myynnissä."',matti:'Matti: "Kiitos. Laitan tämän kuistin pöydälle."'};
-function annaKukka(kuka,back){valitseKukka('Minkä kukan annat?',k=>ask('Annetaanko '+k.n.toLowerCase()+' lahjaksi?',['Anna','Peru'],i=>{if(i!==0)return;S.inv['kukka_'+k.id]--;save();blip(880,.05);say(KUKKALAHJA[kuka],back);}));}
+function annaKukka(kuka,back){valitseKukka('Minkä kukan annat?',k=>ask('Annetaanko '+k.n.toLowerCase()+' lahjaksi?',['Anna','Peru'],i=>{if(i!==0)return;S.inv['kukka_'+k.id]--;if(kuka==='kara'){const R=kSuhde();R.kukka++;R.fe=0;}save();blip(880,.05);say(KUKKALAHJA[kuka],back);}));}
 function makePukukopit(){return outlined(62,72,g=>{const WL='#ece6d4',WD='#cfc6b0',BL='#3a7ab0',BLD='#2a5a88';
   poly(g,[[0,14],[62,14],[56,2],[6,2]],'#5a5e66');for(let y=4;y<14;y+=3)R(g,6-(14-y)*.4|0,y,50+(14-y)*.8|0,1,'#4a4e56');R(g,0,13,62,2,'#3e4248');
   R(g,2,15,58,52,WL);for(let x=2;x<60;x+=5)R(g,x,15,1,52,WD);R(g,2,15,58,2,'#f8f4ea');R(g,30,15,2,52,BLD);
